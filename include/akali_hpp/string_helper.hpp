@@ -16,10 +16,11 @@
 #define AKALI_STRING_HELPER_HPP__
 #pragma once
 
+#include "akali_hpp/arch.hpp"
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "akali_hpp/arch.hpp"
+#include <cwctype>
 
 namespace akali_hpp {
 inline char EasyCharToLowerA(char in) {
@@ -44,6 +45,24 @@ inline wchar_t EasyCharToUpperW(wchar_t in) {
     if (in <= L'z' && in >= L'a')
         return in + (L'Z' - L'z');
     return in;
+}
+
+inline bool StringCaseInSensCompare(const std::string& str1, const std::string& str2) {
+    return ((str1.size() == str2.size()) && std::equal(str1.begin(),
+                                                       str1.end(),
+                                                       str2.begin(),
+                                                       [](const char& c1, const char& c2) {
+                                                           return (c1 == c2 || std::toupper(c1) == std::toupper(c2));
+                                                       }));
+}
+
+inline bool StringCaseInSensCompare(const std::wstring& str1, const std::wstring& str2) {
+    return ((str1.size() == str2.size()) && std::equal(str1.begin(),
+                                                       str1.end(),
+                                                       str2.begin(),
+                                                       [](const wchar_t& c1, const wchar_t& c2) {
+                                                           return (c1 == c2 || std::towupper(c1) == std::towupper(c2));
+                                                       }));
 }
 
 template <typename T, typename Func>
