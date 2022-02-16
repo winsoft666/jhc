@@ -14,7 +14,6 @@
 
 #ifndef AKALI_SCHEDULE_TASK_HPP__
 #define AKALI_SCHEDULE_TASK_HPP__
-#pragma once
 
 #include "akali_hpp/arch.hpp"
 
@@ -28,13 +27,15 @@
 #include <comdef.h>
 #include <taskschd.h>
 #include <strsafe.h>
-#include "akali_hpp/macros.hpp"
+#include "akali_hpp/constructormagic.hpp"
 
 #pragma comment(lib, "taskschd.lib")
 
 namespace akali_hpp {
 class ScheduleTask {
    public:
+    AKALI_DISALLOW_COPY_AND_ASSIGN(ScheduleTask);
+
     ScheduleTask() {
         m_lpITS = NULL;
         m_lpRootFolder = NULL;
