@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2018 - 2020, winsoft666, <winsoft666@outlook.com>.
+ * Copyright (C) 2021 - 2026, winsoft666, <winsoft666@outlook.com>.
  *
  * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
  * EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
@@ -11,8 +11,8 @@
  * that you have found/implemented and I will fix/incorporate them into this
  * file.
  *******************************************************************************/
-#ifndef AKALI_INI_H_
-#define AKALI_INI_H_
+#ifndef AKALI_INI_HPP_
+#define AKALI_INI_HPP_
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
 #include <tchar.h>

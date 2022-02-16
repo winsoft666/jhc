@@ -158,6 +158,7 @@
     <ClInclude Include="..\..\include\akali_hpp\noncopyable.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\os_ver.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\registry.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\singleton.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\stringencode.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\string_helper.hpp" />

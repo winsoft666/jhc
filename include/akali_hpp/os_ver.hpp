@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2018 - 2020, winsoft666, <winsoft666@outlook.com>.
+ * Copyright (C) 2021 - 2026, winsoft666, <winsoft666@outlook.com>.
  *
  * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
  * EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
@@ -12,8 +12,8 @@
  * file.
  *******************************************************************************/
 
-#ifndef AKALI_OS_VER_H__
-#define AKALI_OS_VER_H__
+#ifndef AKALI_OS_VER_HPP__
+#define AKALI_OS_VER_HPP__
 #pragma once
 
 #include "akali_hpp/arch.hpp"
@@ -23,12 +23,15 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#endif
+
 #include <string>
 
 #pragma warning(disable : 4996)
 
+namespace akali_hpp {
 /*
-Operating system                            dwMajorVersion   dwMinorVersion              Other
+Operating system                            dwMajorVersion     dwMinorVersion              Other
 Windows 10 Technical Preview                     10               0                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
 Windows Server Technical Preview                 10               0                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
 Windows 8.1                                      6                3                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
@@ -47,34 +50,55 @@ Windows XP                                       5                1             
 Windows 2000                                     5                0                  Not applicable
 */
 
-namespace akali_hpp {
-#if (defined _WIN32 || defined WIN32)
-enum WinVer {
-    WIN_2000,
-    WIN_XP,
-    WIN_XP_PRO,
-    WIN_2003,
-    WIN_2003_R2,
-    WIN_HOME,
-    WIN_VISTA,
-    WIN_2008,
-    WIN_2008_R2,
-    WIN_7,
-    WIN_2012,
-    WIN_8,
-    WIN_2012_R2,
-    WIN_8_1,
-    WIN_2016,
-    WIN_10,      // Threshold 1: Version 1507, Build 10240.
-    WIN_10_TH2,  // Threshold 2: Version 1511, Build 10586.
-    WIN_10_RS1,  // Redstone 1: Version 1607, Build 14393.
-    WIN_10_RS2,  // Redstone 2: Version 1703, Build 15063.
-    WIN_10_RS3,  // Redstone 3: Version 1709, Build 16299.
-    WIN_LAST     // Indicates error condition.
-};
+typedef struct _WinVerInfo {
+    int major;
+    int minor;
+    int build;
+    int productType;
+
+    _WinVerInfo() {
+        major = minor = build = productType = -1;
+    }
+} WinVerInfo;
 
 class OSVersion {
    public:
+#ifdef AKALI_WIN
+    static WinVerInfo GetWinVer() {
+        WinVerInfo wvf;
+        LONG(WINAPI * RtlGetVersion)
+        (LPOSVERSIONINFOEX);
+        *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+
+        OSVERSIONINFOEX osversion;
+        osversion.dwOSVersionInfoSize = sizeof(osversion);
+        osversion.szCSDVersion[0] = TEXT('\0');
+
+        if (RtlGetVersion != NULL) {
+            // RtlGetVersion uses 0 (STATUS_SUCCESS) as return value when succeeding
+            if (RtlGetVersion(&osversion) != 0)
+                return wvf;
+        }
+        else {
+            // GetVersionEx was deprecated in Windows 10, only use it as fallback
+            OSVERSIONINFOEX osversion;
+            osversion.dwOSVersionInfoSize = sizeof(osversion);
+            osversion.szCSDVersion[0] = TEXT('\0');
+            if (!GetVersionEx((LPOSVERSIONINFO)&osversion))
+                return wvf;
+        }
+
+        wvf.major = (int)osversion.dwMajorVersion;
+        wvf.minor = (int)osversion.dwMinorVersion;
+        wvf.build = (int)osversion.dwBuildNumber;
+
+        DWORD dwProductType = 0;
+        if (GetProductInfo(osversion.dwMajorVersion, osversion.dwMinorVersion, 0, 0, &dwProductType)) {
+            wvf.productType = (int)dwProductType;
+        }
+        return wvf;
+    }
+
     static bool IsWin64() {
         typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
         static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
@@ -92,8 +116,7 @@ class OSVersion {
 
         return bIsWow64 == 1;
     }
+#endif
 };
-#endif
 }  // namespace akali_hpp
-#endif
-#endif  // !AKALI_OS_VER_H__
+#endif  // !AKALI_OS_VER_HPP__

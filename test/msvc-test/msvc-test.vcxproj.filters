@@ -89,5 +89,8 @@
     <ClInclude Include="..\..\include\akali_hpp\win_exception_catch.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

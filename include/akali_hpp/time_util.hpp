@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2018 - 2020, winsoft666, <winsoft666@outlook.com>.
+ * Copyright (C) 2021 - 2026, winsoft666, <winsoft666@outlook.com>.
  *
  * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
  * EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
@@ -12,8 +12,8 @@
  * file.
  *******************************************************************************/
 
-#ifndef AKALI_TIMEUTIL_H_
-#define AKALI_TIMEUTIL_H_
+#ifndef AKALI_TIMEUTIL_HPP_
+#define AKALI_TIMEUTIL_HPP_
 #include "akali_hpp/arch.hpp"
 #include <stdint.h>
 #include <time.h>
@@ -238,4 +238,4 @@ class TimerMeter {
     std::clock_t lStartTime_;
 };
 }  // namespace akali_hpp
-#endif  // AKALI_TIMEUTILS_H_
+#endif  // !AKALI_TIMEUTIL_HPP_
