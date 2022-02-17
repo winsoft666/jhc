@@ -1,6 +1,5 @@
 #ifndef AKALI_THREAD_H__
 #define AKALI_THREAD_H__
-#pragma once
 
 #include "akali_hpp/arch.hpp"
 

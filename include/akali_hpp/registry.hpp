@@ -13,6 +13,7 @@
 *******************************************************************************/
 #ifndef AKALI_REGISTRY_HPP_
 #define AKALI_REGISTRY_HPP_
+
 #include "akali_hpp/arch.hpp"
 
 #ifdef AKALI_WIN

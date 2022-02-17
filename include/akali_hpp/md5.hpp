@@ -14,7 +14,6 @@
 
 #ifndef __MD5_MAKER_34DFDR7_HPP__
 #define __MD5_MAKER_34DFDR7_HPP__
-#pragma once
 
 #include <string>
 #include "akali_hpp/arch.hpp"

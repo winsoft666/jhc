@@ -150,12 +150,12 @@
     <ClInclude Include="..\..\include\akali_hpp\constructormagic.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\criticalsection.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\driver_info.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\event.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\file_util.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\ini.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\macros.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\md5.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\memory_pool.hpp" />
-    <ClInclude Include="..\..\include\akali_hpp\noncopyable.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\os_ver.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\registry.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp" />
@@ -167,9 +167,11 @@
     <ClInclude Include="..\..\include\akali_hpp\timer.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\time_util.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\trace.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\win_env_variable.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_exception_catch.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_service_base.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_service_installer.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\xorstr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,7 @@
 
 #ifndef AKALI_TIMEUTIL_HPP_
 #define AKALI_TIMEUTIL_HPP_
+
 #include "akali_hpp/arch.hpp"
 #include <stdint.h>
 #include <time.h>

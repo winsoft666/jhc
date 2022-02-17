@@ -14,6 +14,7 @@
 
 #ifndef AKALI_STRINGENCODE_HPP_
 #define AKALI_STRINGENCODE_HPP_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

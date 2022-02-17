@@ -14,7 +14,6 @@
 
 #ifndef AKALI_OS_VER_HPP__
 #define AKALI_OS_VER_HPP__
-#pragma once
 
 #include "akali_hpp/arch.hpp"
 
@@ -25,29 +24,28 @@
 #include <windows.h>
 #endif
 
-#include <string>
-
 #pragma warning(disable : 4996)
 
 namespace akali_hpp {
 /*
-Operating system                            dwMajorVersion     dwMinorVersion              Other
-Windows 10 Technical Preview                     10               0                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
-Windows Server Technical Preview                 10               0                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
-Windows 8.1                                      6                3                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
-Windows Server 2012 R2                           6                3                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
-Windows 8                                        6                2                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
-Windows Server 2012                              6                2                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
-Windows 7                                        6                1                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
-Windows Server 2008 R2                           6                1                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
-Windows Server 2008                              6                0                  OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
-Windows Vista                                    6                0                  OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
-Windows Server 2003 R2                           5                2                  GetSystemMetrics(SM_SERVERR2) != 0
-Windows Home Server                              5                2                  OSVERSIONINFOEX.wSuiteMask & VER_SUITE_WH_SERVER
-Windows Server 2003                              5                2                  GetSystemMetrics(SM_SERVERR2) == 0
-Windows XP Professional x64 Edition              5                2                  (OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION) && (SYSTEM_INFO.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
-Windows XP                                       5                1                  Not applicable
-Windows 2000                                     5                0                  Not applicable
+Operating system                            dwMajorVersion     dwMinorVersion         dwBuild                      Other
+Windows 11                                       10               0                   >=22000         Not applicable     
+Windows 10 Technical Preview                     10               0                                   OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+Windows Server Technical Preview                 10               0                                   OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+Windows 8.1                                      6                3                                   OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+Windows Server 2012 R2                           6                3                                   OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+Windows 8                                        6                2                                   OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+Windows Server 2012                              6                2                                   OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+Windows 7                                        6                1                                   OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+Windows Server 2008 R2                           6                1                                   OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+Windows Server 2008                              6                0                                   OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+Windows Vista                                    6                0                                   OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+Windows Server 2003 R2                           5                2                                   GetSystemMetrics(SM_SERVERR2) != 0
+Windows Home Server                              5                2                                   OSVERSIONINFOEX.wSuiteMask & VER_SUITE_WH_SERVER
+Windows Server 2003                              5                2                                   GetSystemMetrics(SM_SERVERR2) == 0
+Windows XP Professional x64 Edition              5                2                                   (OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION) && (SYSTEM_INFO.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
+Windows XP                                       5                1                                   Not applicable
+Windows 2000                                     5                0                                   Not applicable
 */
 
 typedef struct _WinVerInfo {
@@ -97,6 +95,11 @@ class OSVersion {
             wvf.productType = (int)dwProductType;
         }
         return wvf;
+    }
+
+    static bool IsWindows11() {
+        const WinVerInfo wvi = GetWinVer();
+        return (wvi.major == 10 && wvi.minor == 0 && wvi.build >= 22000);
     }
 
     static bool IsWin64() {

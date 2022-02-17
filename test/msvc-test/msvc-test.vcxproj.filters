@@ -44,9 +44,6 @@
     <ClInclude Include="..\..\include\akali_hpp\memory_pool.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\akali_hpp\noncopyable.hpp">
-      <Filter>akali_hpp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp\os_ver.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
@@ -90,6 +87,15 @@
       <Filter>akali_hpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\event.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\xorstr.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\win_env_variable.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
   </ItemGroup>

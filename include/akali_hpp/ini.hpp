@@ -13,6 +13,7 @@
  *******************************************************************************/
 #ifndef AKALI_INI_HPP_
 #define AKALI_INI_HPP_
+
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
 #include <tchar.h>

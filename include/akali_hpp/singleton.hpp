@@ -14,7 +14,6 @@
 
 #ifndef AKALI_SINGLETON_HPP_
 #define AKALI_SINGLETON_HPP_
-#pragma once
 
 #include "akali_hpp/arch.hpp"
 #include <mutex>
