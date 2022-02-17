@@ -1,2 +1,2 @@
 # akali_hpp
-C++ Common 
+A header-only C++ common library.
