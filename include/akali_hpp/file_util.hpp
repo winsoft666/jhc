@@ -14,22 +14,26 @@
 
 #ifndef AKALI_FILE_UTIL_HPP_
 #define AKALI_FILE_UTIL_HPP_
-#pragma once
+
 #include "akali_hpp/arch.hpp"
 
 #ifdef AKALI_WIN
 #include "akali_hpp/stringencode.hpp"
 #include <io.h>
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #include <strsafe.h>
 #include <Shlwapi.h>
+#endif
 
 namespace akali_hpp {
 class FileUtil {
    public:
+#ifdef AKALI_WIN
     static void CopyDir(const wchar_t* pszSource,
                         const wchar_t* pszDest,
                         bool bCopySource,
@@ -185,8 +189,9 @@ class FileUtil {
             return false;
         return CreateDir(StringEncode::AnsiToUnicode(pszDir).c_str());
     }
-
+#endif
    protected:
+#ifdef AKALI_WIN
     static void AddFile(const wchar_t* szPath,
                         const wchar_t* szDest,
                         WIN32_FIND_DATAW file,
@@ -248,8 +253,8 @@ class FileUtil {
         }
         FindClose(fhandle);
     }
+#endif
 };
 }  // namespace akali_hpp
-#endif
 
 #endif  // !AKALI_FILE_UTIL_HPP_

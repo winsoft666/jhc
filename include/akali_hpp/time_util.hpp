@@ -25,10 +25,12 @@
 #include <limits>
 
 #ifdef AKALI_WIN
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #include <mmsystem.h>
 #include <sys/timeb.h>
 #pragma warning(disable : 4995)
@@ -49,7 +51,8 @@ class Time {
         microseconds = 0;
         nanoseconds = 0;
     }
-    std::string ToString(bool mill_precision = false,
+
+    std::string toString(bool mill_precision = false,
                          bool micro_precision = false,
                          bool nano_precision = false) const {
         char szString[512];

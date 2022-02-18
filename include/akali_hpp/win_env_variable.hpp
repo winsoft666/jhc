@@ -19,10 +19,12 @@
 #include <string>
 #include <limits>
 #include <assert.h>
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 
 #ifdef max
 #undef max
@@ -30,9 +32,9 @@
 
 namespace akali_hpp {
 namespace {
-static UINT const broadcastTimeout = 100;  // in milliseconds
-static wchar_t const* userEnvSubKey = L"Environment";
-static wchar_t const* systemEnvSubKey =
+UINT const kBroadcastTimeout = 100;  // in milliseconds
+wchar_t const* userEnvSubKey = L"Environment";
+wchar_t const* systemEnvSubKey =
     L"System\\CurrentControlSet\\Control\\"
     L"Session Manager\\Environment";
 }  // namespace
@@ -300,7 +302,7 @@ class EnvVar {
                            NULL,
                            reinterpret_cast<LPARAM>("Environment"),
                            SMTO_NORMAL,
-                           broadcastTimeout,
+                           kBroadcastTimeout,
                            &result);
     }
 
@@ -319,9 +321,8 @@ class EnvVar {
     std::wstring value_;  // The environment variable's value.
 };
 
-
 class EnvHelper {
-public:
+   public:
     // Removes all matching instances of the specified value from the named
     // environment variable's value.
     //

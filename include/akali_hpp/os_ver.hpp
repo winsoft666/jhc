@@ -18,10 +18,12 @@
 #include "akali_hpp/arch.hpp"
 
 #ifdef AKALI_WIN
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #endif
 
 #pragma warning(disable : 4996)
@@ -117,7 +119,7 @@ class OSVersion {
             fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
         }
 
-        return bIsWow64 == 1;
+        return !!bIsWow64;
     }
 #endif
 };

@@ -1,5 +1,19 @@
-#ifndef THREAD_POOL_H__
-#define THREAD_POOL_H__
+/*******************************************************************************
+ * Copyright (C) 2021 - 2026, winsoft666, <winsoft666@outlook.com>.
+ *
+ * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+ * EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Expect bugs
+ *
+ * Please use and enjoy. Please let me know of any bugs/improvements
+ * that you have found/implemented and I will fix/incorporate them into this
+ * file.
+ *******************************************************************************/
+
+#ifndef THREAD_POOL_HPP__
+#define THREAD_POOL_HPP__
 
 // borrow from https://github.com/progschj/ThreadPool
 // origin name is ThreadPool.h
@@ -19,7 +33,7 @@
 namespace akali_hpp {
 class ThreadPool {
    public:
-    ThreadPool::ThreadPool(size_t threads) :
+    ThreadPool(size_t threads) :
         stop(false) {
         for (size_t i = 0; i < threads; ++i)
             workers.emplace_back([this] {

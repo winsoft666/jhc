@@ -18,6 +18,9 @@
     <ClCompile Include="msvc-test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\include\akali_hpp\file_info.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\akali_hpp\arch.hpp">
@@ -96,6 +99,12 @@
       <Filter>akali_hpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp\win_env_variable.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\process_util.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\process_finder.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
   </ItemGroup>

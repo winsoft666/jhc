@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\include\akali_hpp\file_info.hpp" />
     <ClCompile Include="msvc-test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +158,8 @@
     <ClInclude Include="..\..\include\akali_hpp\md5.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\memory_pool.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\os_ver.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\process_finder.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\process_util.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\registry.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\singleton.hpp" />

@@ -18,7 +18,12 @@
 #pragma once
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
-#include <windows.h>
+#ifndef _INC_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#endif
 #include <stdio.h>
 #include <strsafe.h>
 

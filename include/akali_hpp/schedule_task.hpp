@@ -18,10 +18,12 @@
 #include "akali_hpp/arch.hpp"
 
 #ifdef AKALI_WIN
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #include <tchar.h>
 #include <Atlbase.h>
 #include <comdef.h>

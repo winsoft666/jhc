@@ -23,10 +23,12 @@
 #include <vector>
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #endif
 
 #pragma warning(disable : 4309)
@@ -382,4 +384,4 @@ class StringEncode {
 #define UnicodeToTCHAR(str) akali_hpp::StringEncode::UnicodeToAnsi((str), 0)
 #endif
 }  // namespace akali_hpp
-#endif  // AKALI_STRINGENCODE_H_
+#endif  // AKALI_STRINGENCODE_HPP_

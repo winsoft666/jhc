@@ -17,18 +17,22 @@
 #include <string>
 #ifdef AKALI_WIN
 #include <assert.h>
+#ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#include <Windows.h>
+#endif
 #include <direct.h>
+#endif
 
 namespace akali_hpp {
-class DriverInfo {
+#ifdef AKALI_WIN
+class WinDriverInfo {
    public:
     enum { DRIVE_HOST = 7 };
 
-    float GetFreeMB(int nDrive) {
+    static float GetFreeMB(int nDrive) {
         std::wstring sRoot;
         unsigned long totalClusters, freeClusters, sectors, bytes;
 
@@ -52,7 +56,7 @@ class DriverInfo {
         return 0.0f;
     }
 
-    std::wstring GetVolume(int nDrive) {
+    static std::wstring GetVolume(int nDrive) {
         std::wstring sVolume, sRoot;
 
         assert(nDrive > 0 && nDrive <= 26);
@@ -72,7 +76,7 @@ class DriverInfo {
         return L"";
     }
 
-    std::wstring GetRoot(int nDrive) {
+    static std::wstring GetRoot(int nDrive) {
         std::wstring sRoot;
 
         sRoot = GetLetter(nDrive);
@@ -81,7 +85,7 @@ class DriverInfo {
         return sRoot;
     }
 
-    std::wstring GetFullName(int nDrive) {
+    static std::wstring GetFullName(int nDrive) {
         std::wstring sFullName, sLetter, sVolume;
 
         assert(nDrive > 0 && nDrive <= 26);
@@ -98,7 +102,7 @@ class DriverInfo {
         return L"";
     }
 
-    float GetTotalMB(int nDrive) {
+    static float GetTotalMB(int nDrive) {
         std::wstring sRoot;
         unsigned long totalClusters, freeClusters, sectors, bytes;
 
@@ -122,13 +126,13 @@ class DriverInfo {
         return 0.0f;
     }
 
-    wchar_t GetLetter(int nDrive) {
+    static wchar_t GetLetter(int nDrive) {
         assert(nDrive > 0 && nDrive <= 26);
 
         return (wchar_t)(nDrive + L'A' - 1);
     }
 
-    int GetType(int nDrive) {
+    static int GetType(int nDrive) {
         std::wstring sVolume;
 
         assert(nDrive > 0 && nDrive <= 26);
@@ -140,7 +144,7 @@ class DriverInfo {
         return ::GetDriveTypeW(GetRoot(nDrive).c_str());
     }
 
-    int GetPathType(const wchar_t* szPathName) {
+    static int GetPathType(const wchar_t* szPathName) {
         int nDrive = GetDrive(szPathName);
 
         if (nDrive >= 0)
@@ -153,7 +157,7 @@ class DriverInfo {
             return DRIVE_UNKNOWN;
     }
 
-    void FormatName(std::wstring& sFilename) {
+    static void FormatName(std::wstring& sFilename) {
         // std::wstring sTemp, sChar;
         // int nLen, nChar;
         // wchar_t cChar, cLastChar = ' '; // space
@@ -181,7 +185,7 @@ class DriverInfo {
         // sFilename = sTemp;
     }
 
-    bool IsDriveAvailable(int nDrive) {
+    static bool IsDriveAvailable(int nDrive) {
         int nCurDrive;
         int nRes;
 
@@ -196,9 +200,9 @@ class DriverInfo {
         return (nRes == 0) ? true : false;
     }
 
-    bool IsUNCPath(const wchar_t* szPathName) { return (wcsstr(szPathName, L"\\\\") == szPathName); }
+    static bool IsUNCPath(const wchar_t* szPathName) { return (wcsstr(szPathName, L"\\\\") == szPathName); }
 
-    int GetDrive(const wchar_t* szPathName) {
+    static int GetDrive(const wchar_t* szPathName) {
         int nDrive = 0;
 
         if (wcsstr(szPathName, L":") == szPathName + 1) {
@@ -210,7 +214,7 @@ class DriverInfo {
         return nDrive ? nDrive : -1;
     }
 
-    bool IsMappedPath(const wchar_t* szPathName) {
+    static bool IsMappedPath(const wchar_t* szPathName) {
         int nDrive;
 
         nDrive = GetDrive(szPathName);
@@ -221,7 +225,7 @@ class DriverInfo {
         return (GetType(nDrive) == DRIVE_REMOTE);
     }
 
-    int IsRemotePath(const wchar_t* szPathName, bool bAllowFileCheck) {
+    static int IsRemotePath(const wchar_t* szPathName, bool bAllowFileCheck = true) {
         if (bAllowFileCheck) {
             DWORD dwAttr = ::GetFileAttributesW(szPathName);
 
@@ -232,7 +236,7 @@ class DriverInfo {
         return (IsUNCPath(szPathName) || IsMappedPath(szPathName));
     }
 
-    bool IsFixedPath(const wchar_t* szPathName) {
+    static bool IsFixedPath(const wchar_t* szPathName) {
         int nDrive = GetDrive(szPathName);
 
         if (nDrive == -1)  // unknown
@@ -241,7 +245,7 @@ class DriverInfo {
         return (GetType(nDrive) == DRIVE_FIXED);
     }
 
-    bool IsRemovablePath(const wchar_t* szPathName) {
+    static bool IsRemovablePath(const wchar_t* szPathName) {
         int nDrive = GetDrive(szPathName);
 
         if (nDrive == -1)  // unknown
@@ -251,7 +255,7 @@ class DriverInfo {
     }
 
     // -1 = no such path, else TRUE/FALSE
-    int IsReadonlyPath(const wchar_t* szPathName) {
+    static int IsReadonlyPath(const wchar_t* szPathName) {
         DWORD dwAttr = ::GetFileAttributesW(szPathName);
 
         if (dwAttr == 0xffffffff)
@@ -261,7 +265,7 @@ class DriverInfo {
         return (dwAttr & FILE_ATTRIBUTE_READONLY);
     }
 
-    unsigned long GetSerialNumber(int nDrive) {
+    static unsigned long GetSerialNumber(int nDrive) {
         if (GetType(nDrive) != DRIVE_FIXED)
             return 0;
 

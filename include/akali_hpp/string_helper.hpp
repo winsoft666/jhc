@@ -151,7 +151,7 @@ class StringHelper {
         return (str.find(substring) != std::wstring::npos);
     }
 
-    static size_t IncludeTimes(const std::string& str, const std::string& substring) {
+    static size_t ContainTimes(const std::string& str, const std::string& substring) {
         size_t times = 0;
         size_t pos = std::string::npos;
         size_t offset = 0;
@@ -171,7 +171,7 @@ class StringHelper {
         return times;
     }
 
-    static size_t IncludeTimes(const std::wstring& str, const std::wstring& substring) {
+    static size_t ContainTimes(const std::wstring& str, const std::wstring& substring) {
         size_t times = 0;
         size_t pos = std::wstring::npos;
         size_t offset = 0;
@@ -275,28 +275,80 @@ class StringHelper {
         return ret;
     }
 
-    template <typename T>
-    static typename std::enable_if<
-        std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value ||
-            std::is_same<std::u16string, T>::value || std::is_same<std::u32string, T>::value,
-        std::vector<T> >::type
-    Split(const T& src, const T& delimiter, bool include_empty_string = true) {
-        std::vector<T> fields;
-        typename T::size_type offset = 0;
-        typename T::size_type pos = src.find(delimiter, 0);
+    static std::vector<std::string> Split(const std::string& src, const std::string& delimiter, bool includeEmptyStr = true) {
+        std::vector<std::string> fields;
+        typename std::string::size_type offset = 0;
+        typename std::string::size_type pos = src.find(delimiter, 0);
 
-        while (pos != T::npos) {
-            T t = src.substr(offset, pos - offset);
-            if ((t.length() > 0) || (t.length() == 0 && include_empty_string))
+        while (pos != std::string::npos) {
+            std::string t = src.substr(offset, pos - offset);
+            if ((t.length() > 0) || (t.length() == 0 && includeEmptyStr))
                 fields.push_back(t);
             offset = pos + delimiter.length();
             pos = src.find(delimiter, offset);
         }
 
-        T t = src.substr(offset);
-        if ((t.length() > 0) || (t.length() == 0 && include_empty_string))
+        const std::string t = src.substr(offset);
+        if ((t.length() > 0) || (t.length() == 0 && includeEmptyStr))
             fields.push_back(t);
         return fields;
+    }
+
+    static std::vector<std::wstring> Split(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr = true) {
+        std::vector<std::wstring> fields;
+        typename std::wstring::size_type offset = 0;
+        typename std::wstring::size_type pos = src.find(delimiter, 0);
+
+        while (pos != std::wstring::npos) {
+            std::wstring t = src.substr(offset, pos - offset);
+            if ((t.length() > 0) || (t.length() == 0 && includeEmptyStr))
+                fields.push_back(t);
+            offset = pos + delimiter.length();
+            pos = src.find(delimiter, offset);
+        }
+
+        const std::wstring t = src.substr(offset);
+        if ((t.length() > 0) || (t.length() == 0 && includeEmptyStr))
+            fields.push_back(t);
+        return fields;
+    }
+
+    static std::string Join(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr = true) {
+        std::stringstream ss;
+        for (std::vector<std::string>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
+            if (it->length() > 0) {
+                ss << *it;
+            }
+            else {
+                if (includeEmptyStr) {
+                    ss << *it;
+                }
+            }
+
+            if (it + 1 != src.cend()) {
+                ss << delimiter;
+            }
+        }
+        return ss.str();
+    }
+
+    static std::wstring Join(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr = true) {
+        std::wstringstream ss;
+        for (std::vector<std::wstring>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
+            if (it->length() > 0) {
+                ss << *it;
+            }
+            else {
+                if (includeEmptyStr) {
+                    ss << *it;
+                }
+            }
+
+            if (it + 1 != src.cend()) {
+                ss << delimiter;
+            }
+        }
+        return ss.str();
     }
 };
 }  // namespace akali_hpp
