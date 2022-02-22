@@ -39,7 +39,7 @@
 #include <sys/syscall.h>
 #endif
 
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
 class Thread {

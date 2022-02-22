@@ -148,7 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\akali_hpp\arch.hpp" />
-    <ClInclude Include="..\..\include\akali_hpp\constructormagic.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\criticalsection.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\driver_info.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\event.hpp" />

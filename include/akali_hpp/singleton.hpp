@@ -28,7 +28,7 @@
 #include <sys/file.h>
 #include <fcntl.h>
 #endif
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
 template <class T>

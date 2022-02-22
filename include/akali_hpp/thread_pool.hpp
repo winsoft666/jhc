@@ -28,7 +28,7 @@
 #include <future>
 #include <functional>
 #include <stdexcept>
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
 class ThreadPool {

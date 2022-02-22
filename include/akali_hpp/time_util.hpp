@@ -225,9 +225,9 @@ class TimeUtil {
     }
 };
 
-class TimerMeter {
+class TimeMeter {
    public:
-    TimerMeter() { lStartTime_ = std::clock(); }
+    TimeMeter() { lStartTime_ = std::clock(); }
 
     void Restart() { lStartTime_ = std::clock(); }
 

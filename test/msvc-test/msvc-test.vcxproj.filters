@@ -83,9 +83,6 @@
     <ClInclude Include="..\..\include\akali_hpp\win_service_installer.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\akali_hpp\constructormagic.hpp">
-      <Filter>akali_hpp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp\win_exception_catch.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>

@@ -25,7 +25,7 @@
 #endif
 #include <Windows.h>
 #endif
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
 class CriticalSection {

@@ -29,7 +29,7 @@
 
 #include <string>
 #include "akali_hpp/stringencode.hpp"
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
 #ifdef AKALI_WIN

@@ -29,7 +29,7 @@
 #include <comdef.h>
 #include <taskschd.h>
 #include <strsafe.h>
-#include "akali_hpp/constructormagic.hpp"
+#include "akali_hpp/macros.hpp"
 
 #pragma comment(lib, "taskschd.lib")
 
