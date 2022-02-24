@@ -24,24 +24,51 @@
 namespace akali_hpp {
 class StringHelper {
    public:
-    static std::string ToLowerCase(const std::string& s) {
-        std::string d;
-        std::transform(s.begin(), s.end(),
-                       std::insert_iterator<std::string>(d, d.begin()), tolower);
+    static char EasyCharToLowerA(char in) {
+        if (in <= 'Z' && in >= 'A')
+            return in - ('Z' - 'z');
+        return in;
+    }
+
+    static char EasyCharToUpperA(char in) {
+        if (in <= 'z' && in >= 'a')
+            return in + ('Z' - 'z');
+        return in;
+    }
+
+    static wchar_t EasyCharToLowerW(wchar_t in) {
+        if (in <= 'Z' && in >= 'A')
+            return in - (L'Z' - L'z');
+        return in;
+    }
+
+    static wchar_t EasyCharToUpperW(wchar_t in) {
+        if (in <= L'z' && in >= L'a')
+            return in + (L'Z' - L'z');
+        return in;
+    }
+
+    static std::string ToLower(const std::string& s) {
+        std::string d = s;
+        std::transform(d.begin(), d.end(), d.begin(), EasyCharToLowerA);
         return d;
     }
 
-    static std::wstring ToLowerCase(const std::wstring& s) {
-        std::wstring d;
-#if defined(_MSC_VER)
-        std::transform(s.begin(), s.end(),
-                       std::insert_iterator<std::wstring>(d, d.begin()),
-                       towlower);
-#else
-        std::transform(s.begin(), s.end(),
-                       std::insert_iterator<std::wstring>(d, d.begin()),
-                       (int (*)(int))std::tolower);
-#endif
+    static std::wstring ToLower(const std::wstring& s) {
+        std::wstring d = s;
+        std::transform(d.begin(), d.end(), d.begin(), EasyCharToLowerW);
+        return d;
+    }
+
+    static std::string ToUpper(const std::string& s) {
+        std::string d = s;
+        std::transform(d.begin(), d.end(), d.begin(), EasyCharToUpperA);
+        return d;
+    }
+
+    static std::wstring ToUpper(const std::wstring& s) {
+        std::wstring d = s;
+        std::transform(d.begin(), d.end(), d.begin(), EasyCharToUpperW);
         return d;
     }
 
@@ -121,26 +148,6 @@ class StringHelper {
             return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
         }
         return false;
-    }
-
-    static bool IsEqualsIgnoreCase(const std::string& s1, const char* upper, const char* lower) {
-        for (std::string::const_iterator iter = s1.begin();
-             iter != s1.end();
-             iter++, upper++, lower++) {
-            if (*iter != *upper && *iter != *lower)
-                return false;
-        }
-        return (*upper == 0);
-    }
-
-    static bool IsEqualsIgnoreCase(const std::wstring& s1, const wchar_t* upper, const wchar_t* lower) {
-        for (std::wstring::const_iterator iter = s1.begin();
-             iter != s1.end();
-             iter++, upper++, lower++) {
-            if (*iter != *upper && *iter != *lower)
-                return false;
-        }
-        return (*upper == 0);
     }
 
     static bool IsContains(const std::string& str, const std::string& substring) {
@@ -349,6 +356,44 @@ class StringHelper {
             }
         }
         return ss.str();
+    }
+
+    static bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase = false) {
+        const std::string::size_type s1_len = s1.length();
+        if (s1_len != s2.length())
+            return false;
+
+        for (std::string::size_type i = 0; i < s1_len; i++) {
+            if (ignoreCase) {
+                if (EasyCharToLowerA(s1[i]) != EasyCharToLowerA(s2[i]))
+                    return false;
+            }
+            else {
+                if (s1[i] != s2[i])
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    static bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase = false) {
+        const std::wstring::size_type s1_len = s1.length();
+        if (s1_len != s2.length())
+            return false;
+
+        for (std::wstring::size_type i = 0; i < s1_len; i++) {
+            if (ignoreCase) {
+                if (EasyCharToLowerW(s1[i]) != EasyCharToLowerW(s2[i]))
+                    return false;
+            }
+            else {
+                if (s1[i] != s2[i])
+                    return false;
+            }
+        }
+
+        return true;
     }
 };
 }  // namespace akali_hpp
