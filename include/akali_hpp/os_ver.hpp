@@ -23,7 +23,17 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
+#include <strsafe.h>
 #endif
+#elif defined(AKALI_MACOS)
+#include <sys/sysctl.h>
+#elif defined(AKALI_LINUX)
+#include <sys/stat.h>
+#include <sys/utsname.h>
+#include <stdlib.h>
+#include <cstring>
+#include <fstream>
+#include <regex>
 #endif
 
 #pragma warning(disable : 4996)
@@ -122,6 +132,34 @@ class OSVersion {
         return !!bIsWow64;
     }
 #endif
+
+    static std::string GetOSVersion() {
+#ifdef AKALI_WIN
+        const WinVerInfo wvi = GetWinVer();
+        char result[100] = {0};
+        StringCchPrintfA(result, 100, "%d.%d.%d-%d", wvi.major, wvi.minor, wvi.build, wvi.productType);
+        return result;
+#elif defined(AKALI_MACOS)
+        char result[1024] = {0};
+        size_t size = sizeof(result);
+        if (sysctlbyname("kern.osrelease", result, &size, nullptr, 0) == 0)
+            return result;
+        return "<apple>";
+
+#elif defined(AKALI_LINUX)
+        static std::regex pattern("DISTRIB_DESCRIPTION=\"(.*)\"");
+
+        std::string line;
+        std::ifstream stream("/etc/lsb-release");
+        while (getline(stream, line)) {
+            std::smatch matches;
+            if (std::regex_match(line, matches, pattern))
+                return matches[1];
+        }
+
+        return "<linux>";
+#endif
+    }
 };
 }  // namespace akali_hpp
 #endif  // !AKALI_OS_VER_HPP__

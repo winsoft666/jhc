@@ -62,7 +62,8 @@ class TimerBase {
 
     void Stop(bool bWait) {
         if (m_hTimer) {
-            DeleteTimerQueueTimer(NULL, m_hTimer, bWait ? INVALID_HANDLE_VALUE : NULL);
+            BOOL b = DeleteTimerQueueTimer(NULL, m_hTimer, bWait ? INVALID_HANDLE_VALUE : NULL);
+            assert(b);
             m_hTimer = NULL;
         }
     }
@@ -101,7 +102,7 @@ class TTimer : public TimerBase {
     POnTimer m_pfnOnTimer;
 };
 
-class AKALI_API Timer : public TimerBase {
+class Timer : public TimerBase {
    public:
     typedef std::function<void()> FN_CB;
     Timer() {}

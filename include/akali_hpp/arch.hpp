@@ -16,25 +16,27 @@
 #define AKALI_ARCH_HPP__
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-#define AKALI_WIN
+#define AKALI_WIN 1
 #ifdef _WIN64
+#define AKALI_WIN64 1
 #else
+#define AKALI_WIN32 1
 #endif
-#elif __APPLE__
-#define AKALI_MACOS
+#elif defined(__APPLE__)
+#define AKALI_MACOS 1
 #include <TargetConditionals.h>
-#if TARGET_IPHONE_SIMULATOR
-#elif TARGET_OS_IPHONE
-#elif TARGET_OS_MAC
+#if defined(TARGET_IPHONE_SIMULATOR)
+#elif defined(TARGET_OS_IPHONE)
+#elif defined(TARGET_OS_MAC)
 #else
 #error "Unknown Apple platform"
 #endif
-#elif __linux__
-#define AKALI_LINUX
-#elif __unix__
-#define AKALI_UNIX
+#elif defined(__linux__) || defined(linux) || defined(__linux)
+#define AKALI_LINUX 1
+#elif defined(__unix__) || defined(unix) || defined(__unix)
+#define AKALI_UNIX 1
 #elif defined(_POSIX_VERSION)
-#define AKALI_POSIX
+#define AKALI_POSIX 1
 #else
 #error "Unknown compiler"
 #endif
@@ -45,37 +47,37 @@
 //   http://www.agner.org/optimize/calling_conventions.pdf
 //   or with gcc, run: "echo | gcc -E -dM -"
 #if defined(_M_X64) || defined(__x86_64__)
-#define AKALI_ARCH_X86_FAMILY
-#define AKALI_ARCH_X86_64
-#define AKALI_ARCH_64_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_X86_FAMILY 1
+#define AKALI_ARCH_X86_64 1
+#define AKALI_ARCH_64_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(_M_ARM64) || defined(__aarch64__)
-#define AKALI_ARCH_ARM_FAMILY
-#define AKALI_ARCH_64_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_ARM_FAMILY 1
+#define AKALI_ARCH_64_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(_M_IX86) || defined(__i386__)
-#define AKALI_ARCH_X86_FAMILY
-#define AKALI_ARCH_X86
-#define AKALI_ARCH_32_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_X86_FAMILY 1
+#define AKALI_ARCH_X86 1
+#define AKALI_ARCH_32_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(__ARMEL__)
-#define AKALI_ARCH_ARM_FAMILY
-#define AKALI_ARCH_32_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_ARM_FAMILY 1
+#define AKALI_ARCH_32_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(__MIPSEL__)
-#define AKALI_ARCH_MIPS_FAMILY
+#define AKALI_ARCH_MIPS_FAMILY 1
 #if defined(__LP64__)
-#define AKALI_ARCH_64_BITS
+#define AKALI_ARCH_64_BITS 1
 #else
-#define AKALI_ARCH_32_BITS
+#define AKALI_ARCH_32_BITS 1
 #endif
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(__pnacl__)
-#define AKALI_ARCH_32_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_32_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #elif defined(__EMSCRIPTEN__)
-#define AKALI_ARCH_32_BITS
-#define AKALI_ARCH_LITTLE_ENDIAN
+#define AKALI_ARCH_32_BITS 1
+#define AKALI_ARCH_LITTLE_ENDIAN 1
 #else
 #error Please add support for your architecture in rtc_base/system/arch.h
 #endif

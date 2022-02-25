@@ -42,7 +42,7 @@ class CriticalSection {
     mutable CRITICAL_SECTION crit_;
 };
 
-class AKALI_API CritScope {
+class CritScope {
    public:
     explicit CritScope(const CriticalSection* pCS) :
         crit_(pCS) { crit_->Enter(); }
