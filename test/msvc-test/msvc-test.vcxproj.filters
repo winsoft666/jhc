@@ -59,7 +59,7 @@
     <ClInclude Include="..\..\include\akali_hpp\string_helper.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\akali_hpp\stringencode.hpp">
+    <ClInclude Include="..\..\include\akali_hpp\string_encode.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp\thread.hpp">
@@ -105,6 +105,15 @@
       <Filter>akali_hpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\akali_hpp.h">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\base64.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\url_encode.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\hex_encode.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,19 +10,20 @@ int main()
     const std::wstring sw = L"--abc123456A1bc-*---";
     const std::wstring sw2 = L"--abc123456A1bC-*---";
     const std::wstring sw3 = L"--abc123456A1bC--";
-    cout << akali_hpp::StringHelper::ToLower(s);
-    cout << akali_hpp::StringHelper::ToUpper(s);
 
-    wcout << akali_hpp::StringHelper::ToLower(sw);
-    wcout << akali_hpp::StringHelper::ToUpper(sw);
+    cout << akali_hpp::StringHelper::ToLower(s) << endl;
+    cout << akali_hpp::StringHelper::ToUpper(s) << endl;
 
-    cout << akali_hpp::StringHelper::IsEqual(s, s2, false);
-    cout << akali_hpp::StringHelper::IsEqual(s, s2, true);
+    wcout << akali_hpp::StringHelper::ToLower(sw) << endl;
+    wcout << akali_hpp::StringHelper::ToUpper(sw) << endl;
 
-    cout << akali_hpp::StringHelper::IsEqual(sw, sw2, false);
-    cout << akali_hpp::StringHelper::IsEqual(sw, sw2, true);
+    cout << akali_hpp::StringHelper::IsEqual(s, s2, false) << endl;
+    cout << akali_hpp::StringHelper::IsEqual(s, s2, true) << endl;
 
-    cout << akali_hpp::StringHelper::IsEqual(sw, sw3, true);
+    cout << akali_hpp::StringHelper::IsEqual(sw, sw2, false) << endl;
+    cout << akali_hpp::StringHelper::IsEqual(sw, sw2, true) << endl;
+
+    cout << akali_hpp::StringHelper::IsEqual(sw, sw3, true) << endl;
 
     cout << akali_hpp::StringHelper::IsStartsWith(s, "--b") << endl;
     cout << akali_hpp::StringHelper::ContainTimes(s, "") << endl;
@@ -30,7 +31,17 @@ int main()
     std::vector<std::string> v = akali_hpp::StringHelper::Split(s, "*");
     cout << akali_hpp::StringHelper::Join(v, "+") << endl;
 
-    
+    const std::string base64Encoded = akali_hpp::Base64::Encode("https://www.google.com/?q=test", true);
+    cout << base64Encoded << endl;
+    cout << akali_hpp::Base64::Decode(base64Encoded) << endl;
+
+    const std::string hexEncoded = akali_hpp::HexEncode::Encode("123456789");
+    cout << hexEncoded << endl;
+    cout << akali_hpp::HexEncode::Decode(hexEncoded) << endl;
+
+    const std::string urlEncoded = akali_hpp::UrlEncode::Encode("https://www.google.com/?q=test&a=1");
+    cout << urlEncoded << endl;
+    cout << akali_hpp::UrlEncode::Decode(urlEncoded) << endl;
 
     return 0;
 }

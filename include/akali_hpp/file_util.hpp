@@ -18,7 +18,7 @@
 #include "akali_hpp/arch.hpp"
 
 #ifdef AKALI_WIN
-#include "akali_hpp/stringencode.hpp"
+#include "akali_hpp/string_encode.hpp"
 #include <io.h>
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN

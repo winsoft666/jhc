@@ -89,6 +89,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,6 +106,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,10 +152,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\akali_hpp.h" />
     <ClInclude Include="..\..\include\akali_hpp\arch.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\base64.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\criticalsection.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\driver_info.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\event.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\file_util.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\hex_encode.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\ini.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\macros.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\md5.hpp" />
@@ -163,13 +168,14 @@
     <ClInclude Include="..\..\include\akali_hpp\registry.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\singleton.hpp" />
-    <ClInclude Include="..\..\include\akali_hpp\stringencode.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\string_encode.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\string_helper.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\thread.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\thread_pool.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\timer.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\time_util.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\trace.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\url_encode.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_env_variable.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_exception_catch.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\win_service_base.hpp" />

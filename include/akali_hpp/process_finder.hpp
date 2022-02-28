@@ -28,7 +28,7 @@
 #endif
 
 #include <string>
-#include "akali_hpp/stringencode.hpp"
+#include "akali_hpp/string_encode.hpp"
 #include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {

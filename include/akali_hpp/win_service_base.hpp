@@ -27,7 +27,7 @@
 #endif
 #include <assert.h>
 #include <strsafe.h>
-#include "akali_hpp/stringencode.hpp"
+#include "akali_hpp/string_encode.hpp"
 
 namespace akali_hpp {
 class WinServiceBase {
