@@ -1,18 +1,20 @@
-﻿/****************************** Module Header ******************************\
-* Module Name:  ServiceInstaller.h
-* Project:      CppWindowsService
-* Copyright (c) Microsoft Corporation.
+﻿/*******************************************************************************
+*    Copyright (C) <2022>  <winsoft666@outlook.com>.
 *
-* The file declares functions that install and uninstall the service.
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
 *
-* This source is subject to the Microsoft Public License.
-* See http://www.microsoft.com/en-us/openness/resources/licenses.aspx#MPL.
-* All other rights reserved.
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
 *
-* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-* EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
-\***************************************************************************/
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
 #ifndef AKALI_WIN_SERVICE_INSTALLER_HPP_
 #define AKALI_WIN_SERVICE_INSTALLER_HPP_
 #pragma once
@@ -26,6 +28,7 @@
 #endif
 #include <stdio.h>
 #include <strsafe.h>
+#include "trace.hpp"
 
 namespace akali_hpp {
 class WinServiceInstaller {
@@ -63,14 +66,14 @@ class WinServiceInstaller {
         SC_HANDLE schService = NULL;
 
         if (GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath)) == 0) {
-            wprintf(L"GetModuleFileName failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"GetModuleFileName failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
 
         // Open the local default service control manager database
         schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE);
         if (schSCManager == NULL) {
-            wprintf(L"OpenSCManager failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"OpenSCManager failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
 
@@ -91,7 +94,7 @@ class WinServiceInstaller {
                           NULL                        //pszPassword                     // Password of the account
             );
         if (schService == NULL) {
-            wprintf(L"CreateService failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"CreateService failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
         else {
@@ -103,7 +106,7 @@ class WinServiceInstaller {
             }
         }
 
-        wprintf(L"%s is installed.\n", pszServiceName);
+        Trace::MsgW(L"%s is installed.\n", pszServiceName);
 
     Cleanup:
         // Centralized cleanup for all allocated resources.
@@ -137,26 +140,25 @@ class WinServiceInstaller {
         // Open the local default service control manager database
         schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
         if (schSCManager == NULL) {
-            wprintf(L"OpenSCManager failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"OpenSCManager failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
 
         // Open the service with delete, stop, and query status permissions
-        schService =
-            OpenService(schSCManager, pszServiceName, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
+        schService = OpenService(schSCManager, pszServiceName, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
         if (schService == NULL) {
-            wprintf(L"OpenService failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"OpenService failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
 
         // Try to stop the service
         if (ControlService(schService, SERVICE_CONTROL_STOP, &ssSvcStatus)) {
-            wprintf(L"Stopping %s.", pszServiceName);
+            Trace::MsgW(L"Stopping %s.", pszServiceName);
             Sleep(1000);
 
             while (QueryServiceStatus(schService, &ssSvcStatus)) {
                 if (ssSvcStatus.dwCurrentState == SERVICE_STOP_PENDING) {
-                    wprintf(L".");
+                    Trace::MsgW(L".");
                     Sleep(1000);
                 }
                 else
@@ -164,20 +166,20 @@ class WinServiceInstaller {
             }
 
             if (ssSvcStatus.dwCurrentState == SERVICE_STOPPED) {
-                wprintf(L"\n%s is stopped.\n", pszServiceName);
+                Trace::MsgW(L"\n%s is stopped.\n", pszServiceName);
             }
             else {
-                wprintf(L"\n%s failed to stop.\n", pszServiceName);
+                Trace::MsgW(L"\n%s failed to stop.\n", pszServiceName);
             }
         }
 
         // Now remove the service by calling DeleteService.
         if (!DeleteService(schService)) {
-            wprintf(L"DeleteService failed w/err 0x%08lx\n", GetLastError());
+            Trace::MsgW(L"DeleteService failed w/err 0x%08lx\n", GetLastError());
             goto Cleanup;
         }
 
-        wprintf(L"%s is removed.\n", pszServiceName);
+        Trace::MsgW(L"%s is removed.\n", pszServiceName);
 
     Cleanup:
         // Centralized cleanup for all allocated resources.
