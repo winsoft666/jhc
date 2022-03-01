@@ -17,11 +17,7 @@
 
 #ifndef AKALI_STRING_ENCODE_HPP_
 #define AKALI_STRING_ENCODE_HPP_
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <sstream>
+#include <codecvt>
 #include <string>
 #include <vector>
 #include "akali_hpp/arch.hpp"
@@ -86,9 +82,11 @@ class StringEncode {
         return strRes;
     }
 
-    static std::string UnicodeToUtf8(const std::wstring& str) {
-        std::string strRes;
+#endif
 
+    static std::string UnicodeToUtf8(const std::wstring& str) {
+#ifdef AKALI_WIN
+        std::string strRes;
         int iSize = ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
 
         if (iSize == 0)
@@ -105,14 +103,18 @@ class StringEncode {
 
         strRes = szBuf;
         delete[] szBuf;
-
         return strRes;
+#else
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        return converter.to_bytes(str);
+#endif
     }
 
     static std::string UnicodeToUtf8BOM(const std::wstring& str) {
+#ifdef AKALI_WIN
         std::string strRes;
 
-        int iSize = ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
+        const int iSize = ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
 
         if (iSize == 0)
             return strRes;
@@ -125,19 +127,31 @@ class StringEncode {
         memset(szBuf, 0, iSize + 3);
 
         ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, &szBuf[3], iSize, NULL, NULL);
-        szBuf[0] = 0xef;
-        szBuf[1] = 0xbb;
-        szBuf[2] = 0xbf;
+        szBuf[0] = (char)0xef;
+        szBuf[1] = (char)0xbb;
+        szBuf[2] = (char)0xbf;
 
         strRes = szBuf;
         delete[] szBuf;
 
         return strRes;
+#else
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        const std::string stru8 = converter.to_bytes(str);
+        std::string strRes(3, (const char)0);
+        strRes[0] = (char)0xef;
+        strRes[1] = (char)0xbb;
+        strRes[2] = (char)0xbf;
+        strRes += stru8;
+
+        return strRes;
+#endif
     }
 
     static std::wstring Utf8ToUnicode(const std::string& str) {
+#ifdef AKALI_WIN
         std::wstring strRes;
-        int iSize = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+        const int iSize = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
 
         if (iSize == 0)
             return strRes;
@@ -154,8 +168,13 @@ class StringEncode {
         delete[] szBuf;
 
         return strRes;
+#else
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        return converter.from_bytes(str);
+#endif
     }
 
+#ifdef AKALI_WIN
     static std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0) {
         return UnicodeToUtf8(AnsiToUnicode(str, code_page));
     }
@@ -167,29 +186,10 @@ class StringEncode {
     static std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0) {
         return UnicodeToAnsi(Utf8ToUnicode(str), code_page);
     }
-
 #endif
-
-   protected:
-    // Apply any suitable string transform (including the ones above) to an STL
-    // string. Stack-allocated temporary space is used for the transformation, so
-    // value and source may refer to the same string.
-    typedef size_t (*Transform)(char* buffer, size_t buflen, const char* source, size_t srclen);
-
-    // Return the result of applying transform t to source.
-    static std::string s_transform(const std::string& source, Transform t) {
-        // Ask transformation function to approximate the destination size (returns upper bound)
-        const size_t maxlen = t(nullptr, 0, source.data(), source.length());
-        char* buffer = static_cast<char*>(::malloc((maxlen) * sizeof(char)));
-        if (!buffer)
-            return "";
-        const size_t len = t(buffer, maxlen, source.data(), source.length());
-        std::string result(buffer, len);
-        free(buffer);
-        return result;
-    }
 };
 
+#ifdef AKALI_WIN
 #if (defined UNICODE || defined _UNICODE)
 #define TCHARToAnsi(str) akali_hpp::StringEncode::UnicodeToAnsi((str), 0)
 #define TCHARToUtf8(str) akali_hpp::StringEncode::UnicodeToUtf8((str))
@@ -204,6 +204,7 @@ class StringEncode {
 #define Utf8ToTCHAR(str) akali_hpp::StringEncode::Utf8ToAnsi((str), 0)
 #define TCHARToUnicode(str) akali_hpp::StringEncode::AnsiToUnicode((str), 0)
 #define UnicodeToTCHAR(str) akali_hpp::StringEncode::UnicodeToAnsi((str), 0)
+#endif
 #endif
 }  // namespace akali_hpp
 #endif  // AKALI_STRING_ENCODE_HPP_

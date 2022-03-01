@@ -42,13 +42,13 @@ class WinServiceBase {
     static BOOL Run(WinServiceBase& service) {
         s_service = &service;
 
-        SERVICE_TABLE_ENTRY serviceTable[] = {{service.m_name, ServiceMain}, {NULL, NULL}};
+        SERVICE_TABLE_ENTRYW serviceTable[] = {{service.m_name, ServiceMain}, {NULL, NULL}};
 
         // Connects the main thread of a service process to the service control
         // manager, which causes the thread to be the service control dispatcher
         // thread for the calling process. This call returns when the service has
         // stopped. The process should simply terminate when the call returns.
-        return StartServiceCtrlDispatcher(serviceTable);
+        return StartServiceCtrlDispatcherW(serviceTable);
     }
 
     // Service object constructor. The optional parameters (fCanStop,
@@ -157,12 +157,12 @@ class WinServiceBase {
                 HANDLE hEventSource = NULL;
                 LPCWSTR lpszStrings[2] = {NULL, NULL};
 
-                hEventSource = RegisterEventSource(NULL, pszServiceName);
+                hEventSource = RegisterEventSourceW(NULL, pszServiceName);
                 if (hEventSource) {
                     lpszStrings[0] = pszServiceName;
                     lpszStrings[1] = pMsgBuffer;
 
-                    ReportEvent(hEventSource,  // Event log handle
+                    ReportEventW(hEventSource,  // Event log handle
                                 wType,         // Event type
                                 0,             // Event category
                                 0,             // Event identifier
@@ -299,12 +299,12 @@ class WinServiceBase {
         HANDLE hEventSource = NULL;
         LPCWSTR lpszStrings[2] = {NULL, NULL};
 
-        hEventSource = RegisterEventSource(NULL, m_name);
+        hEventSource = RegisterEventSourceW(NULL, m_name);
         if (hEventSource) {
             lpszStrings[0] = m_name;
             lpszStrings[1] = pszMessage;
 
-            ReportEvent(hEventSource,  // Event log handle
+            ReportEventW(hEventSource,  // Event log handle
                         wType,         // Event type
                         0,             // Event category
                         0,             // Event identifier
@@ -327,7 +327,7 @@ class WinServiceBase {
     // Log an error message to the Application event log.
     void WriteErrorLogEntry(LPCWSTR pszFunction, DWORD dwError = GetLastError()) {
         wchar_t szMessage[260];
-        StringCchPrintf(szMessage, ARRAYSIZE(szMessage), L"%s failed w/err 0x%08lx", pszFunction,
+        StringCchPrintfW(szMessage, ARRAYSIZE(szMessage), L"%s failed w/err 0x%08lx", pszFunction,
                         dwError);
         WriteEventLogEntry(szMessage, EVENTLOG_ERROR_TYPE);
     }
@@ -339,7 +339,7 @@ class WinServiceBase {
         assert(s_service != NULL);
 
         // Register the handler function for the service
-        s_service->m_statusHandle = RegisterServiceCtrlHandler(s_service->m_name, ServiceCtrlHandler);
+        s_service->m_statusHandle = RegisterServiceCtrlHandlerW(s_service->m_name, ServiceCtrlHandler);
         if (s_service->m_statusHandle == NULL) {
             throw GetLastError();
         }

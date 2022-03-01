@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cwctype>
 #include <iterator>
+#include <sstream>
 
 namespace akali_hpp {
 class StringHelper {

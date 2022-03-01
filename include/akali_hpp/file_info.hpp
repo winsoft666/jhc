@@ -69,7 +69,7 @@ class WinFileInfo {
         CloseHandle(hFile);
         hFile = INVALID_HANDLE_VALUE;
 
-        DWORD dwHandle;
+        DWORD dwHandle = 0;
         DWORD dwFileVersionInfoSize = GetFileVersionInfoSizeW(strFileName.c_str(), &dwHandle);
 
         if (!dwFileVersionInfoSize)
@@ -81,7 +81,7 @@ class WinFileInfo {
             return false;
 
         try {
-            if (!GetFileVersionInfoW((LPTSTR)strFileName.c_str(), dwHandle, dwFileVersionInfoSize, lpData))
+            if (!GetFileVersionInfoW((LPWSTR)strFileName.c_str(), dwHandle, dwFileVersionInfoSize, lpData))
                 return false;
 
             LPVOID lpInfo;

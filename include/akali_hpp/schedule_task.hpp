@@ -33,6 +33,7 @@
 #include <taskschd.h>
 #include <strsafe.h>
 #include "akali_hpp/macros.hpp"
+#include "akali_hpp/string_encode.hpp"
 
 #pragma comment(lib, "taskschd.lib")
 
@@ -367,7 +368,8 @@ class ScheduleTask {
             hr = pExecAction->get_Path(&variantTaskStr.bstrVal);
             if (FAILED(hr))
                 break;
-            StringCchCopy(pszProgramPath, MAX_PATH, variantTaskStr.bstrVal);
+
+            StringCchCopy(pszProgramPath, MAX_PATH, UnicodeToTCHAR(variantTaskStr.bstrVal).c_str());
             bRet = true;
         } while (false);
 
@@ -428,7 +430,7 @@ class ScheduleTask {
             hr = pExecAction->get_Arguments(&variantTaskStr.bstrVal);
             if (FAILED(hr))
                 break;
-            StringCchCopy(pszParameters, MAX_PATH, variantTaskStr.bstrVal);
+            StringCchCopy(pszParameters, MAX_PATH, UnicodeToTCHAR(variantTaskStr.bstrVal).c_str());
             bRet = true;
         } while (false);
 

@@ -100,6 +100,9 @@ class Ini {
         WCHAR* pBuf = NULL;
         do {
             pBuf = (WCHAR*)malloc(iBufSize * sizeof(WCHAR));
+            if (!pBuf) {
+                break;
+            }
             memset(pBuf, 0, iBufSize * sizeof(WCHAR));
             SetLastError(0);
             DWORD dwRet = GetPrivateProfileStringW(item.c_str(), sub_item.c_str(), L"", pBuf, iBufSize,
@@ -173,7 +176,7 @@ class Ini {
         if (ini_file_path_.length() == 0)
             return false;
 
-        return !!WritePrivateProfileString(item.c_str(), sub_item.c_str(), value.c_str(),
+        return !!WritePrivateProfileStringW(item.c_str(), sub_item.c_str(), value.c_str(),
                                            ini_file_path_.c_str());
     }
 

@@ -73,11 +73,11 @@ class RegKey {
         m_dwSamDesired = samDesired;
         if (bCreate) {
             DWORD dwDisposition;
-            dwResult = RegCreateKeyEx(m_hkeyRoot, m_strSubKey.c_str(), 0, NULL, 0, samDesired, NULL,
+            dwResult = RegCreateKeyExW(m_hkeyRoot, m_strSubKey.c_str(), 0, NULL, 0, samDesired, NULL,
                                       &m_hkey, &dwDisposition);
         }
         else {
-            dwResult = RegOpenKeyEx(m_hkeyRoot, m_strSubKey.c_str(), 0, samDesired, &m_hkey);
+            dwResult = RegOpenKeyExW(m_hkeyRoot, m_strSubKey.c_str(), 0, samDesired, &m_hkey);
         }
 
         return dwResult;
@@ -291,7 +291,7 @@ class RegKey {
         if (SUCCEEDED(hr)) {
             while (pTemp && TEXT('\0') != *pTemp) {
                 vStrValues.push_back(std::wstring(pTemp));
-                pTemp += lstrlen(pTemp) + 1;
+                pTemp += lstrlenW(pTemp) + 1;
             }
         }
 
@@ -343,7 +343,7 @@ class RegKey {
     HRESULT GetSubKeys(std::vector<std::wstring>& subKeys) {
         WCHAR achKey[256];                    // buffer for subkey name
         DWORD cbName = 255;                   // size of name string
-        WCHAR achClass[MAX_PATH] = TEXT("");  // buffer for class name
+        WCHAR achClass[MAX_PATH] = L"";       // buffer for class name
         DWORD cchClassName = MAX_PATH;        // size of class string
         DWORD cSubKeys = 0;                   // number of subkeys
         DWORD cbMaxSubKey;                    // longest subkey size
@@ -480,7 +480,7 @@ class RegKey {
             FreeLibrary(hAdvAPI32);
         }
         else {
-            ls = RegDeleteKey(hKey, pszSubKey);
+            ls = RegDeleteKeyW(hKey, pszSubKey);
         }
 
         return (ls == ERROR_SUCCESS);
