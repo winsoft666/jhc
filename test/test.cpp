@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define EXPECT_TRUE(x) do{ if(!(x)) printf("Not Pass: " #x "\n"); } while(false)
+#define EXPECT_TRUE(x) do{ if((x)) printf("OK: " #x "\n"); else printf("Failed: " #x "\n"); } while(false)
 
 int main()
 {
