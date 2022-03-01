@@ -18,27 +18,25 @@
 #ifndef AKALI_PROCESS_UTIL_H__
 #define AKALI_PROCESS_UTIL_H__
 
-#include <string>
-#include <strsafe.h>
-#include <tchar.h>
-#include <Shlwapi.h>
-
 #include "akali_hpp/arch.hpp"
+#include <string>
 
 #ifdef AKALI_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // !WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #include <tchar.h>
+#include <strsafe.h>
+#include <Shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
 #elif defined(_GNU_SOURCE)
 #include <errno.h>
 #endif
 
 #pragma warning(disable : 4996)
-#pragma comment(lib, "Shlwapi.lib")
 
 namespace akali_hpp {
 class ProcessUtil {
