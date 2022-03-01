@@ -33,6 +33,8 @@
 #include <Windows.h>
 #endif
 #include <tchar.h>
+#elif defined(_GNU_SOURCE)
+#include <errno.h>
 #endif
 
 #pragma warning(disable : 4996)
@@ -138,6 +140,40 @@ class ProcessUtil {
     }
 
 #endif
+
+    static std::string GetCurrentProcessPath() {
+        std::string ret;
+#ifdef AKALI_WIN
+        char* pBuf = NULL;
+        DWORD dwBufSize = MAX_PATH;
+
+        do {
+            pBuf = (char*)malloc(dwBufSize);
+            if (!pBuf)
+                break;
+            memset(pBuf, 0, dwBufSize);
+
+            DWORD dwGot = GetModuleFileNameA(NULL, pBuf, dwBufSize);
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                free(pBuf);
+                dwBufSize *= 2;
+            }
+            else {
+                break;
+            }
+        } while (true);
+
+        if (pBuf) {
+            ret = pBuf;
+            free(pBuf);
+        }
+#elif defined(AKALI_MACOS)
+        return getprogname();
+#elif defined(_GNU_SOURCE)
+        return program_invocation_name;
+#endif
+        return ret;
+    }
 };
 }  // namespace akali_hpp
 

@@ -36,6 +36,7 @@
 #include "akali_hpp/registry.hpp"
 #include "akali_hpp/schedule_task.hpp"
 #include "akali_hpp/singleton.hpp"
+#include "akali_hpp/spdlog_wrapper.hpp"
 #include "akali_hpp/string_helper.hpp"
 #include "akali_hpp/string_encode.hpp"
 #include "akali_hpp/thread.hpp"

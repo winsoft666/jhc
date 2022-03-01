@@ -43,5 +43,13 @@ int main()
     cout << urlEncoded << endl;
     cout << akali_hpp::UrlEncode::Decode(urlEncoded) << endl;
 
+    cout << akali_hpp::ProcessUtil::GetCurrentProcessPath() << endl;
+
+    if (akali_hpp::SpdlogWrapper::GlobalRegister("akali_hpp_tester")) {
+        for (int i = 0; i < 10000; i++) {
+            akali_hpp::SpdlogWrapper::Trace("this is a test log, id is {}", i);
+        }
+    }
+
     return 0;
 }

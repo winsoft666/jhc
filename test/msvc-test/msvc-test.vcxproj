@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\include\akali_hpp\registry.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\schedule_task.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\singleton.hpp" />
+    <ClInclude Include="..\..\include\akali_hpp\spdlog_wrapper.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\string_encode.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\string_helper.hpp" />
     <ClInclude Include="..\..\include\akali_hpp\thread.hpp" />

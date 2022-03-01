@@ -116,5 +116,8 @@
     <ClInclude Include="..\..\include\akali_hpp\hex_encode.hpp">
       <Filter>akali_hpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\akali_hpp\spdlog_wrapper.hpp">
+      <Filter>akali_hpp</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
