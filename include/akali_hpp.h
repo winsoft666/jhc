@@ -32,6 +32,7 @@
 #include "akali_hpp/file_util.hpp"
 #include "akali_hpp/hex_encode.hpp"
 #include "akali_hpp/ini.hpp"
+#include "akali_hpp/json.hpp"
 #include "akali_hpp/macros.hpp"
 #include "akali_hpp/md5.hpp"
 #include "akali_hpp/memory_pool.hpp"

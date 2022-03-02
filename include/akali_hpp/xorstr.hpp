@@ -18,6 +18,7 @@
 #ifndef AKALI_XOR_STR_HPP__
 #define AKALI_XOR_STR_HPP__
 //
+// Compile time string encryption.
 // Need C++14 support!
 //
 

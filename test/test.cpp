@@ -18,6 +18,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <time.h>
+//
+// It is strongly recommended not to include this file directly!!!
 #include "akali_hpp.h"
 
 #define EXPECT_TRUE(x) do{ if((x)) printf("OK: " #x "\n"); else printf("Failed: " #x "\n"); } while(false)
@@ -100,7 +102,45 @@ void CmdLineParserTest()
     EXPECT_TRUE(clp.getVal(L"k5") == L"");
     EXPECT_TRUE(clp.getVal(L"k6") == L"v6=");
     EXPECT_TRUE(clp.getVal(L"k7") == L"v7 /v=-'");
+}
 
+void JsonTest()
+{
+    akali_hpp::json j;
+    j["pi"] = 3.141;
+    j["happy"] = true;
+    j["name"] = "Niels";
+    j["nothing"] = nullptr;
+    j["answer"]["everything"] = 42;
+    j["list"] = { 1, 0, 2 };
+    j["object"] = { {"currency", "USD"}, {"value", 42.99} };
+
+    std::string strJson = j.dump();
+    printf("%s\n\n", strJson.c_str());
+
+    std::string strJsonIndent = j.dump(4);
+    printf("%s\n\n", strJsonIndent.c_str());
+
+    // instead, you could also write (which looks very similar to the JSON above)
+    akali_hpp::json j2 = {
+      {"pi", 3.141},
+      {"happy", true},
+      {"name", "Niels"},
+      {"nothing", nullptr},
+      {"answer", {
+        {"everything", 42}
+      }},
+      {"list", {1, 0, 2}},
+      {"object", {
+        {"currency", "USD"},
+        {"value", 42.99}
+      }}
+    };
+    std::string strJson2 = j2.dump();
+    printf("%s\n\n", strJson2.c_str());
+
+    std::string strJsonIndent2 = j2.dump(4);
+    printf("%s\n\n", strJsonIndent2.c_str());
 }
 
 int main()
@@ -118,7 +158,7 @@ int main()
     CmdLineParserTest();
     Base64Test();
     SpdlogTest();
-
+    JsonTest();
 
     return 0;
 }

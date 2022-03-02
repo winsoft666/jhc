@@ -493,7 +493,7 @@ class StringHelper {
 
     static int vsnprintfT(wchar_t* dst, size_t count, const wchar_t* format, va_list ap) {
 #if defined(AKALI_WIN)
-        return _vsnwprintf(dst, count, format, ap);
+        return _vsnwprintf_s(dst, count, count - 1, format, ap);
 #else
         return vswprintf(dst, count, format, ap);
 #endif

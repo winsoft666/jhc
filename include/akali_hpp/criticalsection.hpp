@@ -17,10 +17,11 @@
 
 #ifndef AKALI_CRITICAL_SECTION_HPP__
 #define AKALI_CRITICAL_SECTION_HPP__
-#pragma once
+//
+// Windows CriticalSection wrapper.
+//
 
 #include "akali_hpp/arch.hpp"
-
 #ifdef AKALI_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
