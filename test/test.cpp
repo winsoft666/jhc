@@ -59,6 +59,8 @@ int main()
     EXPECT_TRUE(akali_hpp::StringEncode::Utf8ToUnicode(u8str) == wstr);
     EXPECT_TRUE(akali_hpp::StringEncode::UnicodeToUtf8(wstr) == u8str);
 
+    EXPECT_TRUE(akali_hpp::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
+    EXPECT_TRUE(akali_hpp::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
 
     return 0;
 }

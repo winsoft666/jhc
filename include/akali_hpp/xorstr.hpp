@@ -22,6 +22,10 @@
 #include <type_traits>
 #include <cstdlib>
 
+#ifdef __GNUC__
+#define __forceinline __attribute__((always_inline))
+#endif
+
 namespace akali_hpp {
 
 constexpr auto seed = static_cast<int>(__TIME__[7]) + static_cast<int>(__TIME__[6]) * 10 + static_cast<int>(__TIME__[4]) * 60 + static_cast<int>(__TIME__[3]) * 600 + static_cast<int>(__TIME__[1]) * 3600 + static_cast<int>(__TIME__[0]) * 36000;

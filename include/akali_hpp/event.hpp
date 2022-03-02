@@ -18,9 +18,8 @@
 #ifndef AKALI_EVENT_HPP__
 #define AKALI_EVENT_HPP__
 
-#include <stdint.h>
-#include <assert.h>
 #include <mutex>
+#include <condition_variable>
 
 namespace akali_hpp {
 class Event {

@@ -26,9 +26,9 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
+#endif  // !_INC_WINDOWS
 #include <direct.h>
-#endif
+#endif  // !AKALI_WIN
 
 namespace akali_hpp {
 #ifdef AKALI_WIN
@@ -72,8 +72,6 @@ class WinDriverInfo {
             GetVolumeInformationW(sRoot.c_str(), buf, 20, NULL, NULL, NULL, NULL, 0);
 
             std::wstring strVolume = buf;
-            FormatName(sVolume);
-
             return sVolume;
         }
 
@@ -161,34 +159,6 @@ class WinDriverInfo {
             return DRIVE_UNKNOWN;
     }
 
-    static void FormatName(std::wstring& sFilename) {
-        // std::wstring sTemp, sChar;
-        // int nLen, nChar;
-        // wchar_t cChar, cLastChar = ' '; // space
-
-        //// this function accepts pathnames and names with spaces
-        // sFilename.MakeLower();
-        // nLen = sFilename.GetLength();
-
-        //// for each word make the first letter upper case
-        // for (nChar = 0; nChar < nLen; nChar++)
-        //{
-        //    cChar = sFilename[nChar];
-
-        //    if (cLastChar == ' ' || cLastChar == '\\')
-        //    {
-        //        sChar = std::wstring(cChar);
-        //        sChar.MakeUpper();
-        //        cChar = sChar[0];
-        //    }
-
-        //    sTemp += cChar;
-        //    cLastChar = cChar;
-        //}
-
-        // sFilename = sTemp;
-    }
-
     static bool IsDriveAvailable(int nDrive) {
         int nCurDrive;
         int nRes;
@@ -204,7 +174,9 @@ class WinDriverInfo {
         return (nRes == 0) ? true : false;
     }
 
-    static bool IsUNCPath(const wchar_t* szPathName) { return (wcsstr(szPathName, L"\\\\") == szPathName); }
+    static bool IsUNCPath(const wchar_t* szPathName) {
+        return (wcsstr(szPathName, L"\\\\") == szPathName);
+    }
 
     static int GetDrive(const wchar_t* szPathName) {
         int nDrive = 0;
@@ -282,6 +254,6 @@ class WinDriverInfo {
         return dwHDSerialNum;
     }
 };
+#endif // !AKALI_WIN
 }  // namespace akali_hpp
-#endif
 #endif

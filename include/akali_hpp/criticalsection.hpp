@@ -27,7 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
@@ -56,5 +56,5 @@ class CritScope {
     AKALI_DISALLOW_COPY_AND_ASSIGN(CritScope);
 };
 }  // namespace akali_hpp
-#endif
+#endif // !AKALI_WIN
 #endif  // !AKALI_CRITICAL_SECTION_HPP__
