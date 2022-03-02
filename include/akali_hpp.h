@@ -24,6 +24,7 @@
 
 #include "akali_hpp/arch.hpp"
 #include "akali_hpp/base64.hpp"
+#include "akali_hpp/cmd_line_parse.hpp"
 #include "akali_hpp/criticalsection.hpp"
 #include "akali_hpp/driver_info.hpp"
 #include "akali_hpp/event.hpp"

@@ -21,9 +21,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cstdarg>
 #include <cwctype>
 #include <iterator>
 #include <sstream>
+#include <cassert>
 
 #if defined(__GNUC__)
 #define VA_COPY(a, b) (va_copy(a, b))

@@ -52,6 +52,11 @@ void StringHelperTest()
 
     const std::string s1 = akali_hpp::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
     EXPECT_TRUE(s1 == "jack's age is 18");
+
+    const std::wstring ws1 = akali_hpp::StringHelper::StringPrintf(L"%s's age is %d", L"jack", 18);
+    EXPECT_TRUE(ws1 == L"jack's age is 18");
+
+    const std::string bigStr(2048, 'a');
 }
 
 void StringEncodeTest()
@@ -81,6 +86,23 @@ void SpdlogTest()
     akali_hpp::Trace::MsgW(L"[%ld] this message output by akali_hpp::Trace::MsgW\n", time(0));
 }
 
+void CmdLineParserTest()
+{
+    std::wstring wparam = L"\"C:\\Program Files (x86)\\Google\\Chrome.exe\" -k1=v1 -k2:v2 /k3=v3 /k4:v4 /k5 -k6=v6= /k7=\"v7 /v=-'\"";
+    akali_hpp::CmdLineParser clp(wparam);
+    for (akali_hpp::CmdLineParser::ITERPOS it = clp.begin(); it != clp.end(); ++it)
+        printf("Key:%ls, Value:%ls\n", it->first.c_str(), it->second.c_str());
+
+    EXPECT_TRUE(clp.getVal(L"k1") == L"v1");
+    EXPECT_TRUE(clp.getVal(L"k2") == L"v2");
+    EXPECT_TRUE(clp.getVal(L"k3") == L"v3");
+    EXPECT_TRUE(clp.getVal(L"k4") == L"v4");
+    EXPECT_TRUE(clp.getVal(L"k5") == L"");
+    EXPECT_TRUE(clp.getVal(L"k6") == L"v6=");
+    EXPECT_TRUE(clp.getVal(L"k7") == L"v7 /v=-'");
+
+}
+
 int main()
 {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
@@ -93,8 +115,10 @@ int main()
 
     StringHelperTest();
     StringEncodeTest();
+    CmdLineParserTest();
     Base64Test();
     SpdlogTest();
+
 
     return 0;
 }
