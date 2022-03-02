@@ -78,12 +78,33 @@ class Trace {
             pMsgBuffer = NULL;
         }
 #else
-        wchar_t msgBuf[1024] = {0};
+        wchar_t* msgBuf = nullptr;
+        size_t msgBufSize = 1024;
         va_list arglist;
         va_start(arglist, lpFormat);
-        int err = vswprintf(msgBuf, 1024, lpFormat, arglist);
+
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+            msgBuf = (wchar_t*)malloc(msgBufSize * sizeof(wchar_t));
+            memset(msgBuf, 0, msgBufSize * sizeof(wchar_t));
+
+            const int err = vswprintf(msgBuf, msgBufSize, lpFormat, arglist);
+            if (err >= 0 && err < msgBufSize)
+                break;
+
+            msgBufSize *= 2;
+        } while (true);
+
         va_end(arglist);
         printf("%ls\n", msgBuf);
+
+        if (msgBuf) {
+            free(msgBuf);
+            msgBuf = nullptr;
+        }
 #endif
     }
 
@@ -128,12 +149,34 @@ class Trace {
             pMsgBuffer = NULL;
         }
 #else
-        char msgBuf[1024] = {0};
+        char* msgBuf = nullptr;
+        size_t msgBufSize = 1024;
         va_list arglist;
         va_start(arglist, lpFormat);
-        int err = vsnprintf(msgBuf, 1024, lpFormat, arglist);
+
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+
+            msgBuf = (char*)malloc(msgBufSize * sizeof(char));
+            memset(msgBuf, 0, msgBufSize * sizeof(char));
+
+            const int err = vsnprintf(msgBuf, msgBufSize, lpFormat, arglist);
+            if (err >= 0 && err < msgBufSize)
+                break;
+
+            msgBufSize *= 2;
+        } while (true);
+
         va_end(arglist);
         printf("%s\n", msgBuf);
+
+        if (msgBuf) {
+            free(msgBuf);
+            msgBuf = nullptr;
+        }
 #endif
     }
 };

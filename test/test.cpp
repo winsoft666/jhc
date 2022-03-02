@@ -17,6 +17,7 @@
 
 #include "akali_hpp.h"
 #include <stdio.h>
+#include <time.h>
 
 using namespace std;
 
@@ -71,6 +72,8 @@ int main()
     akali_hpp::SpdlogWrapper::Error("this is error log");
     akali_hpp::SpdlogWrapper::Critical("this is critical log");
 
+    akali_hpp::Trace::MsgA("[%ld] this message output by akali_hpp::Trace::MsgA\n", time(0));
+    akali_hpp::Trace::MsgW(L"[%ld] this message output by akali_hpp::Trace::MsgW\n", time(0));
 
     return 0;
 }
