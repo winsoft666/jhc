@@ -99,7 +99,7 @@ class Trace {
         } while (true);
 
         va_end(arglist);
-        printf("%ls\n", msgBuf);
+        printf("%ls", msgBuf);
 
         if (msgBuf) {
             free(msgBuf);
@@ -171,7 +171,7 @@ class Trace {
         } while (true);
 
         va_end(arglist);
-        printf("%s\n", msgBuf);
+        printf("%s", msgBuf);
 
         if (msgBuf) {
             free(msgBuf);
