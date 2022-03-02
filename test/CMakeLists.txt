@@ -49,4 +49,6 @@ add_executable(
 if (WIN32 OR _WIN32)
 	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
 	set_target_properties(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "_CONSOLE")
+else()
+   target_link_libraries(${EXE_NAME} pthread)
 endif()
