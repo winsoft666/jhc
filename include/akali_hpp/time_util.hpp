@@ -55,7 +55,7 @@ class Time {
         nanoseconds = 0;
     }
 
-    std::string toString(bool mill_precision = false,
+    std::string toString(bool milli_precision = false,
                          bool micro_precision = false,
                          bool nano_precision = false) const {
         char szString[512];
@@ -67,7 +67,7 @@ class Time {
             snprintf(szString, 512, "%04d/%02d/%02d %02u:%02u:%02u:%03u:%03u", year, month, day, hour,
                      minute, second, milliseconds, microseconds);
         }
-        else if (mill_precision) {
+        else if (milli_precision) {
             snprintf(szString, 512, "%04d/%02d/%02d %02u:%02u:%02u:%03u", year, month, day, hour, minute,
                      second, milliseconds);
         }
@@ -101,26 +101,35 @@ class TimeUtil {
     static const int64_t kNumNanosecsPerMillisec = kNumNanosecsPerSec / kNumMillisecsPerSec;
     static const int64_t kNumNanosecsPerMicrosec = kNumNanosecsPerSec / kNumMicrosecsPerSec;
 
-    // 从1970-01-01 00:00:00到当前格林威治时间（UTC）所经过的微妙数
-    static long long GetTimeStamp() {
+    // The microseconds that since 1970-01-01 00:00:00(UTC)
+    static int64_t GetCurrentTimestampByMicroSec() {
 #ifdef AKALI_WIN
         union {
-            long long ns100;
+            int64_t ns100;
             FILETIME ft;
         } fileTime;
         GetSystemTimeAsFileTime(&fileTime.ft);
 
-        // lNowMicroMS中存储着从1970-01-01 00:00:00到当前格林威治时间（UTC）所经过的微妙数
-        // 116444736000000000是从1601年1月1日00:00:00:000到1970年1月1日00:00:00:000所经过的100纳秒数
-        long long lNowMicroMS = (long long)((fileTime.ns100 - 116444736000000000LL) / 10LL);
+        // 116444736000000000 is the number of total 100 nanoseconds that from 1601/1/1 00:00:00:000 to 1970/1/1 00:00:00:000
+        int64_t lNowMicroMS = (long long)((fileTime.ns100 - 116444736000000000LL) / 10LL);
 
         return lNowMicroMS;
 #else
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        long long lNowMicroMS = tv.tv_sec * 1000000 + tv.tv_usec;
+        int64_t lNowMicroMS = tv.tv_sec * 1000000 + tv.tv_usec;
         return lNowMicroMS;
 #endif
+    }
+
+    // The milliseconds that since 1970-01-01 00:00:00(UTC)
+    static int64_t GetCurrentTimestampByMilliSec() {
+        return GetCurrentTimestampByMicroSec() / 1000;
+    }
+
+    // The seconds that since 1970-01-01 00:00:00(UTC)
+    static int64_t GetCurrentTimestampBySec() {
+        return GetCurrentTimestampByMicroSec() / 1000000;
     }
 
     // Windows: precision is milliseconds
@@ -213,7 +222,7 @@ class TimeUtil {
         return t;
     }
 #endif
-    long long UTCToTimeStamp(Time t) {
+    int64_t UTCToTimeStamp(Time t) {
         struct tm tmUTC;
         tmUTC.tm_year = t.year - 1900;
         tmUTC.tm_mon = t.month - 1;
@@ -224,7 +233,7 @@ class TimeUtil {
 
         time_t timastampSec = mktime(&tmUTC);
 
-        return (long long)timastampSec * 1000000;
+        return (int64_t)timastampSec * 1000000;
     }
 };
 

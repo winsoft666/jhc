@@ -15,22 +15,15 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "akali_hpp.h"
+#include <inttypes.h>
 #include <stdio.h>
 #include <time.h>
-
-using namespace std;
+#include "akali_hpp.h"
 
 #define EXPECT_TRUE(x) do{ if((x)) printf("OK: " #x "\n"); else printf("Failed: " #x "\n"); } while(false)
 
-int main()
+void StringHelperTest()
 {
-    const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
-    printf("Current OS Version: %s\n", strOSVer.c_str());
-
-    const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
-    printf("Current Path: %s\n", strCurExePath.c_str());
-
     EXPECT_TRUE(akali_hpp::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(akali_hpp::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(akali_hpp::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
@@ -57,14 +50,26 @@ int main()
     EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes("123 4567 121", " ") == 2);
     EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
 
+    const std::string s1 = akali_hpp::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
+    EXPECT_TRUE(s1 == "jack's age is 18");
+}
+
+void StringEncodeTest()
+{
     const std::string u8str = u8"中国china";
     const std::wstring wstr = L"中国china";
     EXPECT_TRUE(akali_hpp::StringEncode::Utf8ToUnicode(u8str) == wstr);
     EXPECT_TRUE(akali_hpp::StringEncode::UnicodeToUtf8(wstr) == u8str);
+}
 
+void Base64Test()
+{
     EXPECT_TRUE(akali_hpp::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
     EXPECT_TRUE(akali_hpp::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
+}
 
+void SpdlogTest()
+{
     EXPECT_TRUE(akali_hpp::SpdlogWrapper::GlobalRegister("akali_hpp_tester"));
     akali_hpp::SpdlogWrapper::Trace("this is trace log");
     akali_hpp::SpdlogWrapper::Info("this is info log");
@@ -74,6 +79,22 @@ int main()
 
     akali_hpp::Trace::MsgA("[%ld] this message output by akali_hpp::Trace::MsgA\n", time(0));
     akali_hpp::Trace::MsgW(L"[%ld] this message output by akali_hpp::Trace::MsgW\n", time(0));
+}
+
+int main()
+{
+    printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
+
+    const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
+    printf("Current OS Version: %s\n", strOSVer.c_str());
+
+    const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
+    printf("Current Path: %s\n", strCurExePath.c_str());
+
+    StringHelperTest();
+    StringEncodeTest();
+    Base64Test();
+    SpdlogTest();
 
     return 0;
 }
