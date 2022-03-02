@@ -17,6 +17,9 @@
 
 #ifndef AKALI_XOR_STR_HPP__
 #define AKALI_XOR_STR_HPP__
+//
+// Need C++14 support!
+//
 
 #include <array>
 #include <type_traits>

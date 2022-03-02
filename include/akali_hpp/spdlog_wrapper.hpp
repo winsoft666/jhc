@@ -23,6 +23,7 @@
 #include "spdlog/sinks/msvc_sink.h"
 #endif
 #include "spdlog/sinks/rotating_file_sink.h"
+#include "akali_hpp/trace.hpp"
 
 #ifdef AKALI_WIN
 #include <Shlwapi.h>
@@ -32,6 +33,9 @@
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Shell32.lib")
+#else
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 namespace akali_hpp {
@@ -74,10 +78,8 @@ class SpdlogWrapper {
             file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e %z] [%L] [%P-%t] %v");
 
 #else
-            // /var/log/<appName>/app.log
-            std::string strLogFolder = "/var/log/" + appName;
-            std::string strExeName = "app";
-            std::string logFileBaseName = strLogFolder + strExeName + ".log";
+            // ./<appName>.log
+            std::string logFileBaseName = "./" + appName + ".log";
 
             file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
                 logFileBaseName,
@@ -101,10 +103,10 @@ class SpdlogWrapper {
             spdlog::flush_every(std::chrono::seconds(1));
             spdlog::flush_on(spdlog::level::warn);
         } catch (const spdlog::spdlog_ex& ex) {
-            (void)(ex);
+            Trace::MsgA("SpdlogWrapper: %s\n", ex.what() ? ex.what() : "");
             return false;
         } catch (const std::exception& e) {
-            (void)(e);
+            Trace::MsgA("SpdlogWrapper: %s\n", e.what() ? e.what() : "");
             return false;
         }
 

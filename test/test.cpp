@@ -24,6 +24,12 @@ using namespace std;
 
 int main()
 {
+    const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
+    printf("Current OS Version: %s\n", strOSVer.c_str());
+
+    const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
+    printf("Current Path: %s\n", strCurExePath.c_str());
+
     EXPECT_TRUE(akali_hpp::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(akali_hpp::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(akali_hpp::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
@@ -50,10 +56,6 @@ int main()
     EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes("123 4567 121", " ") == 2);
     EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
 
-    const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
-    printf("Current OS Version: %s\n", strOSVer.c_str());
-
-
     const std::string u8str = u8"中国china";
     const std::wstring wstr = L"中国china";
     EXPECT_TRUE(akali_hpp::StringEncode::Utf8ToUnicode(u8str) == wstr);
@@ -61,6 +63,14 @@ int main()
 
     EXPECT_TRUE(akali_hpp::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
     EXPECT_TRUE(akali_hpp::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
+
+    EXPECT_TRUE(akali_hpp::SpdlogWrapper::GlobalRegister("akali_hpp_tester"));
+    akali_hpp::SpdlogWrapper::Trace("this is trace log");
+    akali_hpp::SpdlogWrapper::Info("this is info log");
+    akali_hpp::SpdlogWrapper::Warn("this is warn log");
+    akali_hpp::SpdlogWrapper::Error("this is error log");
+    akali_hpp::SpdlogWrapper::Critical("this is critical log");
+
 
     return 0;
 }

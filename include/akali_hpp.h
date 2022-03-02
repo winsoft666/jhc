@@ -18,6 +18,10 @@
 #ifndef AKALI_HPP_H__
 #define AKALI_HPP_H__
 
+//
+// It is strongly recommended not to include this file directly!!!
+// 
+
 #include "akali_hpp/arch.hpp"
 #include "akali_hpp/base64.hpp"
 #include "akali_hpp/criticalsection.hpp"
