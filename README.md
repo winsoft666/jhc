@@ -6,6 +6,14 @@ A header-only C++ common library that don't need install any third party library
 
 `base64.hpp` is provided by [ReneNyffenegger/cpp-base64](https://github.com/ReneNyffenegger/cpp-base64) and adapted by me.
 
+# How to use
+Only need include `akali_hpp/include` folder in you project, then include header file at your code, such as:
+	
+```c++
+#include "akali_hpp/json.hpp"
+```
+
+
 # Build Test
 
 ```bash
