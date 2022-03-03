@@ -18,6 +18,8 @@
 #ifndef AKALI_MACROS_HPP__
 #define AKALI_MACROS_HPP__
 
+#include <float.h>
+
 // Compare two float point value
 #ifndef IS_NEARLY_EQUAL
 #define IS_NEARLY_EQUAL(x, y) (fabs((x) - (y)) < FLT_EPSILON)
