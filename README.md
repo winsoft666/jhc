@@ -6,3 +6,13 @@ A header-only C++ common library that don't need install any third party library
 
 `base64.hpp` is provided by [ReneNyffenegger/cpp-base64](https://github.com/ReneNyffenegger/cpp-base64) and adapted by me.
 
+# Build Test
+
+```bash
+cd test
+mkdir build
+cd build
+cmake ..
+make
+./test
+```
