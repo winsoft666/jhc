@@ -56,7 +56,7 @@ class FileUtil {
 
         WinFileRecurveSearch(szFrom, szTo, pIgnoredNum);
 #else
-#error Not Implemented
+# warning Not Implemented
 #endif
     }
 
@@ -116,7 +116,7 @@ class FileUtil {
 
         return bRet;
 #else
-#error Not Implemented
+#warning Not Implemented
 #endif
     }
 
@@ -190,7 +190,7 @@ class FileUtil {
             free(szDirBuf);
         return true;
 #else
-#error Not Implemented
+#warning Not Implemented
 #endif
     }
 

@@ -20,6 +20,7 @@
 
 #include <mutex>
 #include <string>
+#include <string.h>
 #include <stdlib.h>
 #include "akali_hpp/macros.hpp"
 

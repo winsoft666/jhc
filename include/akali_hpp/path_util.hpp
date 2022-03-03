@@ -164,9 +164,9 @@ const std::vector<PathString> PathUtil::kFilePathParentDirectory = {L".."};
 const PathChar PathUtil::kFilePathExtensionSeparator = L'.';
 #else
 const PathChar PathUtil::kEndChar = '\0';
-const PathChar PathUtil::kFilePathSeparators[] = "/";
-const PathChar PathUtil::kFilePathCurrentDirectory[] = ".";
-const PathChar PathUtil::kFilePathParentDirectory[] = "..";
+const std::vector<PathChar> PathUtil::kFilePathSeparators = {"/"};
+const std::vector<PathString> PathUtil::kFilePathCurrentDirectory = {"."};
+const std::vector<PathString> PathUtil::kFilePathParentDirectory = {".."};
 const PathChar PathUtil::kFilePathExtensionSeparator = '.';
 #endif  // AKALI_WIN
 }  // namespace akali_hpp
