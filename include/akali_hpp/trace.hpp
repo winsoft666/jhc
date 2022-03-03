@@ -33,151 +33,41 @@
 #include <string>
 #include <stdarg.h>
 #endif
+#include "akali_hpp/string_helper.hpp"
 
 namespace akali_hpp {
 class Trace {
    public:
     static void MsgW(const wchar_t* lpFormat, ...) {
-        if (!lpFormat)
-            return;
+        std::wstring output;
+        va_list args;
+        va_start(args, lpFormat);
+        const bool ret = StringHelper::StringPrintfV(lpFormat, args, output);
+        va_end(args);
 
+        if (ret) {
 #ifdef AKALI_WIN
-        wchar_t* pMsgBuffer = NULL;
-        size_t iMsgBufCount = 0;
-
-        va_list arglist;
-        va_start(arglist, lpFormat);
-        HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
-
-        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
-            iMsgBufCount += 1024;
-
-            if (pMsgBuffer) {
-                free(pMsgBuffer);
-                pMsgBuffer = NULL;
-            }
-
-            pMsgBuffer = (wchar_t*)malloc(iMsgBufCount * sizeof(wchar_t));
-
-            if (!pMsgBuffer) {
-                break;
-            }
-
-            hr = StringCchVPrintfW(pMsgBuffer, iMsgBufCount, lpFormat, arglist);
-        }
-
-        va_end(arglist);
-
-        if (hr == S_OK) {
-            if (pMsgBuffer)
-                OutputDebugStringW(pMsgBuffer);
-        }
-
-        if (pMsgBuffer) {
-            free(pMsgBuffer);
-            pMsgBuffer = NULL;
-        }
+            OutputDebugStringW(output.c_str());
 #else
-        wchar_t* msgBuf = nullptr;
-        size_t msgBufSize = 1024;
-        va_list arglist;
-        va_start(arglist, lpFormat);
-
-        do {
-            if (msgBuf) {
-                free(msgBuf);
-                msgBuf = nullptr;
-            }
-            msgBuf = (wchar_t*)malloc(msgBufSize * sizeof(wchar_t));
-            memset(msgBuf, 0, msgBufSize * sizeof(wchar_t));
-
-            const int err = vswprintf(msgBuf, msgBufSize, lpFormat, arglist);
-            if (err >= 0 && err < msgBufSize)
-                break;
-
-            msgBufSize *= 2;
-        } while (true);
-
-        va_end(arglist);
-        printf("%ls", msgBuf);
-
-        if (msgBuf) {
-            free(msgBuf);
-            msgBuf = nullptr;
-        }
+            printf("%ls", output.c_str());
 #endif
+        }
     }
 
     static void MsgA(const char* lpFormat, ...) {
-        if (!lpFormat)
-            return;
+        std::string output;
+        va_list args;
+        va_start(args, lpFormat);
+        const bool ret = StringHelper::StringPrintfV(lpFormat, args, output);
+        va_end(args);
 
+        if (ret) {
 #ifdef AKALI_WIN
-        char* pMsgBuffer = NULL;
-        size_t iMsgBufCount = 0;
-
-        va_list arglist;
-        va_start(arglist, lpFormat);
-        HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
-
-        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
-            iMsgBufCount += 1024;
-
-            if (pMsgBuffer) {
-                free(pMsgBuffer);
-                pMsgBuffer = NULL;
-            }
-
-            pMsgBuffer = (char*)malloc(iMsgBufCount * sizeof(char));
-
-            if (!pMsgBuffer) {
-                break;
-            }
-
-            hr = StringCchVPrintfA(pMsgBuffer, iMsgBufCount, lpFormat, arglist);
-        }
-
-        va_end(arglist);
-
-        if (hr == S_OK) {
-            if (pMsgBuffer)
-                OutputDebugStringA(pMsgBuffer);
-        }
-
-        if (pMsgBuffer) {
-            free(pMsgBuffer);
-            pMsgBuffer = NULL;
-        }
+            OutputDebugStringA(output.c_str());
 #else
-        char* msgBuf = nullptr;
-        size_t msgBufSize = 1024;
-        va_list arglist;
-        va_start(arglist, lpFormat);
-
-        do {
-            if (msgBuf) {
-                free(msgBuf);
-                msgBuf = nullptr;
-            }
-
-            msgBuf = (char*)malloc(msgBufSize * sizeof(char));
-            memset(msgBuf, 0, msgBufSize * sizeof(char));
-
-            const int err = vsnprintf(msgBuf, msgBufSize, lpFormat, arglist);
-            if (err >= 0 && err < msgBufSize)
-                break;
-
-            msgBufSize *= 2;
-        } while (true);
-
-        va_end(arglist);
-        printf("%s", msgBuf);
-
-        if (msgBuf) {
-            free(msgBuf);
-            msgBuf = nullptr;
-        }
+            printf("%s", output.c_str());
 #endif
+        }
     }
 };
 }  // namespace akali_hpp

@@ -18,6 +18,7 @@
 #ifndef AKALI_STRING_HELPER_HPP__
 #define AKALI_STRING_HELPER_HPP__
 
+#include "akali_hpp/arch.hpp"
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -26,13 +27,20 @@
 #include <iterator>
 #include <sstream>
 #include <cassert>
+#ifdef AKALI_WIN
+#ifndef _INC_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif  // !WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif  // !_INC_WINDOWS
+#include <strsafe.h>
+#endif
 
 #if defined(__GNUC__)
 #define VA_COPY(a, b) (va_copy(a, b))
-#elif defined(_MSC_VER)
-#define VA_COPY(a, b) (a = b)
 #else
-#error Not support compiler
+#define VA_COPY(a, b) (a = b)
 #endif
 
 #ifndef COUNT_OF
@@ -415,11 +423,157 @@ class StringHelper {
     }
 
     // format a string
+    static bool StringPrintfV(const char* format, va_list argList, std::string& output) {
+        if (!format)
+            return false;
+
+#ifdef AKALI_WIN
+        char* pMsgBuffer = NULL;
+        size_t iMsgBufCount = 0;
+
+        HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
+        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
+            iMsgBufCount += 1024;
+            if (pMsgBuffer) {
+                free(pMsgBuffer);
+                pMsgBuffer = NULL;
+            }
+
+            pMsgBuffer = (char*)malloc(iMsgBufCount * sizeof(char));
+            if (!pMsgBuffer) {
+                break;
+            }
+            hr = StringCchVPrintfA(pMsgBuffer, iMsgBufCount, format, argList);
+        }
+
+        if (hr == S_OK && pMsgBuffer) {
+            output.assign(pMsgBuffer);
+        }
+
+        if (pMsgBuffer) {
+            free(pMsgBuffer);
+            pMsgBuffer = NULL;
+        }
+
+        return (hr == S_OK);
+#else
+        bool result = false;
+        char* msgBuf = nullptr;
+        size_t msgBufSize = 1024;
+
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+            msgBuf = (char*)malloc(msgBufSize * sizeof(char));
+            if (!msgBuf) {
+                break;
+            }
+            memset(msgBuf, 0, msgBufSize * sizeof(char));
+
+            va_list va_copy;
+            VA_COPY(va_copy, argList);
+            const int err = vsnprintf(msgBuf, msgBufSize, format, va_copy);
+            if (err >= 0 && err < msgBufSize) {
+                result = true;
+                break;
+            }
+
+            msgBufSize *= 2;
+        } while (true);
+
+        if (result && msgBuf) {
+            output.assign(msgBuf);
+        }
+
+        if (msgBuf) {
+            free(msgBuf);
+            msgBuf = nullptr;
+        }
+
+        return result;
+#endif
+    }
+
+    static bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) {
+        if (!format)
+            return false;
+
+#ifdef AKALI_WIN
+        wchar_t* pMsgBuffer = NULL;
+        size_t iMsgBufCount = 0;
+
+        HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
+        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
+            iMsgBufCount += 1024;
+            if (pMsgBuffer) {
+                free(pMsgBuffer);
+                pMsgBuffer = NULL;
+            }
+
+            pMsgBuffer = (wchar_t*)malloc(iMsgBufCount * sizeof(wchar_t));
+            if (!pMsgBuffer) {
+                break;
+            }
+            hr = StringCchVPrintfW(pMsgBuffer, iMsgBufCount, format, argList);
+        }
+
+        if (hr == S_OK && pMsgBuffer) {
+            output.assign(pMsgBuffer);
+        }
+
+        if (pMsgBuffer) {
+            free(pMsgBuffer);
+            pMsgBuffer = NULL;
+        }
+
+        return (hr == S_OK);
+#else
+        bool result = false;
+        wchar_t* msgBuf = nullptr;
+        size_t msgBufSize = 1024;
+
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+            msgBuf = (wchar_t*)malloc(msgBufSize * sizeof(wchar_t));
+            if (!msgBuf) {
+                break;
+            }
+            memset(msgBuf, 0, msgBufSize * sizeof(wchar_t));
+
+            va_list va_copy;
+            VA_COPY(va_copy, argList);
+            const int err = vswprintf(msgBuf, msgBufSize, format, va_copy);
+            if (err >= 0 && err < msgBufSize) {
+                result = true;
+                break;
+            }
+
+            msgBufSize *= 2;
+        } while (true);
+
+        if (result && msgBuf) {
+            output.assign(msgBuf);
+        }
+
+        if (msgBuf) {
+            free(msgBuf);
+            msgBuf = nullptr;
+        }
+
+        return result;
+#endif
+    }
+
     static std::string StringPrintf(const char* format, ...) {
         va_list args;
         va_start(args, format);
         std::string output;
-        StringAppendV(output, format, args);
+        StringPrintfV(format, args, output);
         va_end(args);
 
         return output;
@@ -429,121 +583,22 @@ class StringHelper {
         va_list args;
         va_start(args, format);
         std::wstring output;
-        StringAppendV(output, format, args);
+        StringPrintfV(format, args, output);
         va_end(args);
 
         return output;
     }
 
-    static const std::string& StringPrintf(std::string& output, const char* format, ...) {
-        va_list args;
-        va_start(args, format);
-        output.clear();
-        StringAppendV(output, format, args);
-        va_end(args);
+    static std::string StringPrintfV(const char* format, va_list argList) {
+        std::string output;
+        StringPrintfV(format, argList, output);
         return output;
     }
 
-    static const std::wstring& StringPrintf(std::wstring& output, const wchar_t* format, ...) {
-        va_list args;
-        va_start(args, format);
-        output.clear();
-        StringAppendV(output, format, args);
-        va_end(args);
+    static std::wstring StringPrintfV(const wchar_t* format, va_list argList) {
+        std::wstring output;
+        StringPrintfV(format, argList, output);
         return output;
-    }
-
-    static void StringPrintfV(std::string& output, const char* format, va_list ap) {
-        output.clear();
-        StringAppendV(output, format, ap);
-    }
-
-    static void StringPrintfV(std::wstring& output, const wchar_t* format, va_list ap) {
-        output.clear();
-        StringAppendV(output, format, ap);
-    }
-
-    // format a string and append the result to a existing string
-    static void StringAppendF(std::string& output, const char* format, ...) {
-        va_list args;
-        va_start(args, format);
-        StringAppendV(output, format, args);
-        va_end(args);
-    }
-
-    static void StringAppendF(std::wstring& output, const wchar_t* format, ...) {
-        va_list args;
-        va_start(args, format);
-        StringAppendV(output, format, args);
-        va_end(args);
-    }
-
-    static void StringAppendV(std::string& output, const char* format, va_list ap) {
-        StringAppendVT<char>(format, ap, output);
-    }
-
-    static void StringAppendV(std::wstring& output, const wchar_t* format, va_list ap) {
-        StringAppendVT<wchar_t>(format, ap, output);
-    }
-
-   private:
-    static int vsnprintfT(char* dst, size_t count, const char* format, va_list ap) {
-        return vsnprintf(dst, count, format, ap);
-    }
-
-    static int vsnprintfT(wchar_t* dst, size_t count, const wchar_t* format, va_list ap) {
-#if defined(AKALI_WIN)
-        return _vsnwprintf_s(dst, count, count - 1, format, ap);
-#else
-        return vswprintf(dst, count, format, ap);
-#endif
-    }
-
-    template <typename CharType>
-    static void StringAppendVT(const CharType* format, va_list ap, std::basic_string<CharType>& output) {
-        CharType stack_buffer[1024];
-
-        /* first, we try to finish the task using a fixed-size buffer in the stack */
-        va_list ap_copy;
-        VA_COPY(ap_copy, ap);
-
-        int result = vsnprintfT(stack_buffer, COUNT_OF(stack_buffer), format, ap_copy);
-        va_end(ap_copy);
-        if (result >= 0 && result < static_cast<int>(COUNT_OF(stack_buffer))) {
-            /* It fits */
-            output.append(stack_buffer, result);
-            return;
-        }
-
-        /* then, we have to repeatedly increase buffer size until it fits. */
-        int buffer_size = COUNT_OF(stack_buffer);
-        std::basic_string<CharType> heap_buffer;
-        for (;;) {
-            if (result != -1) {
-                assert(0);
-                return; /* not expected, result should be -1 here */
-            }
-            buffer_size <<= 1; /* try doubling the buffer size */
-            if (buffer_size > 32 * 1024 * 1024) {
-                assert(0);
-                return; /* too long */
-            }
-            /* resize */
-            heap_buffer.resize(buffer_size);
-            /*
-		 * NOTE: You can only use a va_list once.  Since we're in a while loop, we
-		 * need to make a new copy each time so we don't use up the original.
-		 */
-            VA_COPY(ap_copy, ap);
-            result = vsnprintfT(&heap_buffer[0], buffer_size, format, ap_copy);
-            va_end(ap_copy);
-
-            if ((result >= 0) && (result < buffer_size)) {
-                /* It fits */
-                output.append(&heap_buffer[0], result);
-                return;
-            }
-        }
     }
 };
 }  // namespace akali_hpp

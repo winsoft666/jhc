@@ -69,10 +69,26 @@ void StringHelperTest() {
     const std::string s1 = akali_hpp::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
     EXPECT_TRUE(s1 == "jack's age is 18");
 
-    const std::wstring ws1 = akali_hpp::StringHelper::StringPrintf(L"%s's age is %d", L"jack", 18);
+    const std::wstring ws1 = akali_hpp::StringHelper::StringPrintf(L"%ls's age is %d", L"jack", 18);
     EXPECT_TRUE(ws1 == L"jack's age is 18");
 
-    const std::string bigStr(2048, 'a');
+    std::string bigStrA(2048, 'a');
+    bigStrA += "[end]";
+    const std::string s2 = akali_hpp::StringHelper::StringPrintf("%s length is %d", bigStrA.c_str(), bigStrA.length());
+    EXPECT_TRUE(s2 == bigStrA + " length is " + std::to_string(bigStrA.length()));
+
+    std::wstring bigStrW(2048, L'a');
+    bigStrW += L"[end]";
+    const std::wstring ws2 = akali_hpp::StringHelper::StringPrintf(L"%ls length is %d", bigStrW.c_str(), bigStrW.length());
+    EXPECT_TRUE(ws2 == bigStrW + L" length is " + std::to_wstring(bigStrW.length()));
+
+    std::string bigStrA2(1024, 'c');
+    const std::string s3 = akali_hpp::StringHelper::StringPrintf("%s", bigStrA2.c_str());
+    EXPECT_TRUE(s3 == bigStrA2);
+
+    std::wstring bigStrW2(1024, L'c');
+    const std::wstring sw3 = akali_hpp::StringHelper::StringPrintf(L"%ls", bigStrW2.c_str());
+    EXPECT_TRUE(sw3 == bigStrW2);
 }
 
 void StringEncodeTest() {
@@ -83,7 +99,17 @@ void StringEncodeTest() {
 }
 
 void PathTest() {
+}
 
+void TraceTest() {
+    std::string bigStrA(1080, 's');
+    bigStrA += "[end]";
+
+    std::wstring bigStrW(1080, L's');
+    bigStrW += L"[end]";
+
+    akali_hpp::Trace::MsgA("[%" PRId64 "] this big message output by akali_hpp::Trace::MsgA: %s\n", time(nullptr), bigStrA.c_str());
+    akali_hpp::Trace::MsgW(L"[%" PRId64 "] this big message output by akali_hpp::Trace::MsgW: %ls\n", time(nullptr), bigStrW.c_str());
 }
 
 void SpdlogTest() {
@@ -93,9 +119,6 @@ void SpdlogTest() {
     akali_hpp::SpdlogWrapper::Warn("this is warn log");
     akali_hpp::SpdlogWrapper::Error("this is error log");
     akali_hpp::SpdlogWrapper::Critical("this is critical log");
-
-    akali_hpp::Trace::MsgA("[%ld] this message output by akali_hpp::Trace::MsgA\n", time(0));
-    akali_hpp::Trace::MsgW(L"[%ld] this message output by akali_hpp::Trace::MsgW\n", time(0));
 }
 
 void CmdLineParserTest() {
@@ -204,7 +227,6 @@ void ParseJsonMethod1Test() {
     EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["object"]["value"].get<float>(), 42.99f));
 }
 
-
 int main() {
 #ifdef AKALI_WIN
     printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
@@ -226,6 +248,7 @@ int main() {
     StringEncodeTest();
     CmdLineParserTest();
     PathTest();
+    TraceTest();
     SpdlogTest();
 
     CreateJsonMethod1Test();
