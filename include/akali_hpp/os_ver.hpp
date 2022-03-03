@@ -112,6 +112,11 @@ class OSVersion {
         return wvf;
     }
 
+    static bool IsWindowsVistaOrHigher() {
+        const WinVerInfo wvi = GetWinVer();
+        return (wvi.major >= 6);
+    }
+
     static bool IsWindows11() {
         const WinVerInfo wvi = GetWinVer();
         return (wvi.major == 10 && wvi.minor == 0 && wvi.build >= 22000);

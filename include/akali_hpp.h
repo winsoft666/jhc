@@ -38,6 +38,7 @@
 #include "akali_hpp/md5.hpp"
 #include "akali_hpp/memory_pool.hpp"
 #include "akali_hpp/os_ver.hpp"
+#include "akali_hpp/path_util.hpp"
 #include "akali_hpp/process_finder.hpp"
 #include "akali_hpp/process_util.hpp"
 #include "akali_hpp/registry.hpp"

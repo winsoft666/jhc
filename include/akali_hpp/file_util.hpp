@@ -32,55 +32,11 @@
 #include <strsafe.h>
 #include <Shlwapi.h>
 #endif  // !AKALI_WIN
-#include <vector>
+#include "akali_hpp/path_util.hpp"
 
 namespace akali_hpp {
-#ifdef AKALI_WIN
-typedef std::wstring PathString;
-#else
-typedef std::string PathString;
-#endif  // !AKALI_WIN
-
-typedef PathString::value_type PathChar;
-
 class FileUtil {
    public:
-    static const PathChar kEndChar;
-
-    // Null-terminated array of separators used to separate components in path.
-    // Each character in this array is a valid separator
-    static const std::vector<PathChar> kFilePathSeparators;
-
-    // A special path component meaning "this directory."
-    static const std::vector<PathString> kFilePathCurrentDirectory;
-
-    // A special path component meaning "the parent directory."
-    static const std::vector<PathString> kFilePathParentDirectory;
-
-    // The character used to identify a file extension.
-    static const PathChar kFilePathExtensionSeparator;
-
-    static bool IsPathSeparator(const PathChar c) {
-        if (c == kEndChar)
-            return false;
-
-        const size_t len = kFilePathSeparators.size();
-        for (size_t i = 0; i < len; i++) {
-            if (c == kFilePathSeparators[i])
-                return true;
-        }
-
-        return false;
-    }
-
-    static bool IsPathSeparator(const PathString& s) {
-        if (s.empty())
-            return false;
-
-        const PathChar c = s[0];
-        return IsPathSeparator(c);
-    }
-
     static void CopyFolder(const PathString& from, const PathString& to, bool bCopySource, int* pIgnoredNum) {
 #ifdef AKALI_WIN
         wchar_t szFrom[MAX_PATH] = {0};
@@ -300,20 +256,6 @@ class FileUtil {
     }
 #endif
 };
-
-#ifdef AKALI_WIN
-const PathChar FileUtil::kEndChar = L'\0';
-const std::vector<PathChar> FileUtil::kFilePathSeparators = {L'\\', L'/'};
-const std::vector<PathString> FileUtil::kFilePathCurrentDirectory = {L"."};
-const std::vector<PathString> FileUtil::kFilePathParentDirectory = {L".."};
-const PathChar FileUtil::kFilePathExtensionSeparator = L'.';
-#else
-const PathChar FileUtil::kEndChar = '\0';
-const PathChar FileUtil::kFilePathSeparators[] = "/";
-const PathChar FileUtil::kFilePathCurrentDirectory[] = ".";
-const PathChar FileUtil::kFilePathParentDirectory[] = "..";
-const PathChar FileUtil::kFilePathExtensionSeparator = '.';
-#endif  // OS_WIN
 }  // namespace akali_hpp
 
 #endif  // !AKALI_FILE_UTIL_HPP_

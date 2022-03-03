@@ -82,6 +82,10 @@ void StringEncodeTest() {
     EXPECT_TRUE(akali_hpp::StringEncode::UnicodeToUtf8(wstr) == u8str);
 }
 
+void PathTest() {
+
+}
+
 void SpdlogTest() {
     EXPECT_TRUE(akali_hpp::SpdlogWrapper::GlobalRegister("akali_hpp_tester"));
     akali_hpp::SpdlogWrapper::Trace("this is trace log");
@@ -202,6 +206,12 @@ void ParseJsonMethod1Test() {
 
 
 int main() {
+#ifdef AKALI_WIN
+    printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
+    printf("System Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
+    printf("Temp Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
+    printf("LocalAppData Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
+#endif
     printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
 
     const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
@@ -215,6 +225,7 @@ int main() {
     StringHelperTest();
     StringEncodeTest();
     CmdLineParserTest();
+    PathTest();
     SpdlogTest();
 
     CreateJsonMethod1Test();
