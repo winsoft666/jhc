@@ -18,6 +18,11 @@
 #ifndef AKALI_MACROS_HPP__
 #define AKALI_MACROS_HPP__
 
+// Compare two float point value
+#ifndef IS_NEARLY_EQUAL
+#define IS_NEARLY_EQUAL(x, y) (fabs((x) - (y)) < FLT_EPSILON)
+#endif
+
 #ifndef SAFE_FREE
 #define SAFE_FREE(p)   \
   do {                 \

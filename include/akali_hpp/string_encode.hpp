@@ -19,7 +19,6 @@
 #define AKALI_STRING_ENCODE_HPP_
 #include <codecvt>
 #include <string>
-#include <vector>
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
 #ifndef _INC_WINDOWS

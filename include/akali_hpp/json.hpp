@@ -35,9 +35,9 @@ SOFTWARE.
  * removed, but marked deprecated. See "Generate documentation" section in  *
  * file doc/README.md.                                                      *
 \****************************************************************************/
-
-#ifndef INCLUDE_NLOHMANN_JSON_HPP_
-#define INCLUDE_NLOHMANN_JSON_HPP_
+// clang-format off
+#ifndef AKALI_HPP_INCLUDE_NLOHMANN_JSON_HPP_
+#define AKALI_HPP_INCLUDE_NLOHMANN_JSON_HPP_
 
 #define NLOHMANN_JSON_VERSION_MAJOR 3
 #define NLOHMANN_JSON_VERSION_MINOR 10
@@ -22088,4 +22088,5 @@ inline akali_hpp::json::json_pointer operator "" _json_pointer(const char* s, st
 
 
 
-#endif  // INCLUDE_NLOHMANN_JSON_HPP_
+#endif  // AKALI_HPP_INCLUDE_NLOHMANN_JSON_HPP_
+// clang-format on

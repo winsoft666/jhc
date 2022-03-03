@@ -43,7 +43,7 @@ class Trace {
 
 #ifdef AKALI_WIN
         wchar_t* pMsgBuffer = NULL;
-        unsigned int iMsgBufCount = 0;
+        size_t iMsgBufCount = 0;
 
         va_list arglist;
         va_start(arglist, lpFormat);
@@ -114,7 +114,7 @@ class Trace {
 
 #ifdef AKALI_WIN
         char* pMsgBuffer = NULL;
-        unsigned int iMsgBufCount = 0;
+        size_t iMsgBufCount = 0;
 
         va_list arglist;
         va_start(arglist, lpFormat);
