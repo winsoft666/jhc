@@ -531,6 +531,7 @@ class FileUtil {
 #endif
     }
 
+    // Delete file by path.
     static bool RemoveFile(const PathString& path) {
         if (path.empty())
             return false;
@@ -539,6 +540,18 @@ class FileUtil {
         return (_wremove(path.c_str()) == 0);
 #else
         return (remove(path.c_str()) != 0);
+#endif
+    }
+
+    static bool RenameFile(const PathString& from, const PathString& to) {
+        if (from.empty() || to.empty())
+            return false;
+
+#ifdef AKALI_WIN
+        return !!::MoveFileExW(from.c_str(), to.c_str(),
+                             MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH | MOVEFILE_COPY_ALLOWED);
+#else
+        return 0 == rename(from.c_str(), to.c_str());
 #endif
     }
 
