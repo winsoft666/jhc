@@ -46,7 +46,7 @@ class File {
         path_(path) {
     }
 
-    ~File() {
+    virtual ~File() {
         close();
     }
 
