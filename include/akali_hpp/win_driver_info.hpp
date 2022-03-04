@@ -15,11 +15,12 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_DRIVER_INFO_HPP_
-#define AKALI_DRIVER_INFO_HPP_
+#ifndef AKALI_WIN_DRIVER_INFO_HPP_
+#define AKALI_WIN_DRIVER_INFO_HPP_
 #include "akali_hpp/arch.hpp"
-#include <string>
+
 #ifdef AKALI_WIN
+#include <string>
 #include <assert.h>
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -28,10 +29,8 @@
 #include <Windows.h>
 #endif  // !_INC_WINDOWS
 #include <direct.h>
-#endif  // !AKALI_WIN
 
 namespace akali_hpp {
-#ifdef AKALI_WIN
 class WinDriverInfo {
    public:
     enum { DRIVE_HOST = 7 };
@@ -254,6 +253,6 @@ class WinDriverInfo {
         return dwHDSerialNum;
     }
 };
-#endif // !AKALI_WIN
 }  // namespace akali_hpp
-#endif
+#endif  // !AKALI_WIN
+#endif  // !AKALI_WIN_DRIVER_INFO_HPP_

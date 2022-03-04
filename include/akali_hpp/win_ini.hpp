@@ -15,8 +15,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_INI_HPP_
-#define AKALI_INI_HPP_
+#ifndef AKALI_WIN_INI_HPP_
+#define AKALI_WIN_INI_HPP_
 
 #include "akali_hpp/arch.hpp"
 #ifdef AKALI_WIN
@@ -24,9 +24,9 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // !WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #include <string>
 #include <vector>
 #include <strsafe.h>
@@ -290,5 +290,5 @@ class Ini {
     std::wstring ini_file_path_;
 };
 }  // namespace akali_hpp
-#endif
-#endif
+#endif // !AKALI_WIN
+#endif // !AKALI_WIN_INI_HPP_

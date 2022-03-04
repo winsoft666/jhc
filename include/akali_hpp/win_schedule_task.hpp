@@ -15,8 +15,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_SCHEDULE_TASK_HPP__
-#define AKALI_SCHEDULE_TASK_HPP__
+#ifndef AKALI_WIN_SCHEDULE_TASK_HPP__
+#define AKALI_WIN_SCHEDULE_TASK_HPP__
 
 #include "akali_hpp/arch.hpp"
 
@@ -458,4 +458,4 @@ class ScheduleTask {
 };
 }  // namespace akali_hpp
 #endif
-#endif  // !AKALI_SCHEDULE_TASK_HPP__
+#endif  // !AKALI_WIN_SCHEDULE_TASK_HPP__

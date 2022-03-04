@@ -227,6 +227,42 @@ void ParseJsonMethod1Test() {
     EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["object"]["value"].get<float>(), 42.99f));
 }
 
+void FileTest1() {
+    constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
+    const std::string str1K(1024, 'a');
+
+    const akali_hpp::PathString path1 = akali_hpp::PathUtil::ToPathString(L"__test1__.dat");
+    const akali_hpp::PathString openMode1 = akali_hpp::PathUtil::ToPathString(L"ab+");
+
+    akali_hpp::File file1(path1);
+    EXPECT_TRUE(file1.path() == path1);
+    if (akali_hpp::FileUtil::IsExist(file1.path()))
+        EXPECT_TRUE(akali_hpp::FileUtil::RemoveFile(file1.path()));
+    EXPECT_TRUE(akali_hpp::FileUtil::IsExist(file1.path()) == false);
+    EXPECT_TRUE(file1.isOpen() == false);
+    EXPECT_TRUE(file1.exist() == false);
+    EXPECT_TRUE(file1.open(openMode1));
+    // write 4GB file
+    for (size_t i = 0; i < 4 * 1024 * 1024; i++) {
+        file1.writeFrom((void*)str1K.c_str(), str1K.size());
+    }
+
+    EXPECT_TRUE(file1.flush());
+    EXPECT_TRUE(file1.fileSize() == bytes4gb);
+
+    std::string strRead(1024, '\0');
+    EXPECT_TRUE(file1.readFrom((void*)&strRead[0], 1024, 0) == 1024);
+    EXPECT_TRUE(strRead == str1K);
+
+    std::string strRead2(1024, '\0');
+    EXPECT_TRUE(file1.readFrom((void*)&strRead2[0], 1024, 3LL * 1024LL * 1024LL * 1024LL) == 1024);
+    EXPECT_TRUE(strRead2 == str1K);
+
+    EXPECT_TRUE(file1.fileSize() == bytes4gb);
+    EXPECT_TRUE(file1.close());
+    EXPECT_TRUE(akali_hpp::FileUtil::RemoveFile(path1));
+}
+
 int main() {
 #ifdef AKALI_WIN
     printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
@@ -255,6 +291,8 @@ int main() {
     CreateJsonMethod2Test();
     CreateJsonMethod3Test();
     ParseJsonMethod1Test();
+
+    FileTest1();
 
     return 0;
 }

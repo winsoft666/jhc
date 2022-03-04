@@ -25,6 +25,7 @@
 #include <shlobj_core.h>
 #endif
 #include "akali_hpp/os_ver.hpp"
+#include "akali_hpp/string_encode.hpp"
 
 namespace akali_hpp {
 #ifdef AKALI_WIN
@@ -73,6 +74,14 @@ class PathUtil {
 
         const PathChar c = s[0];
         return IsPathSeparator(c);
+    }
+
+    static PathString ToPathString(const std::wstring& s) {
+#ifdef AKALI_WIN
+        return s;
+#else
+        return StringEncode::UnicodeToUtf8(s);
+#endif
     }
 
 #ifdef AKALI_WIN

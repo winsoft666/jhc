@@ -15,8 +15,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_REGISTRY_HPP_
-#define AKALI_REGISTRY_HPP_
+#ifndef AKALI_WIN_REGISTRY_HPP_
+#define AKALI_WIN_REGISTRY_HPP_
 
 #include "akali_hpp/arch.hpp"
 
@@ -615,5 +615,5 @@ class RegKey {
     bool m_bWatchSubtree;
 };
 }  // namespace akali_hpp
-#endif
-#endif
+#endif // !AKALI_WIN
+#endif  // !AKALI_WIN_REGISTRY_HPP_
