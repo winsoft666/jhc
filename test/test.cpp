@@ -99,6 +99,12 @@ void StringEncodeTest() {
 }
 
 void PathTest() {
+#ifdef AKALI_WIN
+    printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
+    printf("System Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
+    printf("Temp Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
+    printf("LocalAppData Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
+#endif
 }
 
 void TraceTest() {
@@ -110,15 +116,6 @@ void TraceTest() {
 
     akali_hpp::Trace::MsgA("[%" PRId64 "] this big message output by akali_hpp::Trace::MsgA: %s\n", time(nullptr), bigStrA.c_str());
     akali_hpp::Trace::MsgW(L"[%" PRId64 "] this big message output by akali_hpp::Trace::MsgW: %ls\n", time(nullptr), bigStrW.c_str());
-}
-
-void SpdlogTest() {
-    EXPECT_TRUE(akali_hpp::SpdlogWrapper::GlobalRegister("akali_hpp_tester"));
-    akali_hpp::SpdlogWrapper::Trace("this is trace log");
-    akali_hpp::SpdlogWrapper::Info("this is info log");
-    akali_hpp::SpdlogWrapper::Warn("this is warn log");
-    akali_hpp::SpdlogWrapper::Error("this is error log");
-    akali_hpp::SpdlogWrapper::Critical("this is critical log");
 }
 
 void CmdLineParserTest() {
@@ -231,14 +228,15 @@ void FileTest1() {
     constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
 
-    const akali_hpp::PathString path1 = akali_hpp::PathUtil::ToPathString(L"__test1__.dat");
-    const akali_hpp::PathString openMode1 = akali_hpp::PathUtil::ToPathString(L"ab+");
+    akali_hpp::filesystem::path path1(u8"__test测试1__.dat");
+    akali_hpp::filesystem::path openMode1(u8"ab+");
 
     akali_hpp::File file1(path1);
     EXPECT_TRUE(file1.path() == path1);
-    if (akali_hpp::FileUtil::IsExist(file1.path()))
-        EXPECT_TRUE(akali_hpp::FileUtil::RemoveFile(file1.path()));
-    EXPECT_TRUE(akali_hpp::FileUtil::IsExist(file1.path()) == false);
+    if (akali_hpp::filesystem::exists(file1.path()))
+        EXPECT_TRUE(akali_hpp::filesystem::remove(file1.path()));
+
+    EXPECT_TRUE(akali_hpp::filesystem::exists(file1.path()) == false);
     EXPECT_TRUE(file1.isOpen() == false);
     EXPECT_TRUE(file1.exist() == false);
     EXPECT_TRUE(file1.open(openMode1));
@@ -260,16 +258,10 @@ void FileTest1() {
 
     EXPECT_TRUE(file1.fileSize() == bytes4gb);
     EXPECT_TRUE(file1.close());
-    EXPECT_TRUE(akali_hpp::FileUtil::RemoveFile(path1));
+    EXPECT_TRUE(akali_hpp::filesystem::remove(file1.path()));
 }
 
 int main() {
-#ifdef AKALI_WIN
-    printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
-    printf("System Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
-    printf("Temp Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
-    printf("LocalAppData Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
-#endif
     printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
 
     const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
@@ -278,14 +270,14 @@ int main() {
     const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
     printf("Current Path: %s\n", strCurExePath.c_str());
 
+    PathTest();
     Md5Test();
     Base64Test();
     StringHelperTest();
     StringEncodeTest();
     CmdLineParserTest();
-    PathTest();
+
     TraceTest();
-    SpdlogTest();
 
     CreateJsonMethod1Test();
     CreateJsonMethod2Test();

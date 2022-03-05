@@ -37,12 +37,12 @@
 #include <fcntl.h>
 #endif  // !AKALI_WIN
 #include "akali_hpp/macros.hpp"
-#include "akali_hpp/path_util.hpp"
+#include "akali_hpp/filesystem.hpp"
 
 namespace akali_hpp {
 class File {
    public:
-    File(const PathString& path) :
+    File(const filesystem::path& path) :
         path_(path) {
     }
 
@@ -50,7 +50,7 @@ class File {
         close();
     }
 
-    PathString path() const {
+    filesystem::path path() const {
         return path_;
     }
 
@@ -95,7 +95,7 @@ class File {
     //
     // see: https://www.cplusplus.com/reference/cstdio/fopen/
     //
-    bool open(const PathString& openMode) {
+    bool open(const filesystem::path& openMode) {
         std::lock_guard<std::recursive_mutex> lg(mutex_);
         if (f_ != nullptr)
             return true;
@@ -355,268 +355,10 @@ class File {
 
    protected:
     FILE* f_ = nullptr;
-    PathString path_;
+    filesystem::path path_;
     std::recursive_mutex mutex_;
 
     AKALI_DISALLOW_COPY_AND_ASSIGN(File);
 };
-
-class FileUtil {
-   public:
-    static void CopyFolder(const PathString& from, const PathString& to, bool bCopySource, int* pIgnoredNum) {
-#ifdef AKALI_WIN
-        wchar_t szFrom[MAX_PATH] = {0};
-        wchar_t szTo[MAX_PATH] = {0};
-        wcscpy_s(szFrom, MAX_PATH, from.c_str());
-        wcscpy_s(szTo, MAX_PATH, to.c_str());
-
-        if (bCopySource) {
-            WIN32_FIND_DATAW filedata;
-            HANDLE fhandle = FindFirstFileW(szFrom, &filedata);
-            size_t len = wcslen(szTo);
-            if (szTo[len - 1] != L'\\')
-                wcscat_s(szTo, MAX_PATH, L"\\");
-            wcscat_s(szTo, filedata.cFileName);
-            ::CreateDirectoryW(szTo, NULL);
-        }
-
-        WinFileRecurveSearch(szFrom, szTo, pIgnoredNum);
-#else
-#warning Not Implemented
-#endif
-    }
-
-    static bool DeleteFolder(const PathString& folder) {
-#ifdef AKALI_WIN
-        if (folder.empty())
-            return false;
-
-        bool bRet = true;
-        const int kBufSize = MAX_PATH * 4;
-        HANDLE hFind = INVALID_HANDLE_VALUE;
-        WCHAR szTemp[kBufSize] = {0};
-        WIN32_FIND_DATAW wfd;
-
-        StringCchCopyW(szTemp, kBufSize, folder.c_str());
-        PathAddBackslashW(szTemp);
-        StringCchCatW(szTemp, kBufSize, L"*.*");
-
-        hFind = FindFirstFileW(szTemp, &wfd);
-        if (hFind == INVALID_HANDLE_VALUE) {
-            return false;
-        }
-
-        do {
-            if (lstrcmpiW(wfd.cFileName, L".") != 0 && lstrcmpiW(wfd.cFileName, L"..") != 0) {
-                StringCchCopyW(szTemp, kBufSize, folder.c_str());
-                PathAddBackslashW(szTemp);
-                StringCchCatW(szTemp, kBufSize, wfd.cFileName);
-
-                if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                    bRet = DeleteFolder(szTemp);
-                }
-                else {
-                    bRet = (DeleteFileW(szTemp) == TRUE);
-                    if (!bRet) {
-                        SetFileAttributesW(szTemp, FILE_ATTRIBUTE_NORMAL);
-                        bRet = (DeleteFileW(szTemp) == TRUE);
-                    }
-                }
-            }
-
-        } while (FindNextFileW(hFind, &wfd));
-
-        FindClose(hFind);
-
-        if (!bRet) {
-            return bRet;
-        }
-
-        bRet = (::RemoveDirectoryW(folder.c_str()) == TRUE);
-        if (!bRet) {
-            DWORD dwAttr = ::GetFileAttributesW(folder.c_str());
-            dwAttr &= ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
-            ::SetFileAttributesW(folder.c_str(), dwAttr);
-            bRet = (::RemoveDirectoryW(folder.c_str()) == TRUE);
-        }
-
-        return bRet;
-#else
-#warning Not Implemented
-#endif
-    }
-
-    static bool CreateFolder(const PathString& folder) {
-#ifdef AKALI_WIN
-        if (folder.empty())
-            return false;
-
-        wchar_t* p = NULL;
-        wchar_t* szDirBuf = NULL;
-        DWORD dwAttributes;
-        size_t iLen = folder.length();
-
-        __try {
-            szDirBuf = (wchar_t*)malloc((iLen + 1) * sizeof(wchar_t));
-            if (szDirBuf == NULL)
-                return false;
-
-            StringCchCopyW(szDirBuf, iLen + 1, folder.c_str());
-            p = szDirBuf;
-
-            if ((*p == L'\\') && (*(p + 1) == L'\\')) {
-                p += 2;
-                while (*p && *p != L'\\')
-                    p = CharNextW(p);
-                if (*p)
-                    p++;
-                while (*p && *p != L'\\')
-                    p = CharNextW(p);
-                if (*p)
-                    p++;
-            }
-            else if (*(p + 1) == L':') {
-                p += 2;
-                if (*p && (*p == L'\\'))
-                    p++;
-            }
-
-            while (*p) {
-                if (*p == L'\\') {
-                    *p = L'\0';
-                    dwAttributes = ::GetFileAttributesW(szDirBuf);
-
-                    if (dwAttributes == 0xffffffff) {
-                        if (!::CreateDirectoryW(szDirBuf, NULL)) {
-                            if (GetLastError() != ERROR_ALREADY_EXISTS) {
-                                free(szDirBuf);
-                                return false;
-                            }
-                        }
-                    }
-                    else {
-                        if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
-                            free(szDirBuf);
-                            return false;
-                        }
-                    }
-
-                    *p = L'\\';
-                }
-
-                p = CharNextW(p);
-            }
-        } __except (EXCEPTION_EXECUTE_HANDLER) {
-            if (szDirBuf)
-                free(szDirBuf);
-            return false;
-        }
-
-        if (szDirBuf)
-            free(szDirBuf);
-        return true;
-#else
-#warning Not Implemented
-#endif
-    }
-
-    static bool IsExist(const PathString& path) {
-        if (path.empty())
-            return false;
-
-#ifdef AKALI_WIN
-        return (_waccess(path.c_str(), 0) == 0);
-#else
-        return (access(path.c_str(), F_OK) == 0);
-#endif
-    }
-
-    // Delete file by path.
-    static bool RemoveFile(const PathString& path) {
-        if (path.empty())
-            return false;
-
-#ifdef AKALI_WIN
-        return (_wremove(path.c_str()) == 0);
-#else
-        return (remove(path.c_str()) != 0);
-#endif
-    }
-
-    static bool RenameFile(const PathString& from, const PathString& to) {
-        if (from.empty() || to.empty())
-            return false;
-
-#ifdef AKALI_WIN
-        return !!::MoveFileExW(from.c_str(), to.c_str(),
-                             MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH | MOVEFILE_COPY_ALLOWED);
-#else
-        return 0 == rename(from.c_str(), to.c_str());
-#endif
-    }
-
-   private:
-#ifdef AKALI_WIN
-    static void WinFileCopy(const wchar_t* szPath, const wchar_t* szDest, WIN32_FIND_DATAW file, int* pIgnoredNum) {
-        if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            if (((wcscmp(file.cFileName, L".") != 0) && (wcscmp(file.cFileName, L"..") != 0))) {
-                wchar_t szTemp[MAX_PATH] = {0};
-                wcscpy_s(szTemp, MAX_PATH, szPath);
-                if (szTemp[wcslen(szTemp) - 1] != L'\\')
-                    wcscat_s(szTemp, MAX_PATH, L"\\");
-
-                wcscat_s(szTemp, MAX_PATH, file.cFileName);
-                // create directory.
-                wchar_t szDir[MAX_PATH] = {0};
-                wcscat_s(szDir, MAX_PATH, szDest);
-                wcscat_s(szDir, MAX_PATH, L"\\");
-                wcscat_s(szDir, MAX_PATH, file.cFileName);
-                if (_waccess_s(szDir, 0) != 0) {
-                    if (!CreateDirectoryW(szDir, NULL)) {
-                        if (pIgnoredNum) {
-                            *pIgnoredNum += 1;
-                        }
-                    }
-                }
-
-                WinFileRecurveSearch(szTemp, szDir, pIgnoredNum);
-            }
-        }
-        else {
-            wchar_t szS[MAX_PATH] = {0};
-            StringCchPrintfW(szS, MAX_PATH, L"%s\\%s", szPath, file.cFileName);
-            wchar_t szD[MAX_PATH] = {0};
-            StringCchPrintfW(szD, MAX_PATH, L"%s\\%s", szDest, file.cFileName);
-            if (!CopyFileW(szS, szD, false)) {
-                if (pIgnoredNum) {
-                    *pIgnoredNum += 1;
-                }
-            }
-        }
-    }
-
-    static void WinFileRecurveSearch(const wchar_t* szPath, const wchar_t* szDest, int* pIgnoredNum) {
-        wchar_t szTemp[MAX_PATH] = {0};
-        wcscpy_s(szTemp, MAX_PATH, szPath);
-
-        size_t len = wcslen(szPath);
-        if (szTemp[len - 1] != '\\')
-            wcscat_s(szTemp, MAX_PATH, L"\\");
-        wcscat_s(szTemp, MAX_PATH, L"*.*");
-
-        WIN32_FIND_DATAW filedata;
-        HANDLE fhandle = FindFirstFileW(szTemp, &filedata);
-        if (fhandle != INVALID_HANDLE_VALUE) {
-            WinFileCopy(szPath, szDest, filedata, pIgnoredNum);
-
-            while (FindNextFileW(fhandle, &filedata) != 0) {
-                WinFileCopy(szPath, szDest, filedata, pIgnoredNum);
-            }
-        }
-        FindClose(fhandle);
-    }
-#endif
-};
 }  // namespace akali_hpp
-
 #endif  // !AKALI_FILE_UTIL_HPP_

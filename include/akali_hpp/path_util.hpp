@@ -25,112 +25,63 @@
 #include <shlobj_core.h>
 #endif
 #include "akali_hpp/os_ver.hpp"
-#include "akali_hpp/string_encode.hpp"
 
 namespace akali_hpp {
 #ifdef AKALI_WIN
-typedef std::wstring PathString;
 #define PATH_FORMAT_SPECIFIER "ls"
 #else
-typedef std::string PathString;
 #define PATH_FORMAT_SPECIFIER "s"
 #endif  // !AKALI_WIN
 
-typedef PathString::value_type PathChar;
-
 class PathUtil {
    public:
-    static const PathChar kEndChar;
-
-    // Null-terminated array of separators used to separate components in path.
-    // Each character in this array is a valid separator
-    static const std::vector<PathChar> kFilePathSeparators;
-
-    // A special path component meaning "this directory."
-    static const std::vector<PathString> kFilePathCurrentDirectory;
-
-    // A special path component meaning "the parent directory."
-    static const std::vector<PathString> kFilePathParentDirectory;
-
-    // The character used to identify a file extension.
-    static const PathChar kFilePathExtensionSeparator;
-
-    static bool IsPathSeparator(const PathChar c) {
-        if (c == kEndChar)
-            return false;
-
-        const size_t len = kFilePathSeparators.size();
-        for (size_t i = 0; i < len; i++) {
-            if (c == kFilePathSeparators[i])
-                return true;
-        }
-
-        return false;
-    }
-
-    static bool IsPathSeparator(const PathString& s) {
-        if (s.empty())
-            return false;
-
-        const PathChar c = s[0];
-        return IsPathSeparator(c);
-    }
-
-    static PathString ToPathString(const std::wstring& s) {
 #ifdef AKALI_WIN
-        return s;
-#else
-        return StringEncode::UnicodeToUtf8(s);
-#endif
-    }
-
-#ifdef AKALI_WIN
-    static PathString GetWindowsFolder() {
-        PathChar szBuf[MAX_PATH] = {0};
+    static std::wstring GetWindowsFolder() {
+        wchar_t szBuf[MAX_PATH] = {0};
         const DWORD result = ::GetWindowsDirectoryW(szBuf, MAX_PATH);
         if (result == 0)
-            return PathString();
+            return filesystem::path::string_type();
 
-        PathString tempPath = szBuf;
+        filesystem::path::string_type tempPath = szBuf;
         if (!tempPath.empty())
             if (tempPath.back() != L'\\')
                 tempPath.push_back(L'\\');
         return tempPath;
     }
 
-    static PathString GetSystemFolder() {
-        PathChar szBuf[MAX_PATH] = {0};
+    static std::wstring GetSystemFolder() {
+        wchar_t szBuf[MAX_PATH] = {0};
         const DWORD result = ::GetSystemDirectoryW(szBuf, MAX_PATH);
         if (result == 0)
-            return PathString();
+            return std::wstring();
 
-        PathString tempPath = szBuf;
+        std::wstring tempPath = szBuf;
         if (!tempPath.empty())
             if (tempPath.back() != L'\\')
                 tempPath.push_back(L'\\');
         return tempPath;
     }
 
-    static PathString GetTempFolder() {
-        PathChar szBuf[MAX_PATH] = {0};
+    static std::wstring GetTempFolder() {
+        wchar_t szBuf[MAX_PATH] = {0};
         const DWORD result = ::GetTempPathW(MAX_PATH, szBuf);
         if (result == 0)
-            return PathString();
+            return std::wstring();
 
-        PathString tempPath = szBuf;
+        std::wstring tempPath = szBuf;
         if (!tempPath.empty())
             if (tempPath.back() != L'\\')
                 tempPath.push_back(L'\\');
         return tempPath;
     }
 
-    static PathString GetLocalAppDataFolder() {
+    static std::wstring GetLocalAppDataFolder() {
 #if (NTDDI_VERSION < NTDDI_VISTA)
 #ifndef KF_FLAG_CREATE
 #define KF_FLAG_CREATE 0x00008000
 #endif
 #endif
-        PathString tempPath;
+        std::wstring tempPath;
         if (OSVersion::IsWindowsVistaOrHigher()) {
             typedef HRESULT(WINAPI * __SHGetKnownFolderPath)(REFKNOWNFOLDERID, DWORD, HANDLE, PWSTR*);
             HMODULE hDll = ::LoadLibraryW(L"shell32.dll");
@@ -150,7 +101,7 @@ class PathUtil {
         else {
             // On Windows XP, CSIDL_LOCAL_APPDATA represents "{user}\Local Settings\Application Data"
             // while CSIDL_APPDATA represents "{user}\Application Data"
-            PathChar buffer[MAX_PATH] = {0};
+            wchar_t buffer[MAX_PATH] = {0};
             if (S_OK == ::SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, buffer))
                 tempPath = buffer;
         }
@@ -161,23 +112,9 @@ class PathUtil {
 
         return tempPath;
     }
-#else
 #endif
 };
 
-#ifdef AKALI_WIN
-const PathChar PathUtil::kEndChar = L'\0';
-const std::vector<PathChar> PathUtil::kFilePathSeparators = {L'\\', L'/'};
-const std::vector<PathString> PathUtil::kFilePathCurrentDirectory = {L"."};
-const std::vector<PathString> PathUtil::kFilePathParentDirectory = {L".."};
-const PathChar PathUtil::kFilePathExtensionSeparator = L'.';
-#else
-const PathChar PathUtil::kEndChar = '\0';
-const std::vector<PathChar> PathUtil::kFilePathSeparators = {'/'};
-const std::vector<PathString> PathUtil::kFilePathCurrentDirectory = {"."};
-const std::vector<PathString> PathUtil::kFilePathParentDirectory = {".."};
-const PathChar PathUtil::kFilePathExtensionSeparator = '.';
-#endif  // AKALI_WIN
 }  // namespace akali_hpp
 
 #endif  // !AKALI_PATH_UTIL_HPP_
