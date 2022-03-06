@@ -100,10 +100,10 @@ void StringEncodeTest() {
 
 void PathTest() {
 #ifdef AKALI_WIN
-    printf("Windows Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
-    printf("System Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
-    printf("Temp Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
-    printf("LocalAppData Folder: %" PATH_FORMAT_SPECIFIER "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
+    printf("Windows Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
+    printf("System Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
+    printf("Temp Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
+    printf("LocalAppData Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
 #endif
 }
 
@@ -224,11 +224,62 @@ void ParseJsonMethod1Test() {
     EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["object"]["value"].get<float>(), 42.99f));
 }
 
+void FileSystemTest1() {
+    akali_hpp::filesystem::path path1(u8"C:/test/测试/__filesystem_test测试1__.dat");
+
+    EXPECT_TRUE(path1.wstring() == L"C:\\test\\测试\\__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.generic_wstring() == L"C:/test/测试/__filesystem_test测试1__.dat");
+
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/test/测试/__filesystem_test测试1__.dat");
+
+    EXPECT_TRUE(path1.has_extension());
+    EXPECT_TRUE(path1.has_filename());
+    EXPECT_TRUE(path1.has_parent_path());
+    EXPECT_TRUE(path1.has_relative_path());
+    EXPECT_TRUE(path1.has_root_directory());
+    EXPECT_TRUE(path1.has_root_name());
+    EXPECT_TRUE(path1.has_root_path());
+    EXPECT_TRUE(path1.has_stem());
+
+    EXPECT_TRUE(path1.extension().u8string() == u8".dat");
+    EXPECT_TRUE(path1.filename() == u8"__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.stem() == u8"__filesystem_test测试1__");
+
+    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\test\\测试");
+    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/test/测试");
+
+    EXPECT_TRUE(path1.relative_path().wstring() == L"test\\测试\\__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.root_name() == "C:");
+    EXPECT_TRUE(path1.root_directory() == "\\");
+    EXPECT_TRUE(path1.root_path() == "C:\\");
+
+    path1.replace_filename(L"测试test.txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\测试test.txt");
+
+    path1.replace_extension(".txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\测试test.txt");
+
+    path1.replace_filename(u8"__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/test/测试/__filesystem_test测试1__.dat");
+
+    path1 = L"C:\\test\\..\\123\\.\\__filesystem_test测试1__.dat";
+    akali_hpp::filesystem::path path2 = akali_hpp::filesystem::absolute(path1);
+    EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test测试1__.dat");
+}
+
+void FileSystemTest2() {
+    akali_hpp::filesystem::path path2(L"C:\\test\\测试\\__filesystem_test_测试2__.dat");
+    if (akali_hpp::filesystem::exists(path2))
+        EXPECT_TRUE(akali_hpp::filesystem::remove(path2));
+    
+}
+
 void FileTest1() {
     constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
 
-    akali_hpp::filesystem::path path1(u8"__test测试1__.dat");
+    akali_hpp::filesystem::path path1(u8"__file_test_文件测试1__.dat");
     akali_hpp::filesystem::path openMode1(u8"ab+");
 
     akali_hpp::File file1(path1);
@@ -284,6 +335,8 @@ int main() {
     CreateJsonMethod3Test();
     ParseJsonMethod1Test();
 
+    FileSystemTest1();
+    FileSystemTest2();
     FileTest1();
 
     return 0;

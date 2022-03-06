@@ -28,9 +28,9 @@
 
 namespace akali_hpp {
 #ifdef AKALI_WIN
-#define PATH_FORMAT_SPECIFIER "ls"
+#define PATH_FS "ls"
 #else
-#define PATH_FORMAT_SPECIFIER "s"
+#define PATH_FS "s"
 #endif  // !AKALI_WIN
 
 class PathUtil {
