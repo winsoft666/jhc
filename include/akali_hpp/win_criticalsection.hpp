@@ -15,8 +15,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_CRITICAL_SECTION_HPP__
-#define AKALI_CRITICAL_SECTION_HPP__
+#ifndef AKALI_WIN_CRITICAL_SECTION_HPP__
+#define AKALI_WIN_CRITICAL_SECTION_HPP__
 //
 // Windows CriticalSection wrapper.
 //
@@ -28,34 +28,33 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif // !_INC_WINDOWS
+#endif  // !_INC_WINDOWS
 #include "akali_hpp/macros.hpp"
 
 namespace akali_hpp {
-class CriticalSection {
+class WinCriticalSection {
    public:
-    CriticalSection() { InitializeCriticalSection(&crit_); }
-    ~CriticalSection() { DeleteCriticalSection(&crit_); }
-    void Enter() const { EnterCriticalSection(&crit_); }
-    void Leave() const { LeaveCriticalSection(&crit_); }
-    bool TryEnter() const { return TryEnterCriticalSection(&crit_) != FALSE; }
+    WinCriticalSection() { InitializeCriticalSection(&crit_); }
+    ~WinCriticalSection() { DeleteCriticalSection(&crit_); }
+    void enter() const { EnterCriticalSection(&crit_); }
+    void leave() const { LeaveCriticalSection(&crit_); }
+    bool tryEnter() const { return TryEnterCriticalSection(&crit_) != FALSE; }
 
    private:
-    CriticalSection(const CriticalSection& refCritSec);
-    CriticalSection& operator=(const CriticalSection& refCritSec);
+    AKALI_DISALLOW_COPY_AND_ASSIGN(WinCriticalSection);
     mutable CRITICAL_SECTION crit_;
 };
 
-class CritScope {
+class ScopedWinCriticalSection {
    public:
-    explicit CritScope(const CriticalSection* pCS) :
-        crit_(pCS) { crit_->Enter(); }
-    ~CritScope() { crit_->Leave(); }
+    explicit ScopedWinCriticalSection(const WinCriticalSection* pCS) :
+        crit_(pCS) { crit_->enter(); }
+    ~ScopedWinCriticalSection() { crit_->leave(); }
 
    private:
-    const CriticalSection* const crit_;
-    AKALI_DISALLOW_COPY_AND_ASSIGN(CritScope);
+    const WinCriticalSection* const crit_;
+    AKALI_DISALLOW_COPY_AND_ASSIGN(ScopedWinCriticalSection);
 };
 }  // namespace akali_hpp
-#endif // !AKALI_WIN
-#endif  // !AKALI_CRITICAL_SECTION_HPP__
+#endif  // !AKALI_WIN
+#endif  // !AKALI_WIN_CRITICAL_SECTION_HPP__
