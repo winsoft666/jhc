@@ -73,11 +73,17 @@ class Process {
     /// Additional parameters to Process constructors.
     struct Config {
         /// Buffer size for reading stdout and stderr. Default is 131072 (128 kB).
-        std::size_t buffer_size = 131072;
+        std::size_t buffer_size;
+
         /// Set to true to inherit file descriptors from parent process. Default is
         /// false. On Windows: has no effect unless read_stdout==nullptr,
         /// read_stderr==nullptr and open_stdin==false.
-        bool inherit_file_descriptors = false;
+        bool inherit_file_descriptors;
+
+        Config() :
+            buffer_size(131072),
+            inherit_file_descriptors(false) {
+        }
     };
 #ifdef AKALI_WIN
     typedef unsigned long id_type;  // Process id type
@@ -105,7 +111,7 @@ class Process {
    public:
     /// Starts a process.
     Process(const std::vector<string_type>& arguments,
-            const string_type& path = string_type(),
+            const string_type& current_folder = string_type(),
             std::function<void(const char* bytes, size_t n)> read_stdout = nullptr,
             std::function<void(const char* bytes, size_t n)> read_stderr = nullptr,
             bool open_stdin = false,
@@ -113,7 +119,7 @@ class Process {
 
     /// Starts a process.
     Process(const string_type& command,
-            const string_type& path = string_type(),
+            const string_type& current_folder = string_type(),
             std::function<void(const char* bytes, size_t n)> read_stdout = nullptr,
             std::function<void(const char* bytes, size_t n)> read_stderr = nullptr,
             bool open_stdin = false,
@@ -121,7 +127,7 @@ class Process {
 
     /// Starts a process with specified environment.
     Process(const std::vector<string_type>& arguments,
-            const string_type& path,
+            const string_type& current_folder,
             const environment_type& environment,
             std::function<void(const char* bytes, size_t n)> read_stdout = nullptr,
             std::function<void(const char* bytes, size_t n)> read_stderr = nullptr,
@@ -130,7 +136,7 @@ class Process {
 
     /// Starts a process with specified environment.
     Process(const string_type& command,
-            const string_type& path,
+            const string_type& current_folder,
             const environment_type& environment,
             std::function<void(const char* bytes, size_t n)> read_stdout = nullptr,
             std::function<void(const char* bytes, size_t n)> read_stderr = nullptr,
@@ -206,10 +212,10 @@ class Process {
     std::unique_ptr<fd_type> stdin_fd_;
 
     id_type open(const std::vector<string_type>& arguments,
-                 const string_type& path,
+                 const string_type& current_folder,
                  const environment_type* environment = nullptr) noexcept;
     id_type open(const string_type& command,
-                 const string_type& path,
+                 const string_type& current_folder,
                  const environment_type* environment = nullptr) noexcept;
 #ifndef AKALI_WIN
     id_type open(const std::function<void()>& function) noexcept;
@@ -220,36 +226,40 @@ class Process {
     AKALI_DISALLOW_COPY_AND_ASSIGN(Process);
 };
 
+#ifdef AKALI_WIN
+std::mutex Process::create_process_mutex;
+#endif
+
 /////////////////////////////////////////////////////////////////
 /// Implement
 /////////////////////////////////////////////////////////////////
 
 inline Process::Process(const std::vector<string_type>& arguments,
-                        const string_type& path,
+                        const string_type& current_folder,
                         std::function<void(const char* bytes, size_t n)> read_stdout,
                         std::function<void(const char* bytes, size_t n)> read_stderr,
                         bool open_stdin,
                         const Config& config) noexcept
     :
     closed_(true), read_stdout_(std::move(read_stdout)), read_stderr_(std::move(read_stderr)), open_stdin_(open_stdin), config_(config) {
-    open(arguments, path);
+    open(arguments, current_folder);
     async_read();
 }
 
 inline Process::Process(const string_type& command,
-                        const string_type& path,
+                        const string_type& current_folder,
                         std::function<void(const char* bytes, size_t n)> read_stdout,
                         std::function<void(const char* bytes, size_t n)> read_stderr,
                         bool open_stdin,
                         const Config& config) noexcept
     :
     closed_(true), read_stdout_(std::move(read_stdout)), read_stderr_(std::move(read_stderr)), open_stdin_(open_stdin), config_(config) {
-    open(command, path);
+    open(command, current_folder);
     async_read();
 }
 
 inline Process::Process(const std::vector<string_type>& arguments,
-                        const string_type& path,
+                        const string_type& current_folder,
                         const environment_type& environment,
                         std::function<void(const char* bytes, size_t n)> read_stdout,
                         std::function<void(const char* bytes, size_t n)> read_stderr,
@@ -257,12 +267,12 @@ inline Process::Process(const std::vector<string_type>& arguments,
                         const Config& config) noexcept
     :
     closed_(true), read_stdout_(std::move(read_stdout)), read_stderr_(std::move(read_stderr)), open_stdin_(open_stdin), config_(config) {
-    open(arguments, path, &environment);
+    open(arguments, current_folder, &environment);
     async_read();
 }
 
 inline Process::Process(const string_type& command,
-                        const string_type& path,
+                        const string_type& current_folder,
                         const environment_type& environment,
                         std::function<void(const char* bytes, size_t n)> read_stdout,
                         std::function<void(const char* bytes, size_t n)> read_stderr,
@@ -270,7 +280,7 @@ inline Process::Process(const string_type& command,
                         const Config& config) noexcept
     :
     closed_(true), read_stdout_(std::move(read_stdout)), read_stderr_(std::move(read_stderr)), open_stdin_(open_stdin), config_(config) {
-    open(command, path, &environment);
+    open(command, current_folder, &environment);
     async_read();
 }
 
@@ -294,21 +304,19 @@ inline bool Process::successed() const noexcept {
     return (data_.id > 0);
 }
 
-
-
 inline Process::id_type Process::open(const std::vector<string_type>& arguments,
-                                      const string_type& path,
+                                      const string_type& current_folder,
                                       const environment_type* environment) noexcept {
     string_type command;
     for (auto& argument : arguments)
         command += (command.empty() ? L"" : L" ") + argument;
-    return open(command, path, environment);
+    return open(command, current_folder, environment);
 }
 
 // Based on the example at
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
 inline Process::id_type Process::open(const string_type& command,
-                                      const string_type& path,
+                                      const string_type& current_folder,
                                       const environment_type* environment) noexcept {
     if (open_stdin_)
         stdin_fd_ = std::unique_ptr<fd_type>(new fd_type(NULL));
@@ -394,7 +402,7 @@ inline Process::id_type Process::open(const string_type& command,
                                               : 0,  // CREATE_NO_WINDOW cannot be used when stdout or
                                                     // stderr is redirected to parent process
         environment_str.empty() ? nullptr : &environment_str[0],
-        path.empty() ? nullptr : path.c_str(), &startup_info, &process_info);
+        current_folder.empty() ? nullptr : current_folder.c_str(), &startup_info, &process_info);
 
     if (!bSuccess)
         return 0;
@@ -730,9 +738,9 @@ inline Process::id_type Process::open(const std::function<void()>& function) noe
 }
 
 inline Process::id_type Process::open(const std::vector<string_type>& arguments,
-                                      const string_type& path,
+                                      const string_type& current_folder,
                                       const environment_type* environment) noexcept {
-    return open([&arguments, &path, &environment] {
+    return open([&arguments, &current_folder, &environment] {
         if (arguments.empty())
             exit(127);
 
@@ -742,8 +750,8 @@ inline Process::id_type Process::open(const std::vector<string_type>& arguments,
             argv_ptrs.emplace_back(argument.c_str());
         argv_ptrs.emplace_back(nullptr);
 
-        if (!path.empty()) {
-            if (chdir(path.c_str()) != 0)
+        if (!current_folder.empty()) {
+            if (chdir(current_folder.c_str()) != 0)
                 exit(1);
         }
 
@@ -767,11 +775,11 @@ inline Process::id_type Process::open(const std::vector<string_type>& arguments,
 }
 
 inline Process::id_type Process::open(const std::string& command,
-                                      const std::string& path,
+                                      const std::string& current_folder,
                                       const environment_type* environment) noexcept {
-    return open([&command, &path, &environment] {
-        if (!path.empty()) {
-            if (chdir(path.c_str()) != 0)
+    return open([&command, &current_folder, &environment] {
+        if (!current_folder.empty()) {
+            if (chdir(current_folder.c_str()) != 0)
                 exit(1);
         }
 
@@ -910,7 +918,7 @@ inline void Process::close_fds() noexcept {
         stdout_stderr_thread_.join();
 
     if (stdin_fd_)
-        CloseStdin();
+        closeStdin();
     if (stdout_fd_) {
         if (data_.id > 0)
             close(*stdout_fd_);

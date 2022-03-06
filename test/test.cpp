@@ -272,7 +272,6 @@ void FileSystemTest2() {
     akali_hpp::filesystem::path path2(L"C:\\test\\测试\\__filesystem_test_测试2__.dat");
     if (akali_hpp::filesystem::exists(path2))
         EXPECT_TRUE(akali_hpp::filesystem::remove(path2));
-    
 }
 
 void FileTest1() {
@@ -312,6 +311,61 @@ void FileTest1() {
     EXPECT_TRUE(akali_hpp::filesystem::remove(file1.path()));
 }
 
+void ProcessTest() {
+#ifdef AKALI_WIN
+    akali_hpp::Process proc(
+        L"cmd.exe",
+        akali_hpp::Process::string_type(),
+        [](const char* bytes, size_t n) {
+            const std::string str(bytes, n);
+            printf("%s", str.c_str());
+        },
+        [](const char* bytes, size_t n) {
+            const std::string str(bytes, n);
+            printf("%s", str.c_str());
+        },
+        true);
+
+    EXPECT_TRUE(proc.successed());
+
+    int exitStatus = 0;
+    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_TRUE(proc.write(std::string("ping 127.0.0.1\n")));
+    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    proc.killProcessTree();
+    EXPECT_TRUE(proc.getExitStatus() > 0);
+#else
+    akali_hpp::Process proc(
+        "bash",
+        akali_hpp::Process::string_type(),
+        [](const char* bytes, size_t n) {
+            const std::string str(bytes, n);
+            printf("%s", str.c_str());
+        },
+        [](const char* bytes, size_t n) {
+            const std::string str(bytes, n);
+            printf("%s", str.c_str());
+        },
+        true);
+
+    EXPECT_TRUE(proc.successed());
+
+    int exitStatus = 0;
+    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_TRUE(proc.write(std::string("ping -c 6 127.0.0.1\n")));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    proc.killProcessTree(true);
+    EXPECT_TRUE(proc.getExitStatus() > 0);
+#endif
+}
+
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
 
@@ -321,6 +375,7 @@ int main() {
     const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
     printf("Current Path: %s\n", strCurExePath.c_str());
 
+    ProcessTest();
     PathTest();
     Md5Test();
     Base64Test();
