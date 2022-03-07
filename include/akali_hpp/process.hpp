@@ -177,6 +177,9 @@ class Process {
     void closeStdin() noexcept;
 
     /// Kill the process. force=true is only supported on Unix-like systems.
+    bool kill(bool force = false) noexcept;
+
+    /// Kill the process and it's child processes. force=true is only supported on Unix-like systems.
     void killProcessTree(bool force = false) noexcept;
 
     /// Kill a given process id. Use KillProcessTree(bool force) instead if
@@ -517,10 +520,10 @@ inline void Process::close_fds() noexcept {
 }
 
 inline bool Process::write(const char* bytes, size_t n) {
-    if (!open_stdin_)
-        throw std::invalid_argument(
-            "Can't write to an unopened stdin pipe. Please set open_stdin=true "
-            "when constructing the process.");
+    if (!open_stdin_) {
+        assert(false && "Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
+        return false;
+    }
 
     std::lock_guard<std::mutex> lock(stdin_mutex_);
     if (stdin_fd_) {
@@ -543,6 +546,17 @@ inline void Process::closeStdin() noexcept {
             CloseHandle(*stdin_fd_);
         stdin_fd_.reset();
     }
+}
+
+inline bool Process::kill(bool /*force*/) noexcept {
+    std::lock_guard<std::mutex> lock(close_mutex_);
+    if (data_.id > 0 && !closed_) {
+        const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, data_.id);
+        if (process_handle)
+            return TerminateProcess(process_handle, 2);
+    }
+
+    return false;
 }
 
 // Based on http://stackoverflow.com/a/1173396
@@ -932,10 +946,10 @@ inline void Process::close_fds() noexcept {
 }
 
 inline bool Process::write(const char* bytes, size_t n) {
-    if (!open_stdin_)
-        throw std::invalid_argument(
-            "Can't write to an unopened stdin pipe. Please set open_stdin=true "
-            "when constructing the process.");
+    if (!open_stdin_) {
+        assert(false && "Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
+        return false;
+    }
 
     std::lock_guard<std::mutex> lock(stdin_mutex_);
     if (stdin_fd_) {
@@ -955,6 +969,15 @@ inline void Process::closeStdin() noexcept {
         if (data_.id > 0)
             close(*stdin_fd_);
         stdin_fd_.reset();
+    }
+}
+
+inline bool Process::kill(bool force) noexcept {
+    std::lock_guard<std::mutex> lock(close_mutex_);
+    if (data_.id > 0 && !closed_) {
+        if (force)
+            return ::kill(data_.id, SIGTERM) == 0;
+        return ::kill(data_.id, SIGINT) == 0;
     }
 }
 
