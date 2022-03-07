@@ -38,7 +38,7 @@
 
 #pragma warning(disable : 4996)
 
-namespace akali_hpp {
+namespace akl {
 class ProcessUtil {
    public:
 #ifdef AKALI_WIN
@@ -173,6 +173,6 @@ class ProcessUtil {
         return ret;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif

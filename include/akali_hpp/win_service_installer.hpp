@@ -30,7 +30,7 @@
 #include <strsafe.h>
 #include "trace.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class WinServiceInstaller {
    public:
     //
@@ -237,6 +237,6 @@ class WinServiceInstaller {
         CloseServiceHandle(schService);
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 #endif

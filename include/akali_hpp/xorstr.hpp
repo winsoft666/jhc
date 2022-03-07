@@ -30,7 +30,7 @@
 #define __forceinline __attribute__((always_inline))
 #endif
 
-namespace akali_hpp {
+namespace akl {
 
 constexpr auto seed = static_cast<int>(__TIME__[7]) + static_cast<int>(__TIME__[6]) * 10 + static_cast<int>(__TIME__[4]) * 60 + static_cast<int>(__TIME__[3]) * 600 + static_cast<int>(__TIME__[1]) * 3600 + static_cast<int>(__TIME__[0]) * 36000;
 
@@ -179,9 +179,9 @@ class DynXorStr {
     T m_key;
     std::basic_string<T> m_buffer;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
-#define XORSTRA(s) (akali_hpp::XorStr<char, _countof(s), __COUNTER__>(s, std::make_index_sequence<_countof(s) - 1>()).decrypt())
-#define XORSTRW(s) (akali_hpp::XorStr<wchar_t, _countof(s), __COUNTER__>(s, std::make_index_sequence<_countof(s) - 1>()).decrypt())
+#define XORSTRA(s) (akl::XorStr<char, _countof(s), __COUNTER__>(s, std::make_index_sequence<_countof(s) - 1>()).decrypt())
+#define XORSTRW(s) (akl::XorStr<wchar_t, _countof(s), __COUNTER__>(s, std::make_index_sequence<_countof(s) - 1>()).decrypt())
 
 #endif

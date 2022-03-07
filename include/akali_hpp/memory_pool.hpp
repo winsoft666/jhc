@@ -39,7 +39,7 @@
  Also see: https://blog.csdn.net/china_jeffery/article/details/80750042
  */
 
-namespace akali_hpp {
+namespace akl {
 template <typename T, size_t BlockSize = 4096, bool ZeroOnDeallocate = true>
 class MemoryPool {
    public:
@@ -318,5 +318,5 @@ inline void MemoryPool<T, BlockSize, ZeroOnDeallocate>::deleteElement(pointer p)
         deallocate(p);
     }
 }
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // AKALI_MEMORY_POOL_H_

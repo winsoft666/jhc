@@ -26,7 +26,7 @@
 #endif
 #include "akali_hpp/os_ver.hpp"
 
-namespace akali_hpp {
+namespace akl {
 #ifdef AKALI_WIN
 #define PATH_FS "ls"
 #else
@@ -115,6 +115,6 @@ class PathUtil {
 #endif
 };
 
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif  // !AKALI_PATH_UTIL_HPP_

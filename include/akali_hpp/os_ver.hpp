@@ -41,7 +41,7 @@
 
 #pragma warning(disable : 4996)
 
-namespace akali_hpp {
+namespace akl {
 /*
 Operating system                            dwMajorVersion     dwMinorVersion         dwBuild                      Other
 Windows 11                                       10               0                   >=22000         Not applicable     
@@ -169,5 +169,5 @@ class OSVersion {
 #endif
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_OS_VER_HPP__

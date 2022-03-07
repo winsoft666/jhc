@@ -44,7 +44,7 @@
 
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class Thread {
    public:
     Thread() :
@@ -160,6 +160,6 @@ class Thread {
     std::atomic_bool running_;
     AKALI_DISALLOW_COPY_AND_ASSIGN(Thread);
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 #endif  // !AKALI_THREAD_H__

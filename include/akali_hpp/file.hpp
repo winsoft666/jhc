@@ -39,7 +39,7 @@
 #include "akali_hpp/macros.hpp"
 #include "akali_hpp/filesystem.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class File {
    public:
     File(const filesystem::path& path) :
@@ -360,5 +360,5 @@ class File {
 
     AKALI_DISALLOW_COPY_AND_ASSIGN(File);
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_FILE_UTIL_HPP_

@@ -20,7 +20,7 @@
 #include <cassert>
 #include <string>
 
-namespace akali_hpp {
+namespace akl {
 class HexEncode {
    public:
     static char Encode(unsigned char val) {
@@ -170,5 +170,5 @@ class HexEncode {
         return DecodeWithDelimiter(buffer, buflen, source.c_str(), source.length(), delimiter);
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_HEX_ENCODE_HPP__

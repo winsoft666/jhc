@@ -37,7 +37,7 @@
 
 #pragma comment(lib, "taskschd.lib")
 
-namespace akali_hpp {
+namespace akl {
 class ScheduleTask {
    public:
     AKALI_DISALLOW_COPY_AND_ASSIGN(ScheduleTask);
@@ -456,6 +456,6 @@ class ScheduleTask {
     ITaskService* m_lpITS;
     ITaskFolder* m_lpRootFolder;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 #endif  // !AKALI_WIN_SCHEDULE_TASK_HPP__

@@ -35,7 +35,7 @@
 
 #include <string>
 
-namespace akali_hpp {
+namespace akl {
 #ifdef AKALI_WIN
 class WinFileInfo {
    public:
@@ -386,5 +386,5 @@ class WinFileInfo {
     FILETIME m_ftLastWriteTime;
 };
 #endif
-}  // namespace akali_hpp
+}  // namespace akl
 #endif

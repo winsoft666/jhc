@@ -30,80 +30,86 @@
             printf("\033[31mFailed:\033[0m " #x "\n"); \
     } while (false)
 
+
 void Md5Test() {
     const std::string str = "hello world!!!";
-    EXPECT_TRUE(akali_hpp::Md5::GetStringMd5((void*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
+    EXPECT_TRUE(akl::Md5::GetStringMd5((void*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
 }
 
 void Base64Test() {
-    EXPECT_TRUE(akali_hpp::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
-    EXPECT_TRUE(akali_hpp::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
+    EXPECT_TRUE(akl::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
+    EXPECT_TRUE(akl::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
+}
+
+void IpAddressTest() {
+    EXPECT_TRUE(akl::IPAddress::IPIsLoopback(akl::IPAddress("192.168.50.12")) == false);
+    EXPECT_TRUE(akl::IPAddress::IPIsLoopback(akl::IPAddress("127.0.0.1")));
 }
 
 void StringHelperTest() {
-    EXPECT_TRUE(akali_hpp::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
-    EXPECT_TRUE(akali_hpp::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
-    EXPECT_TRUE(akali_hpp::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
-    EXPECT_TRUE(akali_hpp::StringHelper::ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
+    EXPECT_TRUE(akl::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
+    EXPECT_TRUE(akl::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
+    EXPECT_TRUE(akl::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
+    EXPECT_TRUE(akl::StringHelper::ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
 
-    EXPECT_TRUE(akali_hpp::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
-    EXPECT_TRUE(!akali_hpp::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
-    EXPECT_TRUE(akali_hpp::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
+    EXPECT_TRUE(akl::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
+    EXPECT_TRUE(!akl::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
+    EXPECT_TRUE(akl::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
 
-    EXPECT_TRUE(akali_hpp::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
-    EXPECT_TRUE(!akali_hpp::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
-    EXPECT_TRUE(akali_hpp::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
+    EXPECT_TRUE(akl::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
+    EXPECT_TRUE(!akl::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
+    EXPECT_TRUE(akl::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
 
-    EXPECT_TRUE(akali_hpp::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "1234567890"));
-    EXPECT_TRUE(akali_hpp::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
-    EXPECT_TRUE(!akali_hpp::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
-    EXPECT_TRUE(!akali_hpp::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
+    EXPECT_TRUE(akl::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "1234567890"));
+    EXPECT_TRUE(akl::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
+    EXPECT_TRUE(!akl::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
+    EXPECT_TRUE(!akl::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
 
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes("123456712", "12") == 2);
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes(L"123456712", L"12") == 2);
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes("1234567121", "121") == 1);
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes(L"1234567121", L"121") == 1);
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes("123 4567 121", " ") == 2);
-    EXPECT_TRUE(akali_hpp::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes("123456712", "12") == 2);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes(L"123456712", L"12") == 2);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes("1234567121", "121") == 1);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes(L"1234567121", L"121") == 1);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes("123 4567 121", " ") == 2);
+    EXPECT_TRUE(akl::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
 
-    const std::string s1 = akali_hpp::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
+    const std::string s1 = akl::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
     EXPECT_TRUE(s1 == "jack's age is 18");
 
-    const std::wstring ws1 = akali_hpp::StringHelper::StringPrintf(L"%ls's age is %d", L"jack", 18);
+    const std::wstring ws1 = akl::StringHelper::StringPrintf(L"%ls's age is %d", L"jack", 18);
     EXPECT_TRUE(ws1 == L"jack's age is 18");
 
     std::string bigStrA(2048, 'a');
     bigStrA += "[end]";
-    const std::string s2 = akali_hpp::StringHelper::StringPrintf("%s length is %d", bigStrA.c_str(), bigStrA.length());
+    const std::string s2 = akl::StringHelper::StringPrintf("%s length is %d", bigStrA.c_str(), bigStrA.length());
     EXPECT_TRUE(s2 == bigStrA + " length is " + std::to_string(bigStrA.length()));
 
     std::wstring bigStrW(2048, L'a');
     bigStrW += L"[end]";
-    const std::wstring ws2 = akali_hpp::StringHelper::StringPrintf(L"%ls length is %d", bigStrW.c_str(), bigStrW.length());
+    const std::wstring ws2 = akl::StringHelper::StringPrintf(L"%ls length is %d", bigStrW.c_str(), bigStrW.length());
     EXPECT_TRUE(ws2 == bigStrW + L" length is " + std::to_wstring(bigStrW.length()));
 
     std::string bigStrA2(1024, 'c');
-    const std::string s3 = akali_hpp::StringHelper::StringPrintf("%s", bigStrA2.c_str());
+    const std::string s3 = akl::StringHelper::StringPrintf("%s", bigStrA2.c_str());
     EXPECT_TRUE(s3 == bigStrA2);
 
     std::wstring bigStrW2(1024, L'c');
-    const std::wstring sw3 = akali_hpp::StringHelper::StringPrintf(L"%ls", bigStrW2.c_str());
+    const std::wstring sw3 = akl::StringHelper::StringPrintf(L"%ls", bigStrW2.c_str());
     EXPECT_TRUE(sw3 == bigStrW2);
 }
 
 void StringEncodeTest() {
     const std::string u8str = u8"中国china";
     const std::wstring wstr = L"中国china";
-    EXPECT_TRUE(akali_hpp::StringEncode::Utf8ToUnicode(u8str) == wstr);
-    EXPECT_TRUE(akali_hpp::StringEncode::UnicodeToUtf8(wstr) == u8str);
+    EXPECT_TRUE(akl::StringEncode::Utf8ToUnicode(u8str) == wstr);
+    EXPECT_TRUE(akl::StringEncode::UnicodeToUtf8(wstr) == u8str);
 }
 
 void PathTest() {
 #ifdef AKALI_WIN
-    printf("Windows Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetWindowsFolder().c_str());
-    printf("System Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetSystemFolder().c_str());
-    printf("Temp Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetTempFolder().c_str());
-    printf("LocalAppData Folder: %" PATH_FS "\n", akali_hpp::PathUtil::GetLocalAppDataFolder().c_str());
+    printf("Windows Folder: %" PATH_FS "\n", akl::PathUtil::GetWindowsFolder().c_str());
+    printf("System Folder: %" PATH_FS "\n", akl::PathUtil::GetSystemFolder().c_str());
+    printf("Temp Folder: %" PATH_FS "\n", akl::PathUtil::GetTempFolder().c_str());
+    printf("LocalAppData Folder: %" PATH_FS "\n", akl::PathUtil::GetLocalAppDataFolder().c_str());
 #endif
 }
 
@@ -114,15 +120,15 @@ void TraceTest() {
     std::wstring bigStrW(1080, L's');
     bigStrW += L"[end]";
 
-    akali_hpp::Trace::MsgA("[%" PRId64 "] this big message output by akali_hpp::Trace::MsgA: %s\n", time(nullptr), bigStrA.c_str());
-    akali_hpp::Trace::MsgW(L"[%" PRId64 "] this big message output by akali_hpp::Trace::MsgW: %ls\n", time(nullptr), bigStrW.c_str());
+    akl::Trace::MsgA("[%" PRId64 "] this big message output by akl::Trace::MsgA: %s\n", time(nullptr), bigStrA.c_str());
+    akl::Trace::MsgW(L"[%" PRId64 "] this big message output by akl::Trace::MsgW: %ls\n", time(nullptr), bigStrW.c_str());
 }
 
 void CmdLineParserTest() {
     std::wstring wparam = L"\"C:\\Program Files (x86)\\Google\\Chrome.exe\" -k1=v1 -k2:v2 /k3=v3 /k4:v4 /k5 -k6=v6= /k7=\"v7 /v=-'\"";
-    akali_hpp::CmdLineParser clp(wparam);
+    akl::CmdLineParser clp(wparam);
     printf("Key-Value list:\n");
-    for (akali_hpp::CmdLineParser::ITERPOS it = clp.begin(); it != clp.end(); ++it)
+    for (akl::CmdLineParser::ITERPOS it = clp.begin(); it != clp.end(); ++it)
         printf("Key:%ls, Value:%ls\n", it->first.c_str(), it->second.c_str());
     printf("\n");
 
@@ -138,7 +144,7 @@ void CmdLineParserTest() {
 void CreateJsonMethod1Test() {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
-    akali_hpp::json j;
+    akl::json j;
     j["pi"] = 3.141;
     j["happy"] = true;
     j["name"] = "Niels";
@@ -153,7 +159,7 @@ void CreateJsonMethod1Test() {
 void CreateJsonMethod2Test() {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
-    akali_hpp::json j2 = {
+    akl::json j2 = {
         {"pi", 3.141},
         {"happy", true},
         {"name", "Niels"},
@@ -168,25 +174,25 @@ void CreateJsonMethod2Test() {
 void CreateJsonMethod3Test() {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
-    akali_hpp::json j3;
+    akl::json j3;
     j3["pi"] = 3.141;
     j3["happy"] = true;
     j3["name"] = "Niels";
     j3["nothing"] = nullptr;
 
-    akali_hpp::json j3_answer;
+    akl::json j3_answer;
     j3_answer["everything"] = 42;
 
     j3["answer"] = j3_answer;
 
-    akali_hpp::json j3_list = akali_hpp::json::array();
+    akl::json j3_list = akl::json::array();
     j3_list.push_back(1);
     j3_list.push_back(0);
     j3_list.push_back(2);
 
     j3["list"] = j3_list;
 
-    akali_hpp::json j3_object;
+    akl::json j3_object;
     j3_object["currency"] = "USD";
     j3_object["value"] = 42.99;
 
@@ -197,7 +203,7 @@ void CreateJsonMethod3Test() {
 
 void ParseJsonMethod1Test() {
     // create json object
-    akali_hpp::json j;
+    akl::json j;
     j["pi"] = 3.141;
     j["happy"] = true;
     j["name"] = "Niels";
@@ -209,7 +215,7 @@ void ParseJsonMethod1Test() {
     const std::string strJson = j.dump();
 
     // parse json string
-    auto jsonObj = akali_hpp::json::parse(strJson);
+    auto jsonObj = akl::json::parse(strJson);
     EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["pi"].get<float>(), 3.141f));
     EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["pi"].get<double>(), 3.141));
     EXPECT_TRUE(jsonObj["happy"].get<bool>() == true);
@@ -225,7 +231,7 @@ void ParseJsonMethod1Test() {
 }
 
 void FileSystemTest1() {
-    akali_hpp::filesystem::path path1(u8"C:/test/测试/__filesystem_test测试1__.dat");
+    akl::filesystem::path path1(u8"C:/test/测试/__filesystem_test测试1__.dat");
 
     EXPECT_TRUE(path1.wstring() == L"C:\\test\\测试\\__filesystem_test测试1__.dat");
     EXPECT_TRUE(path1.generic_wstring() == L"C:/test/测试/__filesystem_test测试1__.dat");
@@ -264,29 +270,29 @@ void FileSystemTest1() {
     EXPECT_TRUE(path1.generic_string() == u8"C:/test/测试/__filesystem_test测试1__.dat");
 
     path1 = L"C:\\test\\..\\123\\.\\__filesystem_test测试1__.dat";
-    akali_hpp::filesystem::path path2 = akali_hpp::filesystem::absolute(path1);
+    akl::filesystem::path path2 = akl::filesystem::absolute(path1);
     EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test测试1__.dat");
 }
 
 void FileSystemTest2() {
-    akali_hpp::filesystem::path path2(L"C:\\test\\测试\\__filesystem_test_测试2__.dat");
-    if (akali_hpp::filesystem::exists(path2))
-        EXPECT_TRUE(akali_hpp::filesystem::remove(path2));
+    akl::filesystem::path path2(L"C:\\test\\测试\\__filesystem_test_测试2__.dat");
+    if (akl::filesystem::exists(path2))
+        EXPECT_TRUE(akl::filesystem::remove(path2));
 }
 
 void FileTest1() {
     constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
 
-    akali_hpp::filesystem::path path1(u8"__file_test_文件测试1__.dat");
-    akali_hpp::filesystem::path openMode1(u8"ab+");
+    akl::filesystem::path path1(u8"__file_test_文件测试1__.dat");
+    akl::filesystem::path openMode1(u8"ab+");
 
-    akali_hpp::File file1(path1);
+    akl::File file1(path1);
     EXPECT_TRUE(file1.path() == path1);
-    if (akali_hpp::filesystem::exists(file1.path()))
-        EXPECT_TRUE(akali_hpp::filesystem::remove(file1.path()));
+    if (akl::filesystem::exists(file1.path()))
+        EXPECT_TRUE(akl::filesystem::remove(file1.path()));
 
-    EXPECT_TRUE(akali_hpp::filesystem::exists(file1.path()) == false);
+    EXPECT_TRUE(akl::filesystem::exists(file1.path()) == false);
     EXPECT_TRUE(file1.isOpen() == false);
     EXPECT_TRUE(file1.exist() == false);
     EXPECT_TRUE(file1.open(openMode1));
@@ -308,14 +314,14 @@ void FileTest1() {
 
     EXPECT_TRUE(file1.fileSize() == bytes4gb);
     EXPECT_TRUE(file1.close());
-    EXPECT_TRUE(akali_hpp::filesystem::remove(file1.path()));
+    EXPECT_TRUE(akl::filesystem::remove(file1.path()));
 }
 
 void ProcessTest() {
 #ifdef AKALI_WIN
-    akali_hpp::Process proc(
+    akl::Process proc(
         L"cmd.exe",
-        akali_hpp::Process::string_type(),
+        akl::Process::string_type(),
         [](const char* bytes, size_t n) {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
@@ -339,9 +345,9 @@ void ProcessTest() {
     proc.killProcessTree();
     EXPECT_TRUE(proc.getExitStatus() > 0);
 #else
-    akali_hpp::Process proc(
+    akl::Process proc(
         "bash",
-        akali_hpp::Process::string_type(),
+        akl::Process::string_type(),
         [](const char* bytes, size_t n) {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
@@ -367,18 +373,20 @@ void ProcessTest() {
 }
 
 int main() {
-    printf("Current timestamp(by microseconds): %" PRId64 "\n", akali_hpp::TimeUtil::GetCurrentTimestampByMicroSec());
+    printf("Current timestamp(by microseconds): %" PRId64 "\n", akl::TimeUtil::GetCurrentTimestampByMicroSec());
 
-    const std::string strOSVer = akali_hpp::OSVersion::GetOSVersion();
+    const std::string strOSVer = akl::OSVersion::GetOSVersion();
     printf("Current OS Version: %s\n", strOSVer.c_str());
 
-    const std::string strCurExePath = akali_hpp::ProcessUtil::GetCurrentProcessPath();
+    const std::string strCurExePath = akl::ProcessUtil::GetCurrentProcessPath();
     printf("Current Path: %s\n", strCurExePath.c_str());
 
     ProcessTest();
     PathTest();
     Md5Test();
     Base64Test();
+    IpAddressTest();
+    return 0;
     StringHelperTest();
     StringEncodeTest();
     CmdLineParserTest();

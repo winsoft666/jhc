@@ -34,7 +34,7 @@
 #include "akali_hpp/macros.hpp"
 #include "akali_hpp/os_ver.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class RegKey {
    public:
     // hkeyRoot can be one of :
@@ -614,6 +614,6 @@ class RegKey {
     std::wstring m_strSubKey;
     bool m_bWatchSubtree;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif // !AKALI_WIN
 #endif  // !AKALI_WIN_REGISTRY_HPP_

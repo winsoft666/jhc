@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-namespace akali_hpp {
+namespace akl {
 class Base64 {
    public:
     static std::string Encode(std::string const& s, bool url = false) {
@@ -268,5 +268,5 @@ const char* Base64::base64_chars[2] = {
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789"
     "-_"};
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_BASE64_HPP__

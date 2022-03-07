@@ -21,7 +21,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace akali_hpp {
+namespace akl {
 class Event {
    public:
     Event(bool setted = false) :
@@ -60,5 +60,5 @@ class Event {
     std::mutex setted_mutex_;
     std::condition_variable setted_cond_var_;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  //!AKALI_EVENT_HPP__

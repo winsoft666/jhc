@@ -47,7 +47,7 @@
 #define COUNT_OF(array) (sizeof(array) / sizeof(array[0]))
 #endif
 
-namespace akali_hpp {
+namespace akl {
 class StringHelper {
    public:
     static char EasyCharToLowerA(char in) {
@@ -601,5 +601,5 @@ class StringHelper {
         return output;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_STRING_HELPER_HPP__

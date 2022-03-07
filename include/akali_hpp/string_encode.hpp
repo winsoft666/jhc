@@ -32,7 +32,7 @@
 
 #pragma warning(disable : 4309)
 
-namespace akali_hpp {
+namespace akl {
 
 class StringEncode {
    public:
@@ -191,20 +191,20 @@ class StringEncode {
 
 #ifdef AKALI_WIN
 #if (defined UNICODE || defined _UNICODE)
-#define TCHARToAnsi(str) akali_hpp::StringEncode::UnicodeToAnsi((str), 0)
-#define TCHARToUtf8(str) akali_hpp::StringEncode::UnicodeToUtf8((str))
-#define AnsiToTCHAR(str) akali_hpp::StringEncode::AnsiToUnicode((str), 0)
-#define Utf8ToTCHAR(str) akali_hpp::StringEncode::Utf8ToUnicode((str))
+#define TCHARToAnsi(str) akl::StringEncode::UnicodeToAnsi((str), 0)
+#define TCHARToUtf8(str) akl::StringEncode::UnicodeToUtf8((str))
+#define AnsiToTCHAR(str) akl::StringEncode::AnsiToUnicode((str), 0)
+#define Utf8ToTCHAR(str) akl::StringEncode::Utf8ToUnicode((str))
 #define TCHARToUnicode(str) ((std::wstring)(str))
 #define UnicodeToTCHAR(str) ((std::wstring)(str))
 #else
 #define TCHARToAnsi(str) ((std::string)(str))
-#define TCHARToUtf8 akali_hpp::StringEncode::AnsiToUtf8((str), 0)
+#define TCHARToUtf8 akl::StringEncode::AnsiToUtf8((str), 0)
 #define AnsiToTCHAR(str) ((std::string)(str))
-#define Utf8ToTCHAR(str) akali_hpp::StringEncode::Utf8ToAnsi((str), 0)
-#define TCHARToUnicode(str) akali_hpp::StringEncode::AnsiToUnicode((str), 0)
-#define UnicodeToTCHAR(str) akali_hpp::StringEncode::UnicodeToAnsi((str), 0)
+#define Utf8ToTCHAR(str) akl::StringEncode::Utf8ToAnsi((str), 0)
+#define TCHARToUnicode(str) akl::StringEncode::AnsiToUnicode((str), 0)
+#define UnicodeToTCHAR(str) akl::StringEncode::UnicodeToAnsi((str), 0)
 #endif
 #endif
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // AKALI_STRING_ENCODE_HPP_

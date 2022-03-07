@@ -32,7 +32,7 @@
 #include <strsafe.h>
 #include <assert.h>
 
-namespace akali_hpp {
+namespace akl {
 class Ini {
    public:
     Ini() noexcept {}
@@ -289,6 +289,6 @@ class Ini {
 
     std::wstring ini_file_path_;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif // !AKALI_WIN
 #endif // !AKALI_WIN_INI_HPP_

@@ -22,7 +22,7 @@
 #include "akali_hpp/arch.hpp"
 #include <memory.h>
 
-namespace akali_hpp {
+namespace akl {
 class libmd5_internal {
    public:
     /*
@@ -372,6 +372,6 @@ class Md5 {
 
     return szMd5;
 }
-};  // namespace akali_hpp
-}  // namespace akali_hpp
+};  // namespace akl
+}  // namespace akl
 #endif

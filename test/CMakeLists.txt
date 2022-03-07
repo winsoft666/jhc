@@ -29,11 +29,9 @@ add_definitions(-DUNICODE -D_UNICODE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 file(GLOB AKALI_HPP_HEADER_FILES ../include/akali_hpp.h ../include/akali_hpp/*.*)
-file(GLOB_RECURSE SPDLOG_FILES ../include/spdlog/*.*)
 file(GLOB TEST_SOURCE_FILES ./*.cpp)
 
 source_group("akali_hpp" FILES ${AKALI_HPP_HEADER_FILES})
-source_group("akali_hpp\\spdlog" FILES ${SPDLOG_FILES})
 source_group("test" FILES ${TEST_SOURCE_FILES})
 
 include_directories(../include)
@@ -41,7 +39,6 @@ include_directories(../include)
 add_executable(
 	${EXE_NAME}
 	${AKALI_HPP_HEADER_FILES}
-	${SPDLOG_FILES}
 	${TEST_SOURCE_FILES}
 	)
 	

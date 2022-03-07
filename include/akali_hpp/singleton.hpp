@@ -33,7 +33,7 @@
 #endif
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 template <class T>
 class Singleton {
  public:
@@ -75,7 +75,7 @@ void Singleton<T>::Release(void) {
   }
 }
 
-#define SINGLETON_CLASS_DECLARE(class_name) friend class ::akali_hpp::Singleton<##class_name>;
+#define SINGLETON_CLASS_DECLARE(class_name) friend class ::akl::Singleton<##class_name>;
 
 class SingletonProcess {
  public:
@@ -123,5 +123,5 @@ class SingletonProcess {
   AKALI_DISALLOW_IMPLICIT_CONSTRUCTORS(SingletonProcess);
 };
 
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_SINGLETON_HPP_

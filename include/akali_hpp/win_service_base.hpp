@@ -32,7 +32,7 @@
 #include <strsafe.h>
 #include "akali_hpp/string_encode.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class WinServiceBase {
    public:
     // Register the executable for a service with the Service Control Manager
@@ -481,7 +481,7 @@ class WinServiceBase {
 
 WinServiceBase* WinServiceBase::s_service = NULL;
 
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 
 #endif  // ! AKALI_WIN_SERVICE_BASE_H_

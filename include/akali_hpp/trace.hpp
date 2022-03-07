@@ -35,7 +35,7 @@
 #endif
 #include "akali_hpp/string_helper.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class Trace {
    public:
     static void MsgW(const wchar_t* lpFormat, ...) {
@@ -70,6 +70,6 @@ class Trace {
         }
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif  // !AKALI_TRACE_H__

@@ -30,6 +30,7 @@
 #endif  // AKALI_WIN
 #include "akali_hpp/macros.hpp"
 
+namespace akl {
 #ifdef AKALI_WIN
 // Simple HANDLE wrapper to close it automatically from the destructor.
 class ScopedHandle {
@@ -67,5 +68,5 @@ class ScopedHandle {
 
 #else
 #endif
-
+}  // namespace akl
 #endif  // !SCOPED_OBJECT_HPP__

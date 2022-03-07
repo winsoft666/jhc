@@ -20,7 +20,7 @@
 #include <string>
 #include "hex_encode.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class UrlEncode {
    public:
     static std::string Encode(const std::string& str) {
@@ -96,6 +96,6 @@ class UrlEncode {
         return result;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif  // !AKALI_URL_ENCODE_HPP__

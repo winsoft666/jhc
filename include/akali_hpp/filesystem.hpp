@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// akali_hpp::filesystem - A C++17-like filesystem implementation for C++11/C++14/C++17/C++20
+// akl::filesystem - A C++17-like filesystem implementation for C++11/C++14/C++17/C++20
 //
 //---------------------------------------------------------------------------------------
 //
@@ -38,7 +38,7 @@
 // #endif
 // #ifndef GHC_USE_STD_FS
 // #include <ghc/filesystem.hpp>
-// namespace fs = akali_hpp::filesystem;
+// namespace fs = akl::filesystem;
 // #endif
 //
 //---------------------------------------------------------------------------------------
@@ -282,7 +282,7 @@
 // LWG #2937 enforces that fs::equivalent emits an error, if !fs::exists(p1)||!exists(p2)
 #define LWG_2937_BEHAVIOUR
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// UTF8-Everywhere is the original behaviour of akali_hpp::filesystem. But since v1.5 the windows
+// UTF8-Everywhere is the original behaviour of akl::filesystem. But since v1.5 the windows
 // version defaults to std::wstring storage backend. Still all std::string will be interpreted
 // as UTF-8 encoded. With this define you can enfoce the old behavior on Windows, using
 // std::string as backend and for fs::path::native() and char for fs::path::c_str(). This
@@ -301,7 +301,7 @@
 #endif  // GHC_WIN_DISABLE_AUTO_PREFIXES
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// akali_hpp::filesystem version in decimal (major * 10000 + minor * 100 + patch)
+// akl::filesystem version in decimal (major * 10000 + minor * 100 + patch)
 #define GHC_FILESYSTEM_VERSION 10510L
 
 #if !defined(GHC_WITH_EXCEPTIONS) && (defined(__EXCEPTIONS) || defined(__cpp_exceptions) || defined(_CPPUNWIND))
@@ -311,7 +311,7 @@
 #error "Can't raise unicode errors with exception support disabled"
 #endif
 
-namespace akali_hpp {
+namespace akl {
 namespace filesystem {
 
 #if defined(GHC_HAS_CUSTOM_STRING_VIEW)
@@ -383,7 +383,7 @@ public:
     /// The path format in which the constructor argument is given.
     enum format {
         generic_format,  ///< The generic format, internally used by
-                         ///< akali_hpp::filesystem::path with slashes
+                         ///< akl::filesystem::path with slashes
         native_format,   ///< The format native to the current platform this code
                          ///< is build for
         auto_format,     ///< Try to auto-detect the format, fallback to native
@@ -638,12 +638,12 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 // [pfs.path.factory] path factory functions
 template <class Source, typename = path::path_from_string<Source>>
 #if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use akali_hpp::filesystem::path::path() with std::u8string instead")]]
+[[deprecated("use akl::filesystem::path::path() with std::u8string instead")]]
 #endif
 path u8path(const Source& source);
 template <class InputIterator>
 #if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use akali_hpp::filesystem::path::path() with std::u8string instead")]]
+[[deprecated("use akl::filesystem::path::path() with std::u8string instead")]]
 #endif
 path u8path(InputIterator first, InputIterator last);
 
@@ -6009,7 +6009,7 @@ GHC_INLINE recursive_directory_iterator end(const recursive_directory_iterator&)
 #endif  // GHC_EXPAND_IMPL
 
 }  // namespace filesystem
-}  // namespace akali_hpp
+}  // namespace akl
 
 // cleanup some macros
 #undef GHC_INLINE

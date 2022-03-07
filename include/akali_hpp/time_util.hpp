@@ -41,7 +41,7 @@
 #include <sys/time.h>
 #endif
 
-namespace akali_hpp {
+namespace akl {
 class Time {
    public:
     Time() {
@@ -253,5 +253,5 @@ class TimeMeter {
    private:
     std::clock_t lStartTime_;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_TIMEUTIL_HPP_

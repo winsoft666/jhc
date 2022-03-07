@@ -31,7 +31,7 @@
 #include <DbgHelp.h>
 #include <strsafe.h>
 
-namespace akali_hpp {
+namespace akl {
 class WinExceptionCatchInternal {
    public:
     typedef struct _EXCEPTION_POINTERS EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
@@ -117,13 +117,13 @@ class WinExceptionCatchInternal {
         return EXCEPTION_EXECUTE_HANDLER;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 #define WINMAIN_BEGIN(szDumpNamePrefix)                                                                 \
     int __96A9695E_RUN_WINMAIN_FUNC(HINSTANCE hInstance, LPTSTR lpCmdLine);                             \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {             \
         OutputDebugString(TEXT("Create a dump file sine an exception occurred in sub-thread.\n"));      \
-        int iRet = akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpNamePrefix);                        \
+        int iRet = akl::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpNamePrefix);                        \
         return iRet;                                                                                    \
     }                                                                                                   \
     int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine,              \
@@ -134,7 +134,7 @@ class WinExceptionCatchInternal {
         int ret = 0;                                                                                    \
         __try {                                                                                         \
             ret = __96A9695E_RUN_WINMAIN_FUNC(hInstance, lpCmdLine);                                    \
-        } __except (akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpNamePrefix)) {          \
+        } __except (akl::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpNamePrefix)) {          \
             OutputDebugString(TEXT("Create a dump file sine an exception occurred in main-thread.\n")); \
         }                                                                                               \
         return ret;                                                                                     \
@@ -146,7 +146,7 @@ class WinExceptionCatchInternal {
     int __96A9695E_RUN_MAIN_FUNC(int argc, wchar_t* argv[]);                                        \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {         \
         OutputDebugString(TEXT("Create a dump file since an exception occurred in sub-thread.\n")); \
-        int iRet = akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpName);                          \
+        int iRet = akl::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpName);                          \
         return iRet;                                                                                \
     }                                                                                               \
     int wmain(int argc, wchar_t* argv[]) {                                                          \
@@ -154,7 +154,7 @@ class WinExceptionCatchInternal {
         int ret = 0;                                                                                \
         __try {                                                                                     \
             ret = __96A9695E_RUN_MAIN_FUNC(argc, argv);                                             \
-        } __except (akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpName)) {            \
+        } __except (akl::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpName)) {            \
             OutputDebugString(                                                                      \
                 TEXT("Create a dump file since an exception occurred in "                           \
                      "main-thread.\n"));                                                            \
@@ -166,7 +166,7 @@ class WinExceptionCatchInternal {
     int __96A9695E_RUN_MAIN_FUNC(int argc, char* argv[]);                                           \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {         \
         OutputDebugString(TEXT("Create a dump file since an exception occurred in sub-thread.\n")); \
-        int iRet = akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpName);                          \
+        int iRet = akl::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpName);                          \
         return iRet;                                                                                \
     }                                                                                               \
     int main(int argc, char* argv[]) {                                                              \
@@ -174,7 +174,7 @@ class WinExceptionCatchInternal {
         int ret = 0;                                                                                \
         __try {                                                                                     \
             ret = __96A9695E_RUN_MAIN_FUNC(argc, argv);                                             \
-        } __except (akali_hpp::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpName)) {            \
+        } __except (akl::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpName)) {            \
             OutputDebugString(                                                                      \
                 TEXT("Create a dump file since an exception occurred in "                           \
                      "main-thread.\n"));                                                            \

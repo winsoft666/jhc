@@ -23,7 +23,7 @@
 #include "akali_hpp/string_encode.hpp"
 #include <unordered_map>
 
-namespace akali_hpp {
+namespace akl {
 namespace {
 const wchar_t delims[] = L"-/";
 const wchar_t quotes[] = L"\"";
@@ -179,5 +179,5 @@ class CmdLineParser {
     std::wstring cmdline_;
     ValsMap value_map_;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  //!AKALI_CMDLIBE_PARSE_HPP__

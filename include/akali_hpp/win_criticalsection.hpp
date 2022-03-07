@@ -31,7 +31,7 @@
 #endif  // !_INC_WINDOWS
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class WinCriticalSection {
    public:
     WinCriticalSection() { InitializeCriticalSection(&crit_); }
@@ -55,6 +55,6 @@ class ScopedWinCriticalSection {
     const WinCriticalSection* const crit_;
     AKALI_DISALLOW_COPY_AND_ASSIGN(ScopedWinCriticalSection);
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_WIN
 #endif  // !AKALI_WIN_CRITICAL_SECTION_HPP__

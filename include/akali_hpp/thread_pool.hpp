@@ -33,7 +33,7 @@
 #include <stdexcept>
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 class ThreadPool {
    public:
     ThreadPool(size_t threads) :
@@ -104,6 +104,6 @@ class ThreadPool {
 
     AKALI_DISALLOW_COPY_AND_ASSIGN(ThreadPool);
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif

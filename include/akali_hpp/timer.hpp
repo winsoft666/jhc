@@ -30,7 +30,7 @@
 #endif
 #include <functional>
 
-namespace akali_hpp {
+namespace akl {
 class TimerBase {
    public:
     TimerBase() {
@@ -124,6 +124,6 @@ class Timer : public TimerBase {
    private:
     FN_CB m_cb;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 #endif  // !AKALI_WIN_TIMER_HPP_

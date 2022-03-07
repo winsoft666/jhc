@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 typedef struct QueueElem {
     void* dataStartAddress;  // start address of the data that we allocated.
     void* dataReadAddress;   // address of the data in buffer. Next time, we get data from this address.
@@ -502,5 +502,5 @@ class BufferQueue {
 
     AKALI_DISALLOW_COPY_AND_ASSIGN(BufferQueue);
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  //! AKALI_BUFFER_QUEUE_HPP__

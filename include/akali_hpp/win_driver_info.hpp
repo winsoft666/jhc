@@ -30,7 +30,7 @@
 #endif  // !_INC_WINDOWS
 #include <direct.h>
 
-namespace akali_hpp {
+namespace akl {
 class WinDriverInfo {
    public:
     enum { DRIVE_HOST = 7 };
@@ -253,6 +253,6 @@ class WinDriverInfo {
         return dwHDSerialNum;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_WIN
 #endif  // !AKALI_WIN_DRIVER_INFO_HPP_

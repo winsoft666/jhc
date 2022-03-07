@@ -94,7 +94,7 @@ SOFTWARE.
 #include <cstdint> // uint8_t
 #include <string> // string
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -167,7 +167,7 @@ inline bool operator<(const value_t lhs, const value_t rhs) noexcept
     return l_index < order.size() && r_index < order.size() && order[l_index] < order[r_index];
 }
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/string_escape.hpp>
 
@@ -2231,7 +2231,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 // #include <nlohmann/detail/meta/void_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -2241,11 +2241,11 @@ template<typename ...Ts> struct make_void
 };
 template<typename ...Ts> using void_t = typename make_void<Ts...>::type;
 } // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 
 // https://en.cppreference.com/w/cpp/experimental/is_detected
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -2298,7 +2298,7 @@ template<class To, template<class...> class Op, class... Args>
 using is_detected_convertible =
     std::is_convertible<detected_t<Op, Args...>, To>;
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 
 // This file contains all internal macro definitions
@@ -2638,8 +2638,8 @@ using is_detected_convertible =
 @since version 3.9.0
 */
 #define NLOHMANN_DEFINE_TYPE_INTRUSIVE(Type, ...)  \
-    friend void to_json(akali_hpp::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    friend void from_json(const akali_hpp::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
+    friend void to_json(akl::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
+    friend void from_json(const akl::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
 
 /*!
 @brief macro
@@ -2647,8 +2647,8 @@ using is_detected_convertible =
 @since version 3.9.0
 */
 #define NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)  \
-    inline void to_json(akali_hpp::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    inline void from_json(const akali_hpp::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
+    inline void to_json(akl::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const akl::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
 
 
 // inspired from https://stackoverflow.com/a/26745591
@@ -2679,7 +2679,7 @@ using is_detected_convertible =
     template<typename... T>                                                       \
     struct would_call_std_##std_name                                              \
     {                                                                             \
-        static constexpr auto const value = ::akali_hpp::detail::                  \
+        static constexpr auto const value = ::akl::detail::                  \
                                             is_detected_exact<std_name##_tag, result_of_##std_name, T...>::value; \
     };                                                                            \
     } /* namespace detail2 */ \
@@ -2704,7 +2704,7 @@ using is_detected_convertible =
 #endif
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -2761,14 +2761,14 @@ static void unescape(std::string& s)
 }
 
 } // namespace detail
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/input/position_t.hpp>
 
 
 #include <cstddef> // size_t
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -2790,12 +2790,12 @@ struct position_t
 };
 
 } // namespace detail
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -3018,7 +3018,7 @@ class other_error : public exception
 };
 
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -3032,7 +3032,7 @@ class other_error : public exception
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -3177,19 +3177,19 @@ template<typename T>
 constexpr T static_const<T>::value; // NOLINT(readability-redundant-declaration)
 
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/meta/identity_tag.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
 // dispatching helper struct
 template <class T> struct identity_tag {};
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
@@ -3212,7 +3212,7 @@ template <class T> struct identity_tag {};
 // #include <nlohmann/detail/meta/cpp_future.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -3255,7 +3255,7 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
     using reference = T&;
 };
 } // namespace detail
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/meta/call_std/begin.hpp>
 
@@ -3263,10 +3263,10 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 NLOHMANN_CAN_CALL_STD_FUNC_IMPL(begin);
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/meta/call_std/end.hpp>
 
@@ -3274,10 +3274,10 @@ NLOHMANN_CAN_CALL_STD_FUNC_IMPL(begin);
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 NLOHMANN_CAN_CALL_STD_FUNC_IMPL(end);
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/meta/cpp_future.hpp>
 
@@ -3298,7 +3298,7 @@ NLOHMANN_CAN_CALL_STD_FUNC_IMPL(end);
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-namespace akali_hpp
+namespace akl
 {
 /*!
 @brief default JSONSerializer template argument
@@ -3343,14 +3343,14 @@ struct ordered_map;
 
 /// @brief specialization that maintains the insertion order of object keys
 /// @sa https://json.nlohmann.me/api/ordered_json/
-using ordered_json = basic_json<akali_hpp::ordered_map>;
+using ordered_json = basic_json<akl::ordered_map>;
 
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif  // INCLUDE_NLOHMANN_JSON_FWD_HPP_
 
 
-namespace akali_hpp
+namespace akl
 {
 /*!
 @brief detail namespace with internal helper functions
@@ -3807,26 +3807,26 @@ T conditional_static_cast(U value)
 }
 
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/value_t.hpp>
 
 
 #if JSON_HAS_EXPERIMENTAL_FILESYSTEM
 #include <experimental/filesystem>
-namespace akali_hpp::detail
+namespace akl::detail
 {
 namespace std_fs = std::experimental::filesystem;
-} // namespace akali_hpp::detail
+} // namespace akl::detail
 #elif JSON_HAS_FILESYSTEM
 #include <filesystem>
-namespace akali_hpp::detail
+namespace akl::detail
 {
 namespace std_fs = std::filesystem;
-} // namespace akali_hpp::detail
+} // namespace akl::detail
 #endif
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -4282,7 +4282,7 @@ namespace // NOLINT(cert-dcl59-cpp,fuchsia-header-anon-namespaces,google-build-n
 {
 constexpr const auto& from_json = detail::static_const<detail::from_json_fn>::value; // NOLINT(misc-definitions-in-headers)
 } // namespace
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/conversions/to_json.hpp>
 
@@ -4312,7 +4312,7 @@ constexpr const auto& from_json = detail::static_const<detail::from_json_fn>::va
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -4448,7 +4448,7 @@ template<typename IteratorType> class iteration_proxy
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 0, int> = 0>
-auto get(const akali_hpp::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
+auto get(const akl::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
 {
     return i.key();
 }
@@ -4456,12 +4456,12 @@ auto get(const akali_hpp::detail::iteration_proxy_value<IteratorType>& i) -> dec
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 1, int> = 0>
-auto get(const akali_hpp::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
+auto get(const akl::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
 {
     return i.value();
 }
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // The Addition to the STD Namespace is required to add
 // Structured Bindings Support to the iteration_proxy_value class
@@ -4475,16 +4475,16 @@ namespace std
     #pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 template<typename IteratorType>
-class tuple_size<::akali_hpp::detail::iteration_proxy_value<IteratorType>>
+class tuple_size<::akl::detail::iteration_proxy_value<IteratorType>>
             : public std::integral_constant<std::size_t, 2> {};
 
 template<std::size_t N, typename IteratorType>
-class tuple_element<N, ::akali_hpp::detail::iteration_proxy_value<IteratorType >>
+class tuple_element<N, ::akl::detail::iteration_proxy_value<IteratorType >>
 {
   public:
     using type = decltype(
                      get<N>(std::declval <
-                            ::akali_hpp::detail::iteration_proxy_value<IteratorType >> ()));
+                            ::akl::detail::iteration_proxy_value<IteratorType >> ()));
 };
 #if defined(__clang__)
     #pragma clang diagnostic pop
@@ -4500,19 +4500,19 @@ class tuple_element<N, ::akali_hpp::detail::iteration_proxy_value<IteratorType >
 
 #if JSON_HAS_EXPERIMENTAL_FILESYSTEM
 #include <experimental/filesystem>
-namespace akali_hpp::detail
+namespace akl::detail
 {
 namespace std_fs = std::experimental::filesystem;
-} // namespace akali_hpp::detail
+} // namespace akl::detail
 #elif JSON_HAS_FILESYSTEM
 #include <filesystem>
-namespace akali_hpp::detail
+namespace akl::detail
 {
 namespace std_fs = std::filesystem;
-} // namespace akali_hpp::detail
+} // namespace akl::detail
 #endif
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -4910,14 +4910,14 @@ namespace // NOLINT(cert-dcl59-cpp,fuchsia-header-anon-namespaces,google-build-n
 {
 constexpr const auto& to_json = detail::static_const<detail::to_json_fn>::value; // NOLINT(misc-definitions-in-headers)
 } // namespace
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/meta/identity_tag.hpp>
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 
 /// @sa https://json.nlohmann.me/api/adl_serializer/
@@ -4928,33 +4928,33 @@ struct adl_serializer
     /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j, TargetType& val) noexcept(
-        noexcept(::akali_hpp::from_json(std::forward<BasicJsonType>(j), val)))
-    -> decltype(::akali_hpp::from_json(std::forward<BasicJsonType>(j), val), void())
+        noexcept(::akl::from_json(std::forward<BasicJsonType>(j), val)))
+    -> decltype(::akl::from_json(std::forward<BasicJsonType>(j), val), void())
     {
-        ::akali_hpp::from_json(std::forward<BasicJsonType>(j), val);
+        ::akl::from_json(std::forward<BasicJsonType>(j), val);
     }
 
     /// @brief convert a JSON value to any value type
     /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j) noexcept(
-    noexcept(::akali_hpp::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
-    -> decltype(::akali_hpp::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
+    noexcept(::akl::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
+    -> decltype(::akl::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
     {
-        return ::akali_hpp::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
+        return ::akl::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
     }
 
     /// @brief convert any value type to a JSON value
     /// @sa https://json.nlohmann.me/api/adl_serializer/to_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto to_json(BasicJsonType& j, TargetType && val) noexcept(
-        noexcept(::akali_hpp::to_json(j, std::forward<TargetType>(val))))
-    -> decltype(::akali_hpp::to_json(j, std::forward<TargetType>(val)), void())
+        noexcept(::akl::to_json(j, std::forward<TargetType>(val))))
+    -> decltype(::akl::to_json(j, std::forward<TargetType>(val)), void())
     {
-        ::akali_hpp::to_json(j, std::forward<TargetType>(val));
+        ::akl::to_json(j, std::forward<TargetType>(val));
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/byte_container_with_subtype.hpp>
 
@@ -4963,7 +4963,7 @@ struct adl_serializer
 #include <tuple> // tie
 #include <utility> // move
 
-namespace akali_hpp
+namespace akl
 {
 
 /// @brief an internal type for a backed binary type
@@ -5050,7 +5050,7 @@ class byte_container_with_subtype : public BinaryType
     bool m_has_subtype = false;
 };
 
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/conversions/from_json.hpp>
 
@@ -5070,7 +5070,7 @@ class byte_container_with_subtype : public BinaryType
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -5182,7 +5182,7 @@ std::size_t hash(const BasicJsonType& j)
 }
 
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/input/binary_reader.hpp>
 
@@ -5225,7 +5225,7 @@ std::size_t hash(const BasicJsonType& j)
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -5687,7 +5687,7 @@ class span_input_adapter
     contiguous_bytes_input_adapter ia;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/input/json_sax.hpp>
 
@@ -5702,13 +5702,13 @@ class span_input_adapter
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 
 /*!
 @brief SAX interface
 
-This class describes the SAX interface used by @ref akali_hpp::json::sax_parse.
+This class describes the SAX interface used by @ref akl::json::sax_parse.
 Each function is called in different situations while the input is parsed. The
 boolean return value informs the parser whether to continue processing the
 input.
@@ -6402,7 +6402,7 @@ class json_sax_acceptor
 };
 }  // namespace detail
 
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/input/lexer.hpp>
 
@@ -6424,7 +6424,7 @@ class json_sax_acceptor
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -8030,7 +8030,7 @@ scan_number_done:
     const char_int_type decimal_point_char = '.';
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -8046,7 +8046,7 @@ scan_number_done:
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -8185,14 +8185,14 @@ struct is_sax_static_asserts
         "std::string&, const exception&)");
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -10691,7 +10691,7 @@ class binary_reader
     json_sax_t* sax = nullptr;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/input/input_adapters.hpp>
 
@@ -10722,7 +10722,7 @@ class binary_reader
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -11203,7 +11203,7 @@ class parser
 };
 
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/iterators/internal_iterator.hpp>
 
@@ -11217,7 +11217,7 @@ class parser
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -11332,10 +11332,10 @@ class primitive_iterator_t
     }
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -11355,7 +11355,7 @@ template<typename BasicJsonType> struct internal_iterator
     primitive_iterator_t primitive_iterator {};
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/iterators/iter_impl.hpp>
 
@@ -11378,7 +11378,7 @@ template<typename BasicJsonType> struct internal_iterator
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -12103,7 +12103,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
     internal_iterator<typename std::remove_const<BasicJsonType>::type> m_it {};
 };
 } // namespace detail
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/iterators/iteration_proxy.hpp>
 
@@ -12114,7 +12114,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
 #include <iterator> // reverse_iterator
 #include <utility> // declval
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -12226,7 +12226,7 @@ class json_reverse_iterator : public std::reverse_iterator<Base>
     }
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/iterators/primitive_iterator.hpp>
 
@@ -12250,7 +12250,7 @@ class json_reverse_iterator : public std::reverse_iterator<Base>
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 
 /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
@@ -13060,7 +13060,7 @@ class json_pointer
     /// the reference tokens
     std::vector<std::string> reference_tokens;
 };
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/json_ref.hpp>
 
@@ -13071,7 +13071,7 @@ class json_pointer
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -13131,7 +13131,7 @@ class json_ref
     value_type const* value_ref = nullptr;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -13175,7 +13175,7 @@ class json_ref
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -13296,10 +13296,10 @@ class output_adapter
     output_adapter_t<CharType> oa = nullptr;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -14918,7 +14918,7 @@ class binary_writer
     output_adapter_t<CharType> oa = nullptr;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/output/output_adapters.hpp>
 
@@ -14952,7 +14952,7 @@ class binary_writer
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -16050,7 +16050,7 @@ char* to_chars(char* first, const char* last, FloatType value)
 }
 
 } // namespace detail
-} // namespace akali_hpp
+} // namespace akl
 
 // #include <nlohmann/detail/exceptions.hpp>
 
@@ -16065,7 +16065,7 @@ char* to_chars(char* first, const char* last, FloatType value)
 // #include <nlohmann/detail/value_t.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 namespace detail
 {
@@ -16844,7 +16844,7 @@ class serializer
     void dump_float(number_float_t x, std::true_type /*is_ieee_single_or_double*/)
     {
         auto* begin = number_buffer.data();
-        auto* end = ::akali_hpp::detail::to_chars(begin, begin + number_buffer.size(), x);
+        auto* end = ::akl::detail::to_chars(begin, begin + number_buffer.size(), x);
 
         o->write_characters(begin, static_cast<size_t>(end - begin));
     }
@@ -17008,7 +17008,7 @@ class serializer
     const error_handler_t error_handler;
 };
 }  // namespace detail
-}  // namespace akali_hpp
+}  // namespace akl
 
 // #include <nlohmann/detail/value_t.hpp>
 
@@ -17029,11 +17029,11 @@ class serializer
 // #include <nlohmann/detail/macro_scope.hpp>
 
 
-namespace akali_hpp
+namespace akl
 {
 
 /// ordered_map: a minimal map-like container that preserves insertion order
-/// for use within akali_hpp::basic_json<ordered_map>
+/// for use within akl::basic_json<ordered_map>
 template <class Key, class T, class IgnoredLess = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
                   struct ordered_map : std::vector<std::pair<const Key, T>, Allocator>
@@ -17244,7 +17244,7 @@ template <class Key, class T, class IgnoredLess = std::less<Key>,
     }
 };
 
-}  // namespace akali_hpp
+}  // namespace akl
 
 
 #if defined(JSON_HAS_CPP_17)
@@ -17256,7 +17256,7 @@ template <class Key, class T, class IgnoredLess = std::less<Key>,
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-namespace akali_hpp
+namespace akl
 {
 
 /*!
@@ -17282,66 +17282,66 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 {
   private:
     template<detail::value_t> friend struct detail::external_constructor;
-    friend ::akali_hpp::json_pointer<basic_json>;
+    friend ::akl::json_pointer<basic_json>;
 
     template<typename BasicJsonType, typename InputType>
-    friend class ::akali_hpp::detail::parser;
-    friend ::akali_hpp::detail::serializer<basic_json>;
+    friend class ::akl::detail::parser;
+    friend ::akl::detail::serializer<basic_json>;
     template<typename BasicJsonType>
-    friend class ::akali_hpp::detail::iter_impl;
+    friend class ::akl::detail::iter_impl;
     template<typename BasicJsonType, typename CharType>
-    friend class ::akali_hpp::detail::binary_writer;
+    friend class ::akl::detail::binary_writer;
     template<typename BasicJsonType, typename InputType, typename SAX>
-    friend class ::akali_hpp::detail::binary_reader;
+    friend class ::akl::detail::binary_reader;
     template<typename BasicJsonType>
-    friend class ::akali_hpp::detail::json_sax_dom_parser;
+    friend class ::akl::detail::json_sax_dom_parser;
     template<typename BasicJsonType>
-    friend class ::akali_hpp::detail::json_sax_dom_callback_parser;
-    friend class ::akali_hpp::detail::exception;
+    friend class ::akl::detail::json_sax_dom_callback_parser;
+    friend class ::akl::detail::exception;
 
     /// workaround type for MSVC
     using basic_json_t = NLOHMANN_BASIC_JSON_TPL;
 
   JSON_PRIVATE_UNLESS_TESTED:
     // convenience aliases for types residing in namespace detail;
-    using lexer = ::akali_hpp::detail::lexer_base<basic_json>;
+    using lexer = ::akl::detail::lexer_base<basic_json>;
 
     template<typename InputAdapterType>
-    static ::akali_hpp::detail::parser<basic_json, InputAdapterType> parser(
+    static ::akl::detail::parser<basic_json, InputAdapterType> parser(
         InputAdapterType adapter,
         detail::parser_callback_t<basic_json>cb = nullptr,
         const bool allow_exceptions = true,
         const bool ignore_comments = false
                                  )
     {
-        return ::akali_hpp::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
+        return ::akl::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
                 std::move(cb), allow_exceptions, ignore_comments);
     }
 
   private:
-    using primitive_iterator_t = ::akali_hpp::detail::primitive_iterator_t;
+    using primitive_iterator_t = ::akl::detail::primitive_iterator_t;
     template<typename BasicJsonType>
-    using internal_iterator = ::akali_hpp::detail::internal_iterator<BasicJsonType>;
+    using internal_iterator = ::akl::detail::internal_iterator<BasicJsonType>;
     template<typename BasicJsonType>
-    using iter_impl = ::akali_hpp::detail::iter_impl<BasicJsonType>;
+    using iter_impl = ::akl::detail::iter_impl<BasicJsonType>;
     template<typename Iterator>
-    using iteration_proxy = ::akali_hpp::detail::iteration_proxy<Iterator>;
-    template<typename Base> using json_reverse_iterator = ::akali_hpp::detail::json_reverse_iterator<Base>;
+    using iteration_proxy = ::akl::detail::iteration_proxy<Iterator>;
+    template<typename Base> using json_reverse_iterator = ::akl::detail::json_reverse_iterator<Base>;
 
     template<typename CharType>
-    using output_adapter_t = ::akali_hpp::detail::output_adapter_t<CharType>;
+    using output_adapter_t = ::akl::detail::output_adapter_t<CharType>;
 
     template<typename InputType>
-    using binary_reader = ::akali_hpp::detail::binary_reader<basic_json, InputType>;
-    template<typename CharType> using binary_writer = ::akali_hpp::detail::binary_writer<basic_json, CharType>;
+    using binary_reader = ::akl::detail::binary_reader<basic_json, InputType>;
+    template<typename CharType> using binary_writer = ::akl::detail::binary_writer<basic_json, CharType>;
 
   JSON_PRIVATE_UNLESS_TESTED:
-    using serializer = ::akali_hpp::detail::serializer<basic_json>;
+    using serializer = ::akl::detail::serializer<basic_json>;
 
   public:
     using value_t = detail::value_t;
-    /// JSON Pointer, see @ref akali_hpp::json_pointer
-    using json_pointer = ::akali_hpp::json_pointer<basic_json>;
+    /// JSON Pointer, see @ref akl::json_pointer
+    using json_pointer = ::akl::json_pointer<basic_json>;
     template<typename T, typename SFINAE>
     using json_serializer = JSONSerializer<T, SFINAE>;
     /// how to treat decoding errors
@@ -17352,7 +17352,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
 
     using input_format_t = detail::input_format_t;
-    /// SAX interface type, see @ref akali_hpp::json_sax
+    /// SAX interface type, see @ref akl::json_sax
     using json_sax_t = json_sax<basic_json>;
 
     ////////////////
@@ -17534,7 +17534,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief a type for a packed binary type
     /// @sa https://json.nlohmann.me/api/basic_json/binary_t/
-    using binary_t = akali_hpp::byte_container_with_subtype<BinaryType>;
+    using binary_t = akl::byte_container_with_subtype<BinaryType>;
 
     /// @}
 
@@ -21840,7 +21840,7 @@ std::string to_string(const NLOHMANN_BASIC_JSON_TPL& j)
     return j.dump();
 }
 
-} // namespace akali_hpp
+} // namespace akl
 
 ///////////////////////
 // nonmember support //
@@ -21852,26 +21852,26 @@ namespace std // NOLINT(cert-dcl58-cpp)
 /// @brief hash value for JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_hash/
 NLOHMANN_BASIC_JSON_TPL_DECLARATION
-struct hash<akali_hpp::NLOHMANN_BASIC_JSON_TPL>
+struct hash<akl::NLOHMANN_BASIC_JSON_TPL>
 {
-    std::size_t operator()(const akali_hpp::NLOHMANN_BASIC_JSON_TPL& j) const
+    std::size_t operator()(const akl::NLOHMANN_BASIC_JSON_TPL& j) const
     {
-        return akali_hpp::detail::hash(j);
+        return akl::detail::hash(j);
     }
 };
 
 // specialization for std::less<value_t>
 template<>
-struct less< ::akali_hpp::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann/json/pull/679
+struct less< ::akl::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann/json/pull/679
 {
     /*!
     @brief compare two value_t enum values
     @since version 3.0.0
     */
-    bool operator()(akali_hpp::detail::value_t lhs,
-                    akali_hpp::detail::value_t rhs) const noexcept
+    bool operator()(akl::detail::value_t lhs,
+                    akl::detail::value_t rhs) const noexcept
     {
-        return akali_hpp::detail::operator<(lhs, rhs);
+        return akl::detail::operator<(lhs, rhs);
     }
 };
 
@@ -21881,9 +21881,9 @@ struct less< ::akali_hpp::detail::value_t> // do not remove the space after '<',
 /// @brief exchanges the values of two JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_swap/
 NLOHMANN_BASIC_JSON_TPL_DECLARATION
-inline void swap(akali_hpp::NLOHMANN_BASIC_JSON_TPL& j1, akali_hpp::NLOHMANN_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name)
-    is_nothrow_move_constructible<akali_hpp::NLOHMANN_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression)
-    is_nothrow_move_assignable<akali_hpp::NLOHMANN_BASIC_JSON_TPL>::value)
+inline void swap(akl::NLOHMANN_BASIC_JSON_TPL& j1, akl::NLOHMANN_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name)
+    is_nothrow_move_constructible<akl::NLOHMANN_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression)
+    is_nothrow_move_assignable<akl::NLOHMANN_BASIC_JSON_TPL>::value)
 {
     j1.swap(j2);
 }
@@ -21895,17 +21895,17 @@ inline void swap(akali_hpp::NLOHMANN_BASIC_JSON_TPL& j1, akali_hpp::NLOHMANN_BAS
 /// @brief user-defined string literal for JSON values
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
 JSON_HEDLEY_NON_NULL(1)
-inline akali_hpp::json operator "" _json(const char* s, std::size_t n)
+inline akl::json operator "" _json(const char* s, std::size_t n)
 {
-    return akali_hpp::json::parse(s, s + n);
+    return akl::json::parse(s, s + n);
 }
 
 /// @brief user-defined string literal for JSON pointer
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json_pointer/
 JSON_HEDLEY_NON_NULL(1)
-inline akali_hpp::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+inline akl::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
 {
-    return akali_hpp::json::json_pointer(std::string(s, n));
+    return akl::json::json_pointer(std::string(s, n));
 }
 
 // #include <nlohmann/detail/macro_unscope.hpp>

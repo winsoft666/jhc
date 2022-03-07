@@ -34,7 +34,7 @@
 #undef max
 #endif
 
-namespace akali_hpp {
+namespace akl {
 namespace {
 UINT const kBroadcastTimeout = 100;  // in milliseconds
 wchar_t const* userEnvSubKey = L"Environment";
@@ -493,6 +493,6 @@ class EnvHelper {
         return count;
     }
 };
-}  // namespace akali_hpp
+}  // namespace akl
 #endif
 #endif

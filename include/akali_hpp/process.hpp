@@ -61,7 +61,7 @@
 #include "akali_hpp/macros.hpp"
 #include "akali_hpp/scoped_object.hpp"
 
-namespace akali_hpp {
+namespace akl {
 /// Platform independent class for creating processes.
 /// Note on Windows: it seems not possible to specify which pipes to redirect.
 /// Thus, at the moment, if read_stdout==nullptr, read_stderr==nullptr and
@@ -1007,5 +1007,5 @@ inline bool Process::Kill(id_type id, bool force) noexcept {
     return ::kill(id, SIGINT) == 0;
 }
 #endif
-}  // namespace akali_hpp
+}  // namespace akl
 #endif  // !AKALI_PROCESS_HPP__

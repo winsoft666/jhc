@@ -34,7 +34,7 @@
 #include "akali_hpp/string_encode.hpp"
 #include "akali_hpp/macros.hpp"
 
-namespace akali_hpp {
+namespace akl {
 #ifdef AKALI_WIN
 class WinProcessFinder {
    public:
@@ -163,6 +163,6 @@ class WinProcessFinder {
     HANDLE m_hSnapShot;
 };
 #endif
-}  // namespace akali_hpp
+}  // namespace akl
 
 #endif
