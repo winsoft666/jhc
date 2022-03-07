@@ -49,28 +49,30 @@ class Thread {
    public:
     Thread() :
         thread_id_(0), exit_(false) { running_.store(false); }
+
     Thread(const std::string& name) :
         thread_id_(0), exit_(false), thread_name_(name) {
         running_.store(false);
     }
-    virtual ~Thread() { Stop(true); }
 
-    void SetThreadName(const std::string& name) { thread_name_ = name; }
-    std::string GetThreadName() const { return thread_name_; }
+    virtual ~Thread() { stop(true); }
 
-    long GetThreadId() { return thread_id_; }
+    void setName(const std::string& name) { thread_name_ = name; }
+    std::string name() const { return thread_name_; }
 
-    bool Start() {
+    long id() { return thread_id_; }
+
+    bool start() {
         if (thread_.valid()) {
             if (thread_.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
                 return false;
             }
         }
-        thread_ = std::async(std::launch::async, &Thread::Run, this);
+        thread_ = std::async(std::launch::async, &Thread::run, this);
         return true;
     }
 
-    virtual void Stop(bool wait_until_stopped) {
+    virtual void stop(bool wait_until_stopped) {
         {
             std::lock_guard<std::mutex> lg(mutex_);
             exit_ = true;
@@ -82,9 +84,10 @@ class Thread {
                 thread_.wait();
         }
     }
-    bool IsRunning() const { return running_.load(); }
 
-    virtual void Run() {
+    bool isRunning() const { return running_.load(); }
+
+    virtual void run() {
         running_.store(true);
 
         SetCurrentThreadName(thread_name_.c_str());
@@ -107,7 +110,7 @@ class Thread {
     }
 
     template <class F, class... Args>
-    auto Invoke(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {
+    auto invoke(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {
         using return_type = typename std::result_of<F(Args...)>::type;
         auto task = std::make_shared<std::packaged_task<return_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
@@ -158,6 +161,7 @@ class Thread {
     bool exit_;
     std::queue<std::function<void()>> work_queue_;
     std::atomic_bool running_;
+
     AKALI_DISALLOW_COPY_AND_ASSIGN(Thread);
 };
 }  // namespace akl

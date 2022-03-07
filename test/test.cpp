@@ -386,13 +386,10 @@ int main() {
     Md5Test();
     Base64Test();
     IpAddressTest();
-    return 0;
     StringHelperTest();
     StringEncodeTest();
     CmdLineParserTest();
-
     TraceTest();
-
     CreateJsonMethod1Test();
     CreateJsonMethod2Test();
     CreateJsonMethod3Test();

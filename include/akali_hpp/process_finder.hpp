@@ -40,6 +40,14 @@ class WinProcessFinder {
    public:
     AKALI_DISALLOW_COPY_AND_ASSIGN(WinProcessFinder);
 
+    // dwFlags can be one or more of the following values.
+    // TH32CS_SNAPHEAPLIST
+    // TH32CS_SNAPPROCESS
+    // TH32CS_SNAPTHREAD
+    // TH32CS_SNAPMODULE
+    // TH32CS_SNAPMODULE32
+    // TH32CS_INHERIT
+    // TH32CS_SNAPALL = (TH32CS_SNAPHEAPLIST | TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD | TH32CS_SNAPMODULE)
     WinProcessFinder(DWORD dwFlags = TH32CS_SNAPALL, DWORD dwProcessID = 0) {
         m_hSnapShot = INVALID_HANDLE_VALUE;
         CreateSnapShot(dwFlags, dwProcessID);
@@ -63,6 +71,7 @@ class WinProcessFinder {
 
         return (m_hSnapShot != INVALID_HANDLE_VALUE);
     }
+
     BOOL ProcessFirst(PPROCESSENTRY32 ppe) const {
         BOOL fOk = Process32First(m_hSnapShot, ppe);
 
@@ -97,7 +106,7 @@ class WinProcessFinder {
 
     BOOL ProcessFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf = false) const {
         BOOL fFound = FALSE;
-        DWORD dwCurrentPID = GetCurrentProcessId();
+        const DWORD dwCurrentPID = GetCurrentProcessId();
 
         for (BOOL fOk = ProcessFirst(ppe); fOk; fOk = ProcessNext(ppe)) {
             fFound = lstrcmpi(ppe->szExeFile, pszExeName) == 0;
@@ -151,11 +160,19 @@ class WinProcessFinder {
         return fFound;
     }
 
-    static bool IsProcessExist(const std::wstring& processName) {
+    static bool IsExist(const std::wstring& processName) {
         WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
         PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
-        BOOL b = wpf.ProcessFind(UnicodeToTCHAR(processName).c_str(), &pe32);
+        const BOOL b = wpf.ProcessFind(UnicodeToTCHAR(processName).c_str(), &pe32);
+        return !!b;
+    }
+
+    static bool IsExist(const std::string& processName) {
+        WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+
+        PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
+        const BOOL b = wpf.ProcessFind(AnsiToTCHAR(processName).c_str(), &pe32);
         return !!b;
     }
 

@@ -55,7 +55,7 @@ class RegKey {
         m_strSubKey(pszSubKey) {}
 
     ~RegKey(void) {
-        Close();
+        close();
 
         if (NULL != m_hChangeEvent)
             CloseHandle(m_hChangeEvent);
@@ -63,18 +63,24 @@ class RegKey {
 
     // samDesired:
     // https://docs.microsoft.com/zh-cn/windows/desktop/SysInfo/registry-key-security-and-access-rights
-    // samDesired can be one of: KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_READ, KEY_WRITE,
-    // KEY_WOW64_32KEY, KEY_WOW64_64KEY and so on.
+    // samDesired can be one of:
+    // KEY_ALL_ACCESS,
+    // KEY_QUERY_VALUE,
+    // KEY_READ,
+    // KEY_WRITE,
+    // KEY_WOW64_32KEY,
+    // KEY_WOW64_64KEY
+    // and so on.
     //
-    LSTATUS Open(REGSAM samDesired, bool bCreate) {
+    LSTATUS open(REGSAM samDesired, bool bCreate) {
         LSTATUS dwResult = ERROR_SUCCESS;
-        Close();
+        close();
 
         m_dwSamDesired = samDesired;
         if (bCreate) {
             DWORD dwDisposition;
             dwResult = RegCreateKeyExW(m_hkeyRoot, m_strSubKey.c_str(), 0, NULL, 0, samDesired, NULL,
-                                      &m_hkey, &dwDisposition);
+                                       &m_hkey, &dwDisposition);
         }
         else {
             dwResult = RegOpenKeyExW(m_hkeyRoot, m_strSubKey.c_str(), 0, samDesired, &m_hkey);
@@ -83,21 +89,21 @@ class RegKey {
         return dwResult;
     }
 
-    bool IsOpen(void) const { return NULL != m_hkey; }
+    bool isOpen(void) const { return NULL != m_hkey; }
 
-    HKEY GetHandle(void) const { return m_hkey; }
+    HKEY getHandle(void) const { return m_hkey; }
 
-    void Attach(HKEY hkey) {
-        Close();
+    void attach(HKEY hkey) {
+        close();
         m_strSubKey.clear();
 
         m_hkeyRoot = NULL;
         m_hkey = hkey;
     }
 
-    void Detach(void) { m_hkey = NULL; }
+    void detach(void) { m_hkey = NULL; }
 
-    void Close(void) {
+    void close(void) {
         if (NULL != m_hkey) {
             HKEY hkeyTemp = m_hkey;
             m_hkey = NULL;
@@ -116,7 +122,7 @@ class RegKey {
         m_dwSamDesired = 0;
     }
 
-    HRESULT WatchForChange(DWORD dwChangeFilter, bool bWatchSubtree) {
+    HRESULT watchForChange(DWORD dwChangeFilter, bool bWatchSubtree) {
         HRESULT hr = E_FAIL;
 
         if (NULL != m_hChangeEvent || NULL == m_hkey)
@@ -141,7 +147,7 @@ class RegKey {
         return hr;
     }
 
-    HRESULT WaitForChange(DWORD dwChangeFilter, bool bWatchSubtree) {
+    HRESULT waitForChange(DWORD dwChangeFilter, bool bWatchSubtree) {
         HRESULT hr = NOERROR;
         LONG lResult = RegNotifyChangeKeyValue(m_hkey, bWatchSubtree, dwChangeFilter, NULL, FALSE);
 
@@ -152,7 +158,7 @@ class RegKey {
         return hr;
     }
 
-    bool DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) {
+    bool deleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) {
         HKEY hSubKey = NULL;
 
         if (pszSubKey) {
@@ -179,13 +185,13 @@ class RegKey {
                 }
             }
             else {
-                if (RegDeleteSubKeys(hSubKey, bPrefer64View)) {
+                if (regDeleteSubKeys(hSubKey, bPrefer64View)) {
                     if (hSubKey != hKey) {
                         if (hSubKey)
                             RegCloseKey(hSubKey);
                     }
 
-                    return RegDeleteKey32_64(hKey, pszSubKey, bPrefer64View);
+                    return regDeleteKey32_64(hKey, pszSubKey, bPrefer64View);
                 }
             }
 
@@ -198,24 +204,24 @@ class RegKey {
         return false;
     }
 
-    bool DeleteSubKeys(HKEY hKeyRoot, LPCTSTR lpSubKey, bool bPrefer64View) {
+    bool deleteSubKeys(HKEY hKeyRoot, LPCTSTR lpSubKey, bool bPrefer64View) {
         TCHAR szDelKey[MAX_PATH * 2];
 
         StringCchCopy(szDelKey, MAX_PATH * 2, lpSubKey);
-        return RegDelSubKeysRecurse(hKeyRoot, szDelKey, bPrefer64View) == TRUE;
+        return regDelSubKeysRecurse(hKeyRoot, szDelKey, bPrefer64View) == TRUE;
     }
 
-    HRESULT GetDWORDValue(LPCWSTR pszValueName, DWORD* pdwDataOut) const {
-        return GetValue(pszValueName, REG_DWORD, (LPBYTE)pdwDataOut, sizeof(DWORD));
+    HRESULT getDWORDValue(LPCWSTR pszValueName, OUT DWORD& pdwDataOut) const {
+        return getValue(pszValueName, REG_DWORD, (LPBYTE)(&pdwDataOut), sizeof(DWORD));
     }
 
-    HRESULT GetBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const {
-        return GetValue(pszValueName, REG_BINARY, pbDataOut, cbDataOut);
+    HRESULT getBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const {
+        return getValue(pszValueName, REG_BINARY, pbDataOut, cbDataOut);
     }
 
-    HRESULT GetSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const {
+    HRESULT getSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const {
         HRESULT hr = E_FAIL;
-        DWORD cb = GetValueBufferSize(pszValueName);
+        DWORD cb = getValueBufferSize(pszValueName);
 
         if (cb == 0)
             return hr;
@@ -225,7 +231,7 @@ class RegKey {
             return E_OUTOFMEMORY;
         memset(pTemp, 0, cb + sizeof(WCHAR));
 
-        hr = GetValue(pszValueName, REG_SZ, (LPBYTE)pTemp, cb);
+        hr = getValue(pszValueName, REG_SZ, (LPBYTE)pTemp, cb);
         if (hr == S_OK)
             strValue = pTemp;
 
@@ -234,7 +240,7 @@ class RegKey {
         return hr;
     }
 
-    HRESULT GetExpandSZValue(LPCWSTR pszValueName,
+    HRESULT getExpandSZValue(LPCWSTR pszValueName,
                              bool bRetrieveExpandedString,
                              OUT std::wstring& strValue) const {
         WCHAR szBuf[MAX_PATH] = {0};
@@ -273,9 +279,9 @@ class RegKey {
         return status;
     }
 
-    HRESULT GetMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const {
+    HRESULT getMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const {
         HRESULT hr = E_FAIL;
-        DWORD cb = GetValueBufferSize(pszValueName);
+        DWORD cb = getValueBufferSize(pszValueName);
 
         if (cb == 0)
             return hr;
@@ -287,7 +293,7 @@ class RegKey {
         memset(pTemp, 0, cb + sizeof(WCHAR));
         WCHAR* pBegin = pTemp;
 
-        hr = GetValue(pszValueName, REG_MULTI_SZ, (LPBYTE)pTemp, cb);
+        hr = getValue(pszValueName, REG_MULTI_SZ, (LPBYTE)pTemp, cb);
         if (SUCCEEDED(hr)) {
             while (pTemp && TEXT('\0') != *pTemp) {
                 vStrValues.push_back(std::wstring(pTemp));
@@ -300,59 +306,59 @@ class RegKey {
         return hr;
     }
 
-    DWORD GetValueBufferSize(LPCWSTR pszValueName) const {
+    DWORD getValueBufferSize(LPCWSTR pszValueName) const {
         DWORD dwType;
         DWORD cbData = 0;
         DWORD dwResult = RegQueryValueExW(m_hkey, pszValueName, 0, &dwType, NULL, (LPDWORD)&cbData);
         return cbData;
     }
 
-    HRESULT SetDWORDValue(LPCWSTR pszValueName, DWORD dwData) {
-        return SetValue(pszValueName, REG_DWORD, (const LPBYTE)&dwData, sizeof(dwData));
+    HRESULT setDWORDValue(LPCWSTR pszValueName, DWORD dwData) {
+        return setValue(pszValueName, REG_DWORD, (const LPBYTE)&dwData, sizeof(dwData));
     }
 
-    HRESULT SetBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData) {
-        return SetValue(pszValueName, REG_BINARY, pbData, cbData);
+    HRESULT setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData) {
+        return setValue(pszValueName, REG_BINARY, pbData, cbData);
     }
 
-    HRESULT SetSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
-        return SetValue(pszValueName, REG_SZ, (const LPBYTE)strData.c_str(),
+    HRESULT setSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
+        return setValue(pszValueName, REG_SZ, (const LPBYTE)strData.c_str(),
                         (strData.length()) * sizeof(WCHAR));
     }
 
-    HRESULT SetExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
-        return SetValue(pszValueName, REG_EXPAND_SZ, (const LPBYTE)strData.c_str(),
+    HRESULT setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
+        return setValue(pszValueName, REG_EXPAND_SZ, (const LPBYTE)strData.c_str(),
                         (strData.length()) * sizeof(WCHAR));
     }
 
-    HRESULT SetMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) {
-        WCHAR* ptrValues = CreateDoubleNulTermList(vStrValues);
+    HRESULT setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) {
+        WCHAR* ptrValues = createDoubleNulTermList(vStrValues);
         int cch = 1;
         int n = vStrValues.size();
 
         for (int i = 0; i < n; i++)
             cch += vStrValues[i].length() + 1;
 
-        HRESULT hr = SetValue(pszValueName, REG_MULTI_SZ, (const LPBYTE)ptrValues, cch * sizeof(TCHAR));
+        HRESULT hr = setValue(pszValueName, REG_MULTI_SZ, (const LPBYTE)ptrValues, cch * sizeof(TCHAR));
 
         SAFE_DELETE_ARRAY(ptrValues);
 
         return hr;
     }
 
-    HRESULT GetSubKeys(std::vector<std::wstring>& subKeys) {
-        WCHAR achKey[256];                    // buffer for subkey name
-        DWORD cbName = 255;                   // size of name string
-        WCHAR achClass[MAX_PATH] = L"";       // buffer for class name
-        DWORD cchClassName = MAX_PATH;        // size of class string
-        DWORD cSubKeys = 0;                   // number of subkeys
-        DWORD cbMaxSubKey;                    // longest subkey size
-        DWORD cchMaxClass;                    // longest class string
-        DWORD cValues;                        // number of values for key
-        DWORD cchMaxValue;                    // longest value name
-        DWORD cbMaxValueData;                 // longest value data
-        DWORD cbSecurityDescriptor;           // size of security descriptor
-        FILETIME ftLastWriteTime;             // last write time
+    HRESULT getSubKeys(std::vector<std::wstring>& subKeys) {
+        WCHAR achKey[256];               // buffer for subkey name
+        DWORD cbName = 255;              // size of name string
+        WCHAR achClass[MAX_PATH] = L"";  // buffer for class name
+        DWORD cchClassName = MAX_PATH;   // size of class string
+        DWORD cSubKeys = 0;              // number of subkeys
+        DWORD cbMaxSubKey;               // longest subkey size
+        DWORD cchMaxClass;               // longest class string
+        DWORD cValues;                   // number of values for key
+        DWORD cchMaxValue;               // longest value name
+        DWORD cbMaxValueData;            // longest value data
+        DWORD cbSecurityDescriptor;      // size of security descriptor
+        FILETIME ftLastWriteTime;        // last write time
 
         DWORD retCode = RegQueryInfoKeyW(m_hkey,                 // key handle
                                          achClass,               // buffer for class name
@@ -390,7 +396,7 @@ class RegKey {
     }
 
    private:
-    HRESULT GetValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const {
+    HRESULT getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const {
         DWORD dwType;
         HRESULT hr = RegQueryValueExW(m_hkey, pszValueName, 0, &dwType, pbData, (LPDWORD)&cbData);
 
@@ -400,13 +406,13 @@ class RegKey {
         return hr;
     }
 
-    HRESULT SetValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, int cbData) {
+    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, int cbData) {
         HRESULT hr = RegSetValueExW(m_hkey, pszValueName, 0, dwValueType, pbData, cbData);
 
         return hr;
     }
 
-    LPWSTR CreateDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const {
+    LPWSTR createDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const {
         size_t cEntries = vStrValues.size();
         size_t cch = 1;  // Account for 2nd null terminate.
 
@@ -457,7 +463,7 @@ class RegKey {
         return 0;
     }
 
-    bool RegDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) {
+    bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) {
         REGSAM rsam = (bPrefer64View && OSVersion::IsWin64()) ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
         HMODULE hAdvAPI32 = LoadLibrary(TEXT("AdvAPI32.dll"));
 
@@ -486,7 +492,7 @@ class RegKey {
         return (ls == ERROR_SUCCESS);
     }
 
-    bool RegDeleteSubKeys(HKEY hKey, bool bPrefer64View) {
+    bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View) {
         DWORD dwSubKeyCnt, dwMaxSubKey;
         const int iMaxKeySize = 256;
 
@@ -503,11 +509,11 @@ class RegKey {
                         if (ERROR_SUCCESS ==
                                 RegOpenKeyExW(hKey, szKeyName, 0, KEY_READ | KEY_WRITE, &hSubKey) &&
                             hSubKey) {
-                            if (RegDeleteSubKeys(hSubKey, bPrefer64View)) {
+                            if (regDeleteSubKeys(hSubKey, bPrefer64View)) {
                                 if (hSubKey)
                                     RegCloseKey(hSubKey);
 
-                                if (!RegDeleteKey32_64(hKey, szKeyName, bPrefer64View))
+                                if (!regDeleteKey32_64(hKey, szKeyName, bPrefer64View))
                                     return false;
                             }
                             else {
@@ -533,7 +539,7 @@ class RegKey {
         return false;
     }
 
-    BOOL RegDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) {
+    BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) {
         LPTSTR lpEnd = NULL;
         LONG lResult;
         DWORD dwSize = 0;
@@ -579,7 +585,7 @@ class RegKey {
                 *lpEnd = TEXT('\0');
                 StringCchCat(lpSubKey, MAX_PATH * 2, szName);
 
-                if (!RegDelSubKeysRecurse(hKeyRoot, lpSubKey, bPrefer64View)) {
+                if (!regDelSubKeysRecurse(hKeyRoot, lpSubKey, bPrefer64View)) {
                     break;
                 }
 
@@ -603,8 +609,9 @@ class RegKey {
     }
 
    private:
-    RegKey(const RegKey& rhs);
-    RegKey& operator=(const RegKey& rhs);
+    RegKey(const RegKey& rhs) = delete;
+    RegKey& operator=(const RegKey& rhs) = delete;
+
     HKEY m_hkeyRoot;
     mutable HKEY m_hkey;
     HANDLE m_hChangeEvent;
@@ -615,5 +622,5 @@ class RegKey {
     bool m_bWatchSubtree;
 };
 }  // namespace akl
-#endif // !AKALI_WIN
+#endif  // !AKALI_WIN
 #endif  // !AKALI_WIN_REGISTRY_HPP_
