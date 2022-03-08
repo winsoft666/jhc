@@ -65,19 +65,54 @@ namespace akl {
 #endif
 
 #if defined(AKALI_ARCH_LITTLE_ENDIAN)
+#ifndef htole16
 #define htole16(v) (v)
+#endif
+
+#ifndef htole32
 #define htole32(v) (v)
+#endif
+
+#ifndef htole64
 #define htole64(v) (v)
+#endif
+
+#ifndef le16toh
 #define le16toh(v) (v)
+#endif
+
+#ifndef le32toh
 #define le32toh(v) (v)
+#endif
+
+#ifndef le64toh
 #define le64toh(v) (v)
+#endif
 #elif defined(AKALI_ARCH_BIG_ENDIAN)
+#ifndef htole16
 #define htole16(v) __builtin_bswap16(v)
+#endif
+
+#ifndef htole32
 #define htole32(v) __builtin_bswap32(v)
+#endif
+
+#ifndef htole64
 #define htole64(v) __builtin_bswap64(v)
+#endif
+
+#ifndef le16toh
 #define le16toh(v) __builtin_bswap16(v)
+#endif
+
+#ifndef le32toh
 #define le32toh(v) __builtin_bswap32(v)
+#endif
+
+#ifndef le64toh
 #define le64toh(v) __builtin_bswap64(v)
+#endif
+
 #endif
 
 class ByteOrder {

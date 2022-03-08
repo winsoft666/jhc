@@ -18,6 +18,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <time.h>
+#include <iostream>
 //
 // It is strongly recommended not to include this file directly!!!
 #include "akali_hpp.h"
@@ -29,7 +30,6 @@
         else                                           \
             printf("\033[31mFailed:\033[0m " #x "\n"); \
     } while (false)
-
 
 void Md5Test() {
     const std::string str = "hello world!!!";
@@ -231,13 +231,13 @@ void ParseJsonMethod1Test() {
 }
 
 void FileSystemTest1() {
-    akl::filesystem::path path1(u8"C:/test/测试/__filesystem_test测试1__.dat");
+#ifdef AKALI_WIN
+    akl::filesystem::path path1(u8"C:/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.wstring() == L"C:\\test\\abc\\__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_wstring() == L"C:/test/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.wstring() == L"C:\\test\\测试\\__filesystem_test测试1__.dat");
-    EXPECT_TRUE(path1.generic_wstring() == L"C:/test/测试/__filesystem_test测试1__.dat");
-
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\__filesystem_test测试1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/test/测试/__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/test/abc/__filesystem_test1__.dat");
 
     EXPECT_TRUE(path1.has_extension());
     EXPECT_TRUE(path1.has_filename());
@@ -249,33 +249,76 @@ void FileSystemTest1() {
     EXPECT_TRUE(path1.has_stem());
 
     EXPECT_TRUE(path1.extension().u8string() == u8".dat");
-    EXPECT_TRUE(path1.filename() == u8"__filesystem_test测试1__.dat");
-    EXPECT_TRUE(path1.stem() == u8"__filesystem_test测试1__");
+    EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
 
-    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\test\\测试");
-    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/test/测试");
+    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\test\\abc");
+    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/test/abc");
 
-    EXPECT_TRUE(path1.relative_path().wstring() == L"test\\测试\\__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path1.relative_path().wstring() == L"test\\abc\\__filesystem_test1__.dat");
     EXPECT_TRUE(path1.root_name() == "C:");
     EXPECT_TRUE(path1.root_directory() == "\\");
     EXPECT_TRUE(path1.root_path() == "C:\\");
 
-    path1.replace_filename(L"测试test.txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\测试test.txt");
+    path1.replace_filename(L"abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\abctest.txt");
 
     path1.replace_extension(".txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\测试\\测试test.txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\abctest.txt");
 
-    path1.replace_filename(u8"__filesystem_test测试1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/test/测试/__filesystem_test测试1__.dat");
+    path1.replace_filename(u8"__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/test/abc/__filesystem_test1__.dat");
 
-    path1 = L"C:\\test\\..\\123\\.\\__filesystem_test测试1__.dat";
+    path1 = L"C:\\test\\..\\123\\.\\__filesystem_test1__.dat";
     akl::filesystem::path path2 = akl::filesystem::absolute(path1);
-    EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test测试1__.dat");
+    EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test1__.dat");
+#else
+    akl::filesystem::path path1(u8"/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.wstring() == L"/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_wstring() == L"/test/abc/__filesystem_test1__.dat");
+
+    EXPECT_TRUE(path1.string() == u8"/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"/test/abc/__filesystem_test1__.dat");
+
+    EXPECT_TRUE(path1.has_extension());
+    EXPECT_TRUE(path1.has_filename());
+    EXPECT_TRUE(path1.has_parent_path());
+    EXPECT_TRUE(path1.has_relative_path());
+    EXPECT_TRUE(path1.has_root_directory());
+    EXPECT_TRUE(path1.has_root_name() == false);
+    EXPECT_TRUE(path1.has_root_path());
+    EXPECT_TRUE(path1.has_stem());
+
+    EXPECT_TRUE(path1.extension().u8string() == u8".dat");
+    EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
+
+    EXPECT_TRUE(path1.parent_path().wstring() == L"/test/abc");
+    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"/test/abc");
+
+    EXPECT_TRUE(path1.relative_path().wstring() == L"test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.root_name() == "");
+    EXPECT_TRUE(path1.root_directory() == "/");
+    EXPECT_TRUE(path1.root_path() == "/");
+
+    path1.replace_filename(L"abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"/test/abc/abctest.txt");
+
+    path1.replace_extension(".txt");
+    EXPECT_TRUE(path1.string() == u8"/test/abc/abctest.txt");
+
+    path1.replace_filename(u8"__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"/test/abc/__filesystem_test1__.dat");
+
+    path1 = L".";
+    akl::filesystem::path path2 = akl::filesystem::absolute(path1);
+    std::wcout << path2.wstring() << std::endl;
+    EXPECT_TRUE(path2.wstring().length() > 4);
+#endif
 }
 
 void FileSystemTest2() {
-    akl::filesystem::path path2(L"C:\\test\\测试\\__filesystem_test_测试2__.dat");
+    akl::filesystem::path path2(L"C:\\test\\abc\\__filesystem_test_2__.dat");
     if (akl::filesystem::exists(path2))
         EXPECT_TRUE(akl::filesystem::remove(path2));
 }
