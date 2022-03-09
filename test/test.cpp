@@ -85,7 +85,11 @@ void Md5Test2() {
     EXPECT_TRUE(file1.open("wb"));
     EXPECT_TRUE(file1.writeFrom((void*)str1K.c_str(), str1K.size(), 0) == str1K.size());
     EXPECT_TRUE(file1.close());
+#ifdef AKALI_WIN
     EXPECT_TRUE(akl::Md5::GetFileMd5(file1.path().wstring()) == "c9a34cfc85d982698c6ac89f76071abd");
+#else
+    EXPECT_TRUE(akl::Md5::GetFileMd5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
+#endif
 }
 
 // Test: string base64 encode/decode.
@@ -405,7 +409,7 @@ void FileSystemTest2() {
     EXPECT_TRUE(akl::filesystem::remove(path2, ec) == true);
 #else
     std::error_code ec;
-    akl::filesystem::path path2("~/test/abc/__filesystem_test2_" + std::to_wstring(time(nullptr)));
+    akl::filesystem::path path2("~/test/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(path2, ec));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == true);
@@ -509,7 +513,7 @@ void FileSystemTest4() {
     EXPECT_TRUE(akl::filesystem::exists(L"C:\\test87w232", ec) == false);
 #else
     std::error_code ec;
-    akl::filesystem::path p1("~/test87w232/abc/__filesystem_test4_" + std::to_wstring(time(nullptr)));
+    akl::filesystem::path p1("~/test87w232/abc/__filesystem_test4_" + std::to_string(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(p1, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(p1, ec));
     EXPECT_TRUE(akl::filesystem::exists(p1, ec) == true);
