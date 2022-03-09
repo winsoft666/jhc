@@ -312,12 +312,12 @@ void ParseJsonMethod1Test() {
 //
 void FileSystemTest1() {
 #ifdef AKALI_WIN
-    akl::filesystem::path path1(u8"C:/test/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.wstring() == L"C:\\test\\abc\\__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_wstring() == L"C:/test/abc/__filesystem_test1__.dat");
+    akl::filesystem::path path1(u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.wstring() == L"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_wstring() == L"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
     EXPECT_TRUE(path1.has_extension());
     EXPECT_TRUE(path1.has_filename());
@@ -332,67 +332,68 @@ void FileSystemTest1() {
     EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
     EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
 
-    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\test\\abc");
-    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/test/abc");
+    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\testoi89hk8\\abc");
+    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/testoi89hk8/abc");
 
-    EXPECT_TRUE(path1.relative_path().wstring() == L"test\\abc\\__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.relative_path().wstring() == L"testoi89hk8\\abc\\__filesystem_test1__.dat");
     EXPECT_TRUE(path1.root_name() == "C:");
     EXPECT_TRUE(path1.root_directory() == "\\");
     EXPECT_TRUE(path1.root_path() == "C:\\");
 
     path1.replace_filename(L"abctest.txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
 
     path1.replace_extension(".txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\test\\abc\\abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
 
     path1.replace_filename(u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
-    path1 = L"C:\\test\\..\\123\\.\\__filesystem_test1__.dat";
+    path1 = L"C:\\testoi89hk8\\..\\123\\.\\__filesystem_test1__.dat";
     akl::filesystem::path path2 = akl::filesystem::absolute(path1);
     EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test1__.dat");
 #else
-    akl::filesystem::path path1(u8"/test/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.wstring() == L"/test/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_wstring() == L"/test/abc/__filesystem_test1__.dat");
+    akl::filesystem::path path1(u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.string() == u8"/test/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+
 
     EXPECT_TRUE(path1.has_extension());
     EXPECT_TRUE(path1.has_filename());
-    EXPECT_TRUE(path1.has_parent_path());
-    EXPECT_TRUE(path1.has_relative_path());
-    EXPECT_TRUE(path1.has_root_directory());
-    EXPECT_TRUE(path1.has_root_name() == false);
-    EXPECT_TRUE(path1.has_root_path());
     EXPECT_TRUE(path1.has_stem());
 
     EXPECT_TRUE(path1.extension().u8string() == u8".dat");
     EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
     EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
 
-    EXPECT_TRUE(path1.parent_path().wstring() == L"/test/abc");
-    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"/test/abc");
+    EXPECT_TRUE(path1.parent_path().wstring() == L"./testoi89hk8/abc");
+    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"./testoi89hk8/abc");
 
-    EXPECT_TRUE(path1.relative_path().wstring() == L"test/abc/__filesystem_test1__.dat");
+    std::cout << std::endl;
+    std::cout << "relative_path:" << path1.relative_path().string() << std::endl;
+    std::cout << "root_name:" << path1.root_name().string() << std::endl;
+    std::cout << "root_directory:" << path1.root_directory().string() << std::endl;
+    std::cout << "root_path:" << path1.root_path().string() << std::endl;
+
+    EXPECT_TRUE(path1.relative_path().string() == "./testoi89hk8/abc/__filesystem_test1__.dat");
     EXPECT_TRUE(path1.root_name() == "");
-    EXPECT_TRUE(path1.root_directory() == "/");
-    EXPECT_TRUE(path1.root_path() == "/");
+    EXPECT_TRUE(path1.root_directory() == "");
+    EXPECT_TRUE(path1.root_path() == "");
 
     path1.replace_filename(L"abctest.txt");
-    EXPECT_TRUE(path1.string() == u8"/test/abc/abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
 
     path1.replace_extension(".txt");
-    EXPECT_TRUE(path1.string() == u8"/test/abc/abctest.txt");
+    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
 
     path1.replace_filename(u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"/test/abc/__filesystem_test1__.dat");
+    EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-    path1 = L".";
     akl::filesystem::path path2 = akl::filesystem::absolute(path1);
-    std::wcout << path2.wstring() << std::endl;
+    std::wcout << "absolute:" << path2.wstring() << std::endl;
     EXPECT_TRUE(path2.wstring().length() > 4);
 #endif
 }
@@ -402,14 +403,14 @@ void FileSystemTest1() {
 void FileSystemTest2() {
 #ifdef AKALI_WIN
     std::error_code ec;
-    akl::filesystem::path path2(L"C:\\test\\abc\\__filesystem_test2_" + std::to_wstring(time(nullptr)));
+    akl::filesystem::path path2(L"C:\\testuy763e\\abc\\__filesystem_test2_" + std::to_wstring(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(path2, ec));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == true);
     EXPECT_TRUE(akl::filesystem::remove(path2, ec) == true);
 #else
     std::error_code ec;
-    akl::filesystem::path path2("~/test/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
+    akl::filesystem::path path2("./testuy763e/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(path2, ec));
     EXPECT_TRUE(akl::filesystem::exists(path2, ec) == true);
@@ -422,7 +423,7 @@ void FileSystemTest2() {
 void FileSystemTest3() {
 #ifdef AKALI_WIN
     std::error_code ec;
-    akl::filesystem::path path3(L"C:\\test\\abc\\__filesystem_test3_" + std::to_wstring(time(nullptr)));
+    akl::filesystem::path path3(L"C:\\testuy763e\\abc\\__filesystem_test3_" + std::to_wstring(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(path3, ec));
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == true);
@@ -440,12 +441,10 @@ void FileSystemTest3() {
     EXPECT_TRUE(akl::filesystem::remove(path3, ec) == false);  // remove can only delete empty directory
     EXPECT_TRUE(akl::filesystem::remove_all(path3, ec) == 2);  // return remove item count
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == false);
-
-    path3.append("..");
-    EXPECT_TRUE(akl::filesystem::exists(path3, ec) == true);
+    EXPECT_TRUE(akl::filesystem::exists(path3.parent_path(), ec) == true);
 #else
     std::error_code ec;
-    akl::filesystem::path path3(L"~/test/abc/__filesystem_test3_" + std::to_wstring(time(nullptr)));
+    akl::filesystem::path path3(L"./testuy763e/abc/__filesystem_test3_" + std::to_wstring(time(nullptr)));
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == false);
     EXPECT_TRUE(akl::filesystem::create_directories(path3, ec));
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == true);
@@ -464,8 +463,7 @@ void FileSystemTest3() {
     EXPECT_TRUE(akl::filesystem::remove_all(path3, ec) == 2);  // return remove item count
     EXPECT_TRUE(akl::filesystem::exists(path3, ec) == false);
 
-    path3.append("..");
-    EXPECT_TRUE(akl::filesystem::exists(path3, ec) == true);
+    EXPECT_TRUE(akl::filesystem::exists(path3.parent_path(), ec) == true);
 #endif
 }
 
