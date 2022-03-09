@@ -104,9 +104,9 @@ class File {
             return false;
 
 #ifdef AKALI_WIN
-        _wfopen_s(&f_, path_.c_str(), openMode.c_str());
+        _wfopen_s(&f_, path_.c_str(), openMode.wstring().c_str());
 #else
-        f_ = fopen(path_.c_str(), openMode.c_str());
+        f_ = fopen(path_.c_str(), openMode.string().c_str());
 #endif
 
         return (f_ != nullptr);
