@@ -369,7 +369,6 @@ void FileSystemTest1() {
     EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
     EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-
     EXPECT_TRUE(path1.has_extension());
     EXPECT_TRUE(path1.has_filename());
     EXPECT_TRUE(path1.has_stem());
@@ -617,6 +616,60 @@ void ProcessTest() {
 #endif
 }
 
+// Test: Windows http get request
+//
+void WinHttpGetRequestTest() {
+    akl::WinHttp winHttp;
+    EXPECT_TRUE(winHttp.openSession());
+    EXPECT_TRUE(winHttp.openConnect(L"https://www.baidu.com"));
+    EXPECT_TRUE(winHttp.openRequest(false));
+    EXPECT_TRUE(winHttp.sendRequest());
+    EXPECT_TRUE(winHttp.receiveResponse());
+
+    const std::vector<BYTE> body = winHttp.getResponseBody();
+    EXPECT_TRUE(body.size() > 0);
+
+    const DWORD dwStatusCode = winHttp.getResponseStatusCode();
+    EXPECT_TRUE(dwStatusCode == 200);
+
+    const std::wstring strStatusTxt = winHttp.getResponseStatusText();
+    EXPECT_TRUE(strStatusTxt == L"OK");
+
+    const std::wstring strRawHeaders = winHttp.getResponseRawHeaders();
+    EXPECT_TRUE(strRawHeaders.size() > 0);
+
+    const std::unordered_map<std::wstring, std::wstring> headerMap = winHttp.getResponseHeaders();
+    EXPECT_TRUE(headerMap.size() > 0);
+}
+
+// Test: Windows http post request
+//
+void WinHttpPostRequestTest() {
+    std::string data = "test";
+
+    akl::WinHttp winHttp;
+    EXPECT_TRUE(winHttp.openSession());
+    EXPECT_TRUE(winHttp.openConnect(L"https://www.baidu.com"));
+    EXPECT_TRUE(winHttp.openRequest(true));
+    EXPECT_TRUE(winHttp.sendRequest((LPVOID)data.c_str(), data.size()));
+    EXPECT_TRUE(winHttp.receiveResponse());
+
+    const std::vector<BYTE> body = winHttp.getResponseBody();
+    EXPECT_TRUE(body.size() > 0);
+
+    const DWORD dwStatusCode = winHttp.getResponseStatusCode();
+    EXPECT_TRUE(dwStatusCode == 200);
+
+    const std::wstring strStatusTxt = winHttp.getResponseStatusText();
+    EXPECT_TRUE(strStatusTxt == L"OK");
+
+    const std::wstring strRawHeaders = winHttp.getResponseRawHeaders();
+    EXPECT_TRUE(strRawHeaders.size() > 0);
+
+    const std::unordered_map<std::wstring, std::wstring> headerMap = winHttp.getResponseHeaders();
+    EXPECT_TRUE(headerMap.size() > 0);
+}
+
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", akl::TimeUtil::GetCurrentTimestampByMicroSec());
 
@@ -645,6 +698,8 @@ int main() {
     FileSystemTest3();
     FileSystemTest4();
     ProcessTest();
+    WinHttpGetRequestTest();
+    WinHttpPostRequestTest();
 
     return 0;
 }

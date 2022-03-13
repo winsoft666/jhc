@@ -60,6 +60,7 @@
 #include "akali_hpp/win_env_variable.hpp"
 #include "akali_hpp/win_exception_catch.hpp"
 #include "akali_hpp/win_ini.hpp"
+#include "akali_hpp/win_http.hpp"
 #include "akali_hpp/win_registry.hpp"
 #include "akali_hpp/win_schedule_task.hpp"
 #include "akali_hpp/win_service_base.hpp"
