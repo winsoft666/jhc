@@ -70,25 +70,34 @@ void FileTest1() {
     EXPECT_TRUE(akl::filesystem::remove(file1.path()));
 }
 
-// Test: string md5.
+// Test: string hash.
 //
-void Md5Test1() {
+void HashTest1() {
     const std::string str = "hello world!!!";
-    EXPECT_TRUE(akl::Md5::GetStringMd5((void*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
+    EXPECT_TRUE(akl::CRC32::GetDataCRC32((const unsigned char*)str.c_str(), str.length()) == "2416a280");
+    EXPECT_TRUE(akl::MD5::GetDataMD5((const unsigned char*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
+    EXPECT_TRUE(akl::SHA1::GetDataSHA1((const unsigned char*)str.c_str(), str.length()) == "8233f28c479ff758b3b4ba9ad66069db68811e59");
+    EXPECT_TRUE(akl::SHA256::GetDataSHA256((const unsigned char*)str.c_str(), str.length()) == "a5f4396b45548597f81681147f53c66065d5137f2fbd85e6758a8983107228e4");
 }
 
-// Test: file md5.
+// Test: file hash.
 //
-void Md5Test2() {
+void HashTest2() {
     const std::string str1K(1024, 'a');
-    akl::File file1("md5_test_file.dat");
+    akl::File file1("hash_test_file.dat");
     EXPECT_TRUE(file1.open("wb"));
     EXPECT_TRUE(file1.writeFrom((void*)str1K.c_str(), str1K.size(), 0) == str1K.size());
     EXPECT_TRUE(file1.close());
 #ifdef AKALI_WIN
-    EXPECT_TRUE(akl::Md5::GetFileMd5(file1.path().wstring()) == "c9a34cfc85d982698c6ac89f76071abd");
+    EXPECT_TRUE(akl::CRC32::GetFileCRC32(file1.path().wstring()) == "7c5597b9");
+    EXPECT_TRUE(akl::MD5::GetFileMD5(file1.path().wstring()) == "c9a34cfc85d982698c6ac89f76071abd");
+    EXPECT_TRUE(akl::SHA1::GetFileSHA1(file1.path().wstring()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    EXPECT_TRUE(akl::SHA256::GetFileSHA256(file1.path().wstring()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
 #else
-    EXPECT_TRUE(akl::Md5::GetFileMd5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
+    EXPECT_TRUE(akl::CRC32::GetFileCRC32(file1.path().string()) == "7c5597b9");
+    EXPECT_TRUE(akl::MD5::GetFileMD5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
+    EXPECT_TRUE(akl::SHA1::GetFileSHA1(file1.path().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    EXPECT_TRUE(akl::SHA256::GetFileSHA256(file1.path().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
 #endif
 }
 
@@ -618,8 +627,8 @@ int main() {
     printf("Current Path: %s\n", strCurExePath.c_str());
 
     FileTest1();
-    Md5Test1();
-    Md5Test2();
+    HashTest1();
+    HashTest2();
     Base64Test();
     IpAddressTest();
     StringHelperTest();

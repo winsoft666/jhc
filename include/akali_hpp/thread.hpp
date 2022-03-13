@@ -15,8 +15,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef AKALI_THREAD_H__
-#define AKALI_THREAD_H__
+#ifndef AKALI_THREAD_HPP__
+#define AKALI_THREAD_HPP__
 
 #include "akali_hpp/arch.hpp"
 
@@ -166,4 +166,4 @@ class Thread {
 };
 }  // namespace akl
 #endif
-#endif  // !AKALI_THREAD_H__
+#endif  // !AKALI_THREAD_HPP__
