@@ -11,7 +11,7 @@ JHC(JiangXueqiao's helper classes, who's JiangXueqiao? I have no idea), a header
 
 
 # How to use
-Only need include `jhc/include` folder in you project, then include header file at your code, such as:
+Only need include `jhc/include` folder in your project, then include then specific header file at your code, such as:
 	
 ```c++
 #include "jhc/json.hpp"
