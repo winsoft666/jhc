@@ -561,6 +561,7 @@ void FileSystemTest4() {
 #endif
 }
 
+#ifdef JHC_WIN
 // Test: create process, send data to process's input and get process's output.
 //
 void ProcessTest() {
@@ -671,6 +672,7 @@ void WinHttpPostRequestTest() {
     const std::unordered_map<std::wstring, std::wstring> headerMap = winHttp.getResponseHeaders();
     EXPECT_TRUE(headerMap.size() > 0);
 }
+#endif
 
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", jhc::TimeUtil::GetCurrentTimestampByMicroSec());
@@ -700,8 +702,9 @@ int main() {
     FileSystemTest3();
     FileSystemTest4();
     ProcessTest();
+#ifdef JHC_WIN
     WinHttpGetRequestTest();
     WinHttpPostRequestTest();
-
+#endif
     return 0;
 }

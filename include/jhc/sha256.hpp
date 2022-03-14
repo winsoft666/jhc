@@ -19,7 +19,7 @@
 
 #ifndef JHC_SHA256_HPP__
 #define JHC_SHA256_HPP__
-#include <stdint.H>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
