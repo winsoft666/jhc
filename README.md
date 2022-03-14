@@ -1,5 +1,5 @@
 # JHC
-JHC(JiangXueqiao's helper classes), a header-only C++ common library that don't need install any third party library.
+JHC(JiangXueqiao's helper classes, who's JiangXueqiao? I have no idea), a header-only C++ common library that don't need install any third party library.
 
 # Illustrate
 `json.hpp` is provided by [nlohmann/json](https://github.com/nlohmann/json), I renamed namespace from `nlohmann` to `jhc`.
