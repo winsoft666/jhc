@@ -1,5 +1,5 @@
-# akali_hpp
-A header-only C++ common library that don't need install any third party library.
+# JHC
+JHC(JiangXueqiao's helper classes), a header-only C++ common library that don't need install any third party library.
 
 # Illustrate
 `json.hpp` is provided by [nlohmann/json](https://github.com/nlohmann/json), I renamed namespace from `nlohmann` to `akl`.
@@ -11,10 +11,10 @@ A header-only C++ common library that don't need install any third party library
 
 
 # How to use
-Only need include `akali_hpp/include` folder in you project, then include header file at your code, such as:
+Only need include `jhc/include` folder in you project, then include header file at your code, such as:
 	
 ```c++
-#include "akali_hpp/json.hpp"
+#include "jhc/json.hpp"
 ```
 
 

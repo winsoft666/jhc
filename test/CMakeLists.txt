@@ -1,5 +1,7 @@
-############################################################################
-#    Copyright (C) <2019-2022>, winsoft666, <winsoft666@outlook.com>.
+##################################################################################
+#    C++ Common Library
+#    ---------------------------------------------------------------------------
+#    Copyright (C) 2022 JiangXueqiao <winsoft666@outlook.com>.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -12,13 +14,13 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http:#www.gnu.org/licenses/>.
-############################################################################
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##################################################################################
 
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
-project(akali_hpp CXX)
+project(jhc CXX)
 
 set (CMAKE_CXX_STANDARD 14)
 
@@ -28,17 +30,17 @@ add_definitions(-DUNICODE -D_UNICODE)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-file(GLOB AKALI_HPP_HEADER_FILES ../include/akali_hpp.h ../include/akali_hpp/*.*)
+file(GLOB JHC_HEADER_FILES ../include/jhc_all.hpp ../include/jhc/*.*)
 file(GLOB TEST_SOURCE_FILES ./*.cpp)
 
-source_group("akali_hpp" FILES ${AKALI_HPP_HEADER_FILES})
+source_group("jhc" FILES ${JHC_HEADER_FILES})
 source_group("test" FILES ${TEST_SOURCE_FILES})
 
 include_directories(../include)
 
 add_executable(
 	${EXE_NAME}
-	${AKALI_HPP_HEADER_FILES}
+	${JHC_HEADER_FILES}
 	${TEST_SOURCE_FILES}
 	)
 	
