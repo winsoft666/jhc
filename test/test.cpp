@@ -120,10 +120,26 @@ void IpAddressTest() {
 // Test: string operate.
 //
 void StringHelperTest() {
+    EXPECT_TRUE(jhc::StringHelper::ToLower('c') == 'c');
+    EXPECT_TRUE(jhc::StringHelper::ToLower('C') == 'c');
+    EXPECT_TRUE(jhc::StringHelper::ToUpper('A') == 'A');
+    EXPECT_TRUE(jhc::StringHelper::ToUpper('a') == 'A');
+    EXPECT_TRUE(jhc::StringHelper::ToLower(L'c') == L'c');
+    EXPECT_TRUE(jhc::StringHelper::ToLower(L'C') == L'c');
+    EXPECT_TRUE(jhc::StringHelper::ToUpper(L'A') == L'A');
+    EXPECT_TRUE(jhc::StringHelper::ToUpper(L'a') == L'A');
     EXPECT_TRUE(jhc::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(jhc::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
     EXPECT_TRUE(jhc::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
     EXPECT_TRUE(jhc::StringHelper::ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
+
+    EXPECT_TRUE(jhc::StringHelper::IsDigit("3.14") == false);
+    EXPECT_TRUE(jhc::StringHelper::IsDigit("3a12") == false);
+    EXPECT_TRUE(jhc::StringHelper::IsDigit("134") == true);
+
+    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"3.14") == false);
+    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"3a12") == false);
+    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"134") == true);
 
     EXPECT_TRUE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
     EXPECT_TRUE(!jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
@@ -674,6 +690,29 @@ void WinHttpPostRequestTest() {
 }
 #endif
 
+// Test: Version compare
+//
+void VersionTest() {
+    jhc::Version v1("1.2.3.4");
+    jhc::Version v2("4.3.2");
+    jhc::Version v3(L"4.3.2.1");
+    jhc::Version v4 = v3;
+
+    EXPECT_TRUE(v1.isValid());
+    EXPECT_TRUE(v2.isValid());
+    EXPECT_TRUE(v1.isSameFormat(v2) == false);
+    EXPECT_TRUE(v2.isSameFormat(v1) == false);
+
+    EXPECT_TRUE(v1 != v3);
+    EXPECT_TRUE(v3 == v4);
+    EXPECT_TRUE(v3 >= v4);
+    EXPECT_TRUE(v3 <= v4);
+    EXPECT_TRUE(v1 <= v4);
+    EXPECT_TRUE(v1 < v4);
+    EXPECT_TRUE(v4 >= v1);
+    EXPECT_TRUE(v4 > v1);
+}
+
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", jhc::TimeUtil::GetCurrentTimestampByMicroSec());
 
@@ -706,5 +745,6 @@ int main() {
     WinHttpGetRequestTest();
     WinHttpPostRequestTest();
 #endif
+    VersionTest();
     return 0;
 }

@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cctype>
 #include <cstdarg>
 #include <cwctype>
 #include <iterator>
@@ -52,25 +53,25 @@
 namespace jhc {
 class StringHelper {
    public:
-    static char EasyCharToLowerA(char in) {
+    static char ToLower(const char& in) {
         if (in <= 'Z' && in >= 'A')
             return in - ('Z' - 'z');
         return in;
     }
 
-    static char EasyCharToUpperA(char in) {
+    static char ToUpper(const char& in) {
         if (in <= 'z' && in >= 'a')
             return in + ('Z' - 'z');
         return in;
     }
 
-    static wchar_t EasyCharToLowerW(wchar_t in) {
+    static wchar_t ToLower(const wchar_t& in) {
         if (in <= 'Z' && in >= 'A')
             return in - (L'Z' - L'z');
         return in;
     }
 
-    static wchar_t EasyCharToUpperW(wchar_t in) {
+    static wchar_t ToUpper(const wchar_t& in) {
         if (in <= L'z' && in >= L'a')
             return in + (L'Z' - L'z');
         return in;
@@ -78,26 +79,40 @@ class StringHelper {
 
     static std::string ToLower(const std::string& s) {
         std::string d = s;
-        std::transform(d.begin(), d.end(), d.begin(), EasyCharToLowerA);
+        char (*pf)(const char&) = StringHelper::ToLower;
+        std::transform(d.begin(), d.end(), d.begin(), pf);
         return d;
     }
 
     static std::wstring ToLower(const std::wstring& s) {
         std::wstring d = s;
-        std::transform(d.begin(), d.end(), d.begin(), EasyCharToLowerW);
+        wchar_t (*pf)(const wchar_t&) = StringHelper::ToLower;
+        std::transform(d.begin(), d.end(), d.begin(), pf);
         return d;
     }
 
     static std::string ToUpper(const std::string& s) {
         std::string d = s;
-        std::transform(d.begin(), d.end(), d.begin(), EasyCharToUpperA);
+        char (*pf)(const char&) = StringHelper::ToUpper;
+        std::transform(d.begin(), d.end(), d.begin(), pf);
         return d;
     }
 
     static std::wstring ToUpper(const std::wstring& s) {
         std::wstring d = s;
-        std::transform(d.begin(), d.end(), d.begin(), EasyCharToUpperW);
+        wchar_t (*pf)(const wchar_t&) = StringHelper::ToUpper;
+        std::transform(d.begin(), d.end(), d.begin(), pf);
         return d;
+    }
+
+    static bool IsDigit(const std::string& s) {
+        return !s.empty() &&
+               std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+    }
+
+    static bool IsDigit(const std::wstring& s) {
+        return !s.empty() &&
+               std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
     }
 
     static std::string Trim(const std::string& s, char c = ' ') {
@@ -393,7 +408,7 @@ class StringHelper {
 
         for (std::string::size_type i = 0; i < s1_len; i++) {
             if (ignoreCase) {
-                if (EasyCharToLowerA(s1[i]) != EasyCharToLowerA(s2[i]))
+                if (ToLower(s1[i]) != ToLower(s2[i]))
                     return false;
             }
             else {
@@ -412,7 +427,7 @@ class StringHelper {
 
         for (std::wstring::size_type i = 0; i < s1_len; i++) {
             if (ignoreCase) {
-                if (EasyCharToLowerW(s1[i]) != EasyCharToLowerW(s2[i]))
+                if (ToLower(s1[i]) != ToLower(s2[i]))
                     return false;
             }
             else {

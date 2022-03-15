@@ -56,6 +56,7 @@
 #include "jhc/timer.hpp"
 #include "jhc/trace.hpp"
 #include "jhc/url_encode.hpp"
+#include "jhc/version.hpp"
 #include "jhc/win_criticalsection.hpp"
 #include "jhc/win_directory_monitor.hpp"
 #include "jhc/win_driver_info.hpp"
