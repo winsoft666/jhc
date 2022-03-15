@@ -141,6 +141,16 @@ void StringHelperTest() {
     EXPECT_TRUE(jhc::StringHelper::IsDigit(L"3a12") == false);
     EXPECT_TRUE(jhc::StringHelper::IsDigit(L"134") == true);
 
+    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces");
+    EXPECT_TRUE(jhc::StringHelper::Trim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces");
+    EXPECT_TRUE(jhc::StringHelper::LeftTrim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces   \n");
+    EXPECT_TRUE(jhc::StringHelper::LeftTrim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces   \n");
+    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
+    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
+    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
+    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
+    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "\r\f") == " erase\n\t white-spaces   \n");
+
     EXPECT_TRUE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
     EXPECT_TRUE(!jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
     EXPECT_TRUE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));

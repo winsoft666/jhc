@@ -115,28 +115,28 @@ class StringHelper {
                std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
     }
 
-    static std::string Trim(const std::string& s, char c = ' ') {
-        const std::string::size_type pos = s.find_first_not_of(c);
+    static std::string Trim(const std::string& s, const std::string &whitespaces = " \t\f\v\n\r") {
+        const std::string::size_type pos = s.find_first_not_of(whitespaces);
         if (pos == std::string::npos) {
             return std::string();
         }
 
-        std::string::size_type n = s.find_last_not_of(c) - pos + 1;
+        std::string::size_type n = s.find_last_not_of(whitespaces) - pos + 1;
         return s.substr(pos, n);
     }
 
-    static std::wstring Trim(const std::wstring& s, wchar_t c = L' ') {
-        const std::wstring::size_type pos = s.find_first_not_of(c);
+    static std::wstring Trim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r") {
+        const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
         if (pos == std::wstring::npos) {
             return std::wstring();
         }
 
-        std::wstring::size_type n = s.find_last_not_of(c) - pos + 1;
+        std::wstring::size_type n = s.find_last_not_of(whitespaces) - pos + 1;
         return s.substr(pos, n);
     }
 
-    static std::string LeftTrim(const std::string& s, char c = ' ') {
-        const std::string::size_type pos = s.find_first_not_of(c);
+    static std::string LeftTrim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r") {
+        const std::string::size_type pos = s.find_first_not_of(whitespaces);
         if (pos == std::string::npos) {
             return std::string();
         }
@@ -144,8 +144,8 @@ class StringHelper {
         return s.substr(pos);
     }
 
-    static std::wstring LeftTrim(const std::wstring& s, wchar_t c = L' ') {
-        const std::wstring::size_type pos = s.find_first_not_of(c);
+    static std::wstring LeftTrim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r") {
+        const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
         if (pos == std::wstring::npos) {
             return std::wstring();
         }
@@ -153,8 +153,8 @@ class StringHelper {
         return s.substr(pos);
     }
 
-    static std::string RightTrim(const std::string& s, char c = ' ') {
-        const std::string::size_type pos = s.find_last_not_of(c);
+    static std::string RightTrim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r") {
+        const std::string::size_type pos = s.find_last_not_of(whitespaces);
         if (pos == 0) {
             return std::string();
         }
@@ -162,8 +162,8 @@ class StringHelper {
         return s.substr(0, pos + 1);
     }
 
-    static std::wstring RightTrim(const std::wstring& s, wchar_t c = L' ') {
-        const std::wstring::size_type pos = s.find_last_not_of(c);
+    static std::wstring RightTrim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r") {
+        const std::wstring::size_type pos = s.find_last_not_of(whitespaces);
         if (pos == 0) {
             return std::wstring();
         }
