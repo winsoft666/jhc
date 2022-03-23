@@ -26,9 +26,9 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
+#endif  // !WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#endif // !_INC_WINDOWS
+#endif  // !_INC_WINDOWS
 #include <string>
 #include <vector>
 #include <strsafe.h>
@@ -44,11 +44,11 @@ class Ini {
 
     ~Ini() noexcept {}
 
-    void SetIniFilePath(const std::wstring& file_path) noexcept { ini_file_path_ = file_path; }
+    void setIniFilePath(const std::wstring& file_path) noexcept { ini_file_path_ = file_path; }
 
-    std::wstring GetIniFilePath() const noexcept { return ini_file_path_; }
+    std::wstring iniFilePath() const noexcept { return ini_file_path_; }
 
-    bool ReadInt(const std::wstring& item, const std::wstring& sub_item, UINT* result) noexcept {
+    bool readInt(const std::wstring& item, const std::wstring& sub_item, UINT* result) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
         INT iDefault = 0;
@@ -64,7 +64,7 @@ class Ini {
         return false;
     }
 
-    UINT ReadInt(const std::wstring& item,
+    UINT readInt(const std::wstring& item,
                  const std::wstring& sub_item,
                  UINT default_value) noexcept {
         if (ini_file_path_.length() == 0)
@@ -75,7 +75,7 @@ class Ini {
                                      ini_file_path_.c_str());
     }
 
-    std::wstring ReadString(const std::wstring& item,
+    std::wstring readString(const std::wstring& item,
                             const std::wstring& sub_item,
                             const std::wstring& default_value) noexcept {
         if (ini_file_path_.length() == 0)
@@ -91,7 +91,7 @@ class Ini {
         return result;
     }
 
-    bool ReadString(const std::wstring& item,
+    bool readString(const std::wstring& item,
                     const std::wstring& sub_item,
                     std::wstring* result) noexcept {
         if (ini_file_path_.length() == 0)
@@ -134,55 +134,55 @@ class Ini {
         return ret;
     }
 
-    bool WriteInt(const std::wstring& item, const std::wstring& sub_item, LONG value) noexcept {
+    bool writeInt(const std::wstring& item, const std::wstring& sub_item, LONG value) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
 
         WCHAR szValue[50];
         StringCchPrintfW(szValue, 50, L"%ld", value);
-        return WriteString(item, sub_item, szValue);
+        return writeString(item, sub_item, szValue);
     }
 
-    bool WriteColor(const std::wstring& item, const std::wstring& sub_item, COLORREF value) noexcept {
+    bool writeColor(const std::wstring& item, const std::wstring& sub_item, COLORREF value) noexcept {
         WCHAR szValue[60];
         StringCchPrintfW(szValue, 60, L"%d,%d,%d,%d", (BYTE)(value >> 24), (BYTE)(value >> 16),
                          (BYTE)(value >> 8), (BYTE)value);
 
-        return WriteString(item, sub_item, szValue);
+        return writeString(item, sub_item, szValue);
     }
 
-    bool WritePoint(const std::wstring& item, const std::wstring& sub_item, POINT value) noexcept {
+    bool writePoint(const std::wstring& item, const std::wstring& sub_item, POINT value) noexcept {
         WCHAR szValue[50];
         StringCchPrintfW(szValue, 50, L"%d,%d", value.x, value.y);
 
-        return WriteString(item, sub_item, szValue);
+        return writeString(item, sub_item, szValue);
     }
 
-    bool WriteSize(const std::wstring& item, const std::wstring& sub_item, SIZE value) noexcept {
+    bool writeSize(const std::wstring& item, const std::wstring& sub_item, SIZE value) noexcept {
         WCHAR szValue[50];
         StringCchPrintfW(szValue, 50, L"%d,%d", value.cx, value.cy);
 
-        return WriteString(item, sub_item, szValue);
+        return writeString(item, sub_item, szValue);
     }
 
-    bool WriteRect(const std::wstring& item, const std::wstring& sub_item, RECT value) noexcept {
+    bool writeRect(const std::wstring& item, const std::wstring& sub_item, RECT value) noexcept {
         WCHAR szValue[50];
         StringCchPrintfW(szValue, 50, L"%d,%d,%d,%d", value.left, value.top, value.right, value.bottom);
 
-        return WriteString(item, sub_item, szValue);
+        return writeString(item, sub_item, szValue);
     }
 
-    bool WriteString(const std::wstring& item,
+    bool writeString(const std::wstring& item,
                      const std::wstring& sub_item,
                      const std::wstring& value) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
 
         return !!WritePrivateProfileStringW(item.c_str(), sub_item.c_str(), value.c_str(),
-                                           ini_file_path_.c_str());
+                                            ini_file_path_.c_str());
     }
 
-    bool ReadRect(const std::wstring& item, const std::wstring& sub_item, RECT* result) noexcept {
+    bool readRect(const std::wstring& item, const std::wstring& sub_item, RECT* result) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
 
@@ -206,7 +206,7 @@ class Ini {
         return false;
     }
 
-    bool ReadSize(const std::wstring& item, const std::wstring& sub_item, SIZE* result) noexcept {
+    bool readSize(const std::wstring& item, const std::wstring& sub_item, SIZE* result) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
         WCHAR szReadData[64] = L"";
@@ -227,7 +227,7 @@ class Ini {
         return false;
     }
 
-    bool ReadPoint(const std::wstring& item, const std::wstring& sub_item, POINT* result) noexcept {
+    bool readPoint(const std::wstring& item, const std::wstring& sub_item, POINT* result) noexcept {
         if (ini_file_path_.length() == 0)
             return false;
         WCHAR szReadData[64] = L"";
@@ -249,7 +249,7 @@ class Ini {
         return false;
     }
 
-    bool ReadColor(const std::wstring& item,
+    bool readColor(const std::wstring& item,
                    const std::wstring& sub_item,
                    COLORREF* result) noexcept {
         if (ini_file_path_.length() == 0)
@@ -292,5 +292,5 @@ class Ini {
     std::wstring ini_file_path_;
 };
 }  // namespace jhc
-#endif // !JHC_WIN
-#endif // !JHC_WIN_INI_HPP_
+#endif  // !JHC_WIN
+#endif  // !JHC_WIN_INI_HPP_

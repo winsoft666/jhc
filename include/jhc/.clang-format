@@ -4,6 +4,7 @@ BasedOnStyle:  Chromium
 SortIncludes: false
 SortUsingDeclarations: false
 BreakStringLiterals: false
+NamespaceIndentation: None
 
 IndentWidth: 4
 

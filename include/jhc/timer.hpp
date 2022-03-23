@@ -19,10 +19,8 @@
 
 #ifndef JHC_TIMER_HPP_
 #define JHC_TIMER_HPP_
-#pragma once
 
 #include "jhc/arch.hpp"
-
 #ifdef JHC_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -40,32 +38,34 @@ class TimerBase {
         m_pTimer = NULL;
     }
 
-    virtual ~TimerBase() {}
+    virtual ~TimerBase() = default;
+
     static void CALLBACK TimerProc(void* param, BOOLEAN timerCalled) {
         UNREFERENCED_PARAMETER(timerCalled);
         TimerBase* timer = static_cast<TimerBase*>(param);
 
-        timer->OnTimedEvent();
+        if (timer)
+            timer->onTimedEvent();
     }
 
     // About dwFlags, see:
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682485(v=vs.85).aspx
     //
-    BOOL Start(DWORD ulInterval,  // ulInterval in ms
+    bool start(DWORD ulInterval,  // ulInterval in ms
                BOOL bImmediately,
                BOOL bOnce,
                ULONG dwFlags = WT_EXECUTELONGFUNCTION) {
-        BOOL bRet = FALSE;
+        bool bRet = false;
 
         if (!m_hTimer) {
-            bRet = CreateTimerQueueTimer(&m_hTimer, NULL, TimerProc, (PVOID)this,
-                                         bImmediately ? 0 : ulInterval, bOnce ? 0 : ulInterval, dwFlags);
+            bRet = !!CreateTimerQueueTimer(&m_hTimer, NULL, TimerProc, (PVOID)this,
+                                           bImmediately ? 0 : ulInterval, bOnce ? 0 : ulInterval, dwFlags);
         }
 
         return bRet;
     }
 
-    void Stop(bool bWait) {
+    void stop(bool bWait) {
         if (m_hTimer) {
             BOOL b = DeleteTimerQueueTimer(NULL, m_hTimer, bWait ? INVALID_HANDLE_VALUE : NULL);
             assert(b);
@@ -73,7 +73,7 @@ class TimerBase {
         }
     }
 
-    virtual void OnTimedEvent() {}
+    virtual void onTimedEvent() {}
 
    private:
     HANDLE m_hTimer;
@@ -83,20 +83,20 @@ class TimerBase {
 template <class T>
 class TTimer : public TimerBase {
    public:
-    typedef private void (T::*POnTimer)(void);
+    typedef void (T::*POnTimer)(void);
 
     TTimer() {
         m_pClass = NULL;
         m_pfnOnTimer = NULL;
     }
 
-    void SetTimedEvent(T* pClass, POnTimer pFunc) {
+    void setTimedEvent(T* pClass, POnTimer pFunc) {
         m_pClass = pClass;
         m_pfnOnTimer = pFunc;
     }
 
    protected:
-    void OnTimedEvent() override {
+    void onTimedEvent() override {
         if (m_pfnOnTimer && m_pClass) {
             (m_pClass->*m_pfnOnTimer)();
         }
@@ -112,12 +112,12 @@ class Timer : public TimerBase {
     typedef std::function<void()> FN_CB;
     Timer() {}
 
-    Timer(FN_CB cb) { SetTimedEvent(cb); }
+    Timer(FN_CB cb) { setTimedEvent(cb); }
 
-    void SetTimedEvent(FN_CB cb) { m_cb = cb; }
+    void setTimedEvent(FN_CB cb) { m_cb = cb; }
 
    protected:
-    void OnTimedEvent() override {
+    void onTimedEvent() override {
         if (m_cb) {
             m_cb();
         }

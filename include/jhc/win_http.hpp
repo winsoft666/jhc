@@ -37,9 +37,11 @@
 
 namespace jhc {
 class WinHttp {
+    JHC_DISALLOW_COPY_AND_ASSIGN(WinHttp);
+    JHC_DISALLOW_MOVE_AND_ASSIGN(WinHttp);
+
    public:
-    WinHttp() {
-    }
+    WinHttp() = default;
 
     virtual ~WinHttp() {
         if (m_hRequest) {
