@@ -44,6 +44,23 @@ class CmdLineParser {
         }
     }
 
+    explicit CmdLineParser(std::wstring&& cmdline) {
+        if (cmdline.length() > 0) {
+            cmdline_ = std::move(cmdline);
+            parse();
+        }
+    }
+
+    CmdLineParser(const CmdLineParser& that) {
+        cmdline_ = that.cmdline_;
+        value_map_ = that.value_map_;
+    }
+
+    CmdLineParser(CmdLineParser&& that) noexcept {
+        cmdline_ = std::move(that.cmdline_);
+        value_map_ = std::move(that.value_map_);
+    }
+
     ~CmdLineParser() = default;
 
     ITERPOS begin() const {

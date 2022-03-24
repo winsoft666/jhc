@@ -49,6 +49,9 @@
 namespace jhc {
 class Thread {
    public:
+    JHC_DISALLOW_COPY_AND_ASSIGN(Thread);
+    JHC_DISALLOW_MOVE_AND_ASSIGN(Thread);
+
     Thread() :
         thread_id_(0), exit_(false) { running_.store(false); }
 
@@ -163,8 +166,6 @@ class Thread {
     bool exit_;
     std::queue<std::function<void()>> work_queue_;
     std::atomic_bool running_;
-
-    JHC_DISALLOW_COPY_AND_ASSIGN(Thread);
 };
 }  // namespace jhc
 #endif

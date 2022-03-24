@@ -34,87 +34,90 @@
 #include "jhc/uuid.hpp"
 
 namespace jhc {
-    class SingletonProcess {
-    public:
-        SingletonProcess() {
-            uniqueName_ = jhc::UUID::Create();
-            assert(!uniqueName_.empty());
-            check();
-        }
+class SingletonProcess {
+   public:
+    SingletonProcess() {
+        uniqueName_ = jhc::UUID::Create();
+        assert(!uniqueName_.empty());
+        check();
+    }
 
-        SingletonProcess(const std::string& uniqueName) : uniqueName_(uniqueName) {
-            assert(!uniqueName_.empty());
-            check();
-        }
+    SingletonProcess(const std::string& uniqueName) :
+        uniqueName_(uniqueName) {
+        assert(!uniqueName_.empty());
+        check();
+    }
 
-        SingletonProcess(std::string&& uniqueName) : uniqueName_(std::move(uniqueName)) {
-            assert(!uniqueName_.empty());
-            check();
-        }
+    SingletonProcess(std::string&& uniqueName) :
+        uniqueName_(std::move(uniqueName)) {
+        assert(!uniqueName_.empty());
+        check();
+    }
 
-        SingletonProcess(const SingletonProcess& that) {
-            uniqueName_ = that.uniqueName_;
-            isPrimary_ = that.isPrimary_;
-        }
+    SingletonProcess(const SingletonProcess& that) {
+        uniqueName_ = that.uniqueName_;
+        isPrimary_ = that.isPrimary_;
+    }
 
-        SingletonProcess(SingletonProcess&& that) {
-            uniqueName_ = std::move(that.uniqueName_);
-            isPrimary_ = that.isPrimary_;
-        }
+    SingletonProcess(SingletonProcess&& that) noexcept {
+        uniqueName_ = std::move(that.uniqueName_);
+        isPrimary_ = that.isPrimary_;
+    }
 
-        ~SingletonProcess() = default;
+    ~SingletonProcess() = default;
 
-        SingletonProcess& operator=(const SingletonProcess& that) {
-            uniqueName_ = that.uniqueName_;
-            isPrimary_ = that.isPrimary_;
-            return *this;
-        }
+    SingletonProcess& operator=(const SingletonProcess& that) {
+        uniqueName_ = that.uniqueName_;
+        isPrimary_ = that.isPrimary_;
+        return *this;
+    }
 
-        SingletonProcess& operator=(SingletonProcess&& that) {
-            uniqueName_ = std::move(that.uniqueName_);
-            isPrimary_ = that.isPrimary_;
-            return *this;
-        }
+    SingletonProcess& operator=(SingletonProcess&& that) {
+        uniqueName_ = std::move(that.uniqueName_);
+        isPrimary_ = that.isPrimary_;
+        return *this;
+    }
 
-        const std::string& uniqueName() const {
-            return uniqueName_;
-        }
+    const std::string& uniqueName() const {
+        return uniqueName_;
+    }
 
-        bool operator()() const {
-            return isPrimary_;
-        }
-    protected:
-        void check() {
+    bool operator()() const {
+        return isPrimary_;
+    }
+
+   protected:
+    void check() {
 #ifdef JHC_WIN
-            HANDLE mutex = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
-            const DWORD gle = GetLastError();
-            isPrimary_ = true;
+        HANDLE mutex = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
+        const DWORD gle = GetLastError();
+        isPrimary_ = true;
 
-            if (mutex) {
-                if (gle == ERROR_ALREADY_EXISTS) {
-                    CloseHandle(mutex);
-                    isPrimary_ = false;
-                }
+        if (mutex) {
+            if (gle == ERROR_ALREADY_EXISTS) {
+                CloseHandle(mutex);
+                isPrimary_ = false;
             }
-            else {
-                if (gle == ERROR_ACCESS_DENIED)
-                    isPrimary_ = false;
-            }
-            // NOT CloseHandle
-#else
-            int pid_file = open(("/tmp/" + uniqueName_ + ".pid").c_str(), O_CREAT | O_RDWR, 0666);
-            int rc = flock(pid_file, LOCK_EX | LOCK_NB);
-            if (rc) {
-                if (EWOULDBLOCK == errno)
-                    isPrimary_ = false;
-            }
-            isPrimary_ = true;
-#endif
         }
+        else {
+            if (gle == ERROR_ACCESS_DENIED)
+                isPrimary_ = false;
+        }
+        // NOT CloseHandle
+#else
+        int pid_file = open(("/tmp/" + uniqueName_ + ".pid").c_str(), O_CREAT | O_RDWR, 0666);
+        int rc = flock(pid_file, LOCK_EX | LOCK_NB);
+        if (rc) {
+            if (EWOULDBLOCK == errno)
+                isPrimary_ = false;
+        }
+        isPrimary_ = true;
+#endif
+    }
 
-    private:
-        std::string uniqueName_;
-        bool isPrimary_ = true;
-    };
-} // namespace jhc 
-#endif // !JHC_SINGLETON_PROCESS_HPP__
+   private:
+    std::string uniqueName_;
+    bool isPrimary_ = true;
+};
+}  // namespace jhc
+#endif  // !JHC_SINGLETON_PROCESS_HPP__

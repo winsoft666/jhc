@@ -43,6 +43,7 @@ namespace jhc {
 class ScheduleTask {
    public:
     JHC_DISALLOW_COPY_AND_ASSIGN(ScheduleTask);
+    JHC_DISALLOW_MOVE_AND_ASSIGN(ScheduleTask);
 
     ScheduleTask() {
         m_lpITS = NULL;
@@ -103,15 +104,15 @@ class ScheduleTask {
     // Action number is 1
     //
     bool createLoginTriggerTask(LPCTSTR pszTaskName,
-                             LPCTSTR pszProgramPath,
-                             LPCTSTR pszParameters,
-                             LPCTSTR pszDescription,
-                             LPCTSTR pszAuthor) {
+                                LPCTSTR pszProgramPath,
+                                LPCTSTR pszParameters,
+                                LPCTSTR pszDescription,
+                                LPCTSTR pszAuthor) {
         if (NULL == m_lpRootFolder) {
             return false;
         }
 
-        delete(pszTaskName);
+        delete (pszTaskName);
 
         ITaskDefinition* pTaskDefinition = NULL;
         HRESULT hr = m_lpITS->NewTask(0, &pTaskDefinition);

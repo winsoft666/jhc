@@ -41,7 +41,7 @@ namespace jhc {
 class WinProcessFinder {
    public:
     JHC_DISALLOW_COPY_AND_ASSIGN(WinProcessFinder);
-
+    JHC_DISALLOW_MOVE_AND_ASSIGN(WinProcessFinder);
     // dwFlags can be one or more of the following values.
     // TH32CS_SNAPHEAPLIST
     // TH32CS_SNAPPROCESS
@@ -50,9 +50,10 @@ class WinProcessFinder {
     // TH32CS_SNAPMODULE32
     // TH32CS_INHERIT
     // TH32CS_SNAPALL = (TH32CS_SNAPHEAPLIST | TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD | TH32CS_SNAPMODULE)
-    WinProcessFinder(DWORD dwFlags = TH32CS_SNAPALL, DWORD dwProcessID = 0) {
+    //
+    explicit WinProcessFinder(DWORD dwFlags = TH32CS_SNAPALL, DWORD dwProcessID = 0) {
         m_hSnapShot = INVALID_HANDLE_VALUE;
-        CreateSnapShot(dwFlags, dwProcessID);
+        createSnapShot(dwFlags, dwProcessID);
     }
 
     ~WinProcessFinder() {
@@ -62,7 +63,7 @@ class WinProcessFinder {
         }
     }
 
-    BOOL CreateSnapShot(DWORD dwFlag, DWORD dwProcessID) {
+    bool createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
         if (m_hSnapShot != INVALID_HANDLE_VALUE)
             CloseHandle(m_hSnapShot);
 
@@ -74,29 +75,29 @@ class WinProcessFinder {
         return (m_hSnapShot != INVALID_HANDLE_VALUE);
     }
 
-    BOOL ProcessFirst(PPROCESSENTRY32 ppe) const {
+    bool processFirst(PPROCESSENTRY32 ppe) const {
         BOOL fOk = Process32First(m_hSnapShot, ppe);
 
         if (fOk && (ppe->th32ProcessID == 0))
-            fOk = ProcessNext(ppe);  // remove the "[System Process]" (PID = 0)
+            fOk = processNext(ppe);  // remove the "[System Process]" (PID = 0)
 
         return fOk;
     }
 
-    BOOL ProcessNext(PPROCESSENTRY32 ppe) const {
+    bool processNext(PPROCESSENTRY32 ppe) const {
         BOOL fOk = Process32Next(m_hSnapShot, ppe);
 
         if (fOk && (ppe->th32ProcessID == 0))
-            fOk = ProcessNext(ppe);  // remove the "[System Process]" (PID = 0)
+            fOk = processNext(ppe);  // remove the "[System Process]" (PID = 0)
 
         return fOk;
     }
 
     // Don't forgot pe.dwSize = sizeof(PROCESSENTRY32);
-    BOOL ProcessFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
+    bool ProcessFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
         BOOL fFound = FALSE;
 
-        for (BOOL fOk = ProcessFirst(ppe); fOk; fOk = ProcessNext(ppe)) {
+        for (BOOL fOk = processFirst(ppe); fOk; fOk = processNext(ppe)) {
             fFound = (ppe->th32ProcessID == dwProcessId);
 
             if (fFound)
@@ -106,11 +107,11 @@ class WinProcessFinder {
         return fFound;
     }
 
-    BOOL ProcessFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf = false) const {
+    bool processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf = false) const {
         BOOL fFound = FALSE;
         const DWORD dwCurrentPID = GetCurrentProcessId();
 
-        for (BOOL fOk = ProcessFirst(ppe); fOk; fOk = ProcessNext(ppe)) {
+        for (BOOL fOk = processFirst(ppe); fOk; fOk = processNext(ppe)) {
             fFound = lstrcmpi(ppe->szExeFile, pszExeName) == 0;
 
             if (fFound) {
@@ -127,18 +128,18 @@ class WinProcessFinder {
         return fFound;
     }
 
-    BOOL ModuleFirst(PMODULEENTRY32 pme) const {
+    bool moduleFirst(PMODULEENTRY32 pme) const {
         return (Module32First(m_hSnapShot, pme));
     }
 
-    BOOL ModuleNext(PMODULEENTRY32 pme) const {
+    bool moduleNext(PMODULEENTRY32 pme) const {
         return (Module32Next(m_hSnapShot, pme));
     }
 
-    BOOL ModuleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
+    bool moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
         BOOL fFound = FALSE;
 
-        for (BOOL fOk = ModuleFirst(pme); fOk; fOk = ModuleNext(pme)) {
+        for (BOOL fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
             fFound = (pme->modBaseAddr == pvBaseAddr);
 
             if (fFound)
@@ -148,10 +149,10 @@ class WinProcessFinder {
         return fFound;
     }
 
-    BOOL ModuleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
+    bool moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
         BOOL fFound = FALSE;
 
-        for (BOOL fOk = ModuleFirst(pme); fOk; fOk = ModuleNext(pme)) {
+        for (BOOL fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
             fFound =
                 (lstrcmpi(pme->szModule, pszModName) == 0) || (lstrcmpi(pme->szExePath, pszModName) == 0);
 
@@ -166,7 +167,7 @@ class WinProcessFinder {
         WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
         PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
-        const BOOL b = wpf.ProcessFind(UnicodeToTCHAR(processName).c_str(), &pe32);
+        const BOOL b = wpf.processFind(UnicodeToTCHAR(processName).c_str(), &pe32);
         return !!b;
     }
 
@@ -174,7 +175,7 @@ class WinProcessFinder {
         WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
         PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
-        const BOOL b = wpf.ProcessFind(AnsiToTCHAR(processName).c_str(), &pe32);
+        const BOOL b = wpf.processFind(AnsiToTCHAR(processName).c_str(), &pe32);
         return !!b;
     }
 

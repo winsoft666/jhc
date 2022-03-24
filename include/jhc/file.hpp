@@ -44,11 +44,15 @@
 namespace jhc {
 class File {
    public:
+    JHC_DISALLOW_COPY_AND_ASSIGN(File);
+    JHC_DISALLOW_MOVE_AND_ASSIGN(File);
+
     File(const fs::path& path) :
         path_(path) {
     }
 
-    File(fs::path&& path) : path_(std::move(path)){
+    File(fs::path&& path) :
+        path_(std::move(path)) {
     }
 
     virtual ~File() {
@@ -362,8 +366,6 @@ class File {
     FILE* f_ = nullptr;
     fs::path path_;
     std::recursive_mutex mutex_;
-
-    JHC_DISALLOW_COPY_AND_ASSIGN(File);
 };
 }  // namespace jhc
 #endif  // !JHC_FILE_UTIL_HPP_

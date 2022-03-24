@@ -22,46 +22,46 @@
 #include <mutex>
 
 namespace jhc {
-    template <class T>
-    class SingletonClass {
-    public:
-        static T* Instance();
-        static void Release();
+template <class T>
+class SingletonClass {
+   public:
+    static T* Instance();
+    static void Release();
 
-    protected:
-        SingletonClass() {}
-        SingletonClass(const SingletonClass&) {}
-        SingletonClass& operator=(const SingletonClass&) {}
+   protected:
+    SingletonClass() {}
+    SingletonClass(const SingletonClass&) {}
+    SingletonClass& operator=(const SingletonClass&) {}
 
-    private:
-        static T* this_;
-        static std::mutex m_;
-    };
+   private:
+    static T* this_;
+    static std::mutex m_;
+};
 
-    template <class T>
-    T* SingletonClass<T>::this_ = nullptr;
+template <class T>
+T* SingletonClass<T>::this_ = nullptr;
 
-    template <class T>
-    std::mutex SingletonClass<T>::m_;
+template <class T>
+std::mutex SingletonClass<T>::m_;
 
-    template <class T>
-    T* SingletonClass<T>::Instance(void) {
-        // double-check
+template <class T>
+T* SingletonClass<T>::Instance(void) {
+    // double-check
+    if (this_ == nullptr) {
+        std::lock_guard<std::mutex> lg(m_);
         if (this_ == nullptr) {
-            std::lock_guard<std::mutex> lg(m_);
-            if (this_ == nullptr) {
-                this_ = new T;
-            }
+            this_ = new T;
         }
-        return this_;
     }
+    return this_;
+}
 
-    template <class T>
-    void SingletonClass<T>::Release(void) {
-        if (this_) {
-            delete this_;
-        }
+template <class T>
+void SingletonClass<T>::Release(void) {
+    if (this_) {
+        delete this_;
     }
+}
 }  // namespace jhc
 #define SINGLETON_CLASS_DECLARE(class_name) friend class ::jhc::SingletonClass<##class_name>;
 #endif  // !JHC_SINGLETON_CLASS_HPP_

@@ -21,7 +21,6 @@
 #define JHC_WIN_REGISTRY_HPP_
 
 #include "jhc/arch.hpp"
-
 #ifdef JHC_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -39,6 +38,9 @@
 namespace jhc {
 class RegKey {
    public:
+    JHC_DISALLOW_COPY_AND_ASSIGN(RegKey);
+    JHC_DISALLOW_MOVE_AND_ASSIGN(RegKey);
+
     // hkeyRoot can be one of :
     // HKEY_CLASSES_ROOT
     // HKEY_CURRENT_CONFIG
@@ -46,7 +48,7 @@ class RegKey {
     // HKEY_LOCAL_MACHINE
     // HKEY_USERS
     //
-    RegKey(HKEY hkeyRoot, LPCWSTR pszSubKey) :
+    RegKey(HKEY hkeyRoot, const std::wstring& subKey) :
         m_hkeyRoot(hkeyRoot),
         m_hkey(NULL),
         m_hChangeEvent(NULL),
@@ -54,12 +56,12 @@ class RegKey {
         m_bWatchSubtree(false),
         m_dwChangeFilter(0),
         m_dwSamDesired(0),
-        m_strSubKey(pszSubKey) {}
+        m_strSubKey(subKey) {}
 
-    ~RegKey(void) {
+    ~RegKey() {
         close();
 
-        if (NULL != m_hChangeEvent)
+        if (m_hChangeEvent)
             CloseHandle(m_hChangeEvent);
     }
 
@@ -142,7 +144,7 @@ class RegKey {
         unsigned int uThreadId = 0;
         m_hNotifyThr = (HANDLE)_beginthreadex(NULL, 0, NotifyWaitThreadProc, this, 0, &uThreadId);
 
-        if (NULL != m_hNotifyThr) {
+        if (m_hNotifyThr) {
             hr = NOERROR;
         }
 
@@ -611,9 +613,6 @@ class RegKey {
     }
 
    private:
-    RegKey(const RegKey& rhs) = delete;
-    RegKey& operator=(const RegKey& rhs) = delete;
-
     HKEY m_hkeyRoot;
     mutable HKEY m_hkey;
     HANDLE m_hChangeEvent;

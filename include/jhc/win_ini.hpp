@@ -37,12 +37,15 @@
 namespace jhc {
 class Ini {
    public:
-    Ini() noexcept {}
+    Ini() = default;
 
-    Ini(const std::wstring& file_path) noexcept :
+    Ini(const std::wstring& file_path) :
         ini_file_path_(file_path) {}
 
-    ~Ini() noexcept {}
+    Ini(std::wstring&& file_path) :
+        ini_file_path_(std::move(file_path)) {}
+
+    ~Ini() = default;
 
     void setIniFilePath(const std::wstring& file_path) noexcept { ini_file_path_ = file_path; }
 
