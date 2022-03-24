@@ -1,0 +1,6 @@
+[submodule "include/jhc/external/nlohmann-json"]
+	path = include/jhc/external/nlohmann-json
+	url = https://github.com/nlohmann/json
+[submodule "include/jhc/external/gulrak-filesystem"]
+	path = include/jhc/external/gulrak-filesystem
+	url = https://github.com/gulrak/filesystem

@@ -44,15 +44,18 @@
 namespace jhc {
 class File {
    public:
-    File(const filesystem::path& path) :
+    File(const fs::path& path) :
         path_(path) {
+    }
+
+    File(fs::path&& path) : path_(std::move(path)){
     }
 
     virtual ~File() {
         close();
     }
 
-    filesystem::path path() const {
+    const fs::path& path() const {
         return path_;
     }
 
@@ -97,7 +100,7 @@ class File {
     //
     // see: https://www.cplusplus.com/reference/cstdio/fopen/
     //
-    bool open(const filesystem::path& openMode) {
+    bool open(const fs::path& openMode) {
         std::lock_guard<std::recursive_mutex> lg(mutex_);
         if (f_ != nullptr)
             return true;
@@ -357,7 +360,7 @@ class File {
 
    protected:
     FILE* f_ = nullptr;
-    filesystem::path path_;
+    fs::path path_;
     std::recursive_mutex mutex_;
 
     JHC_DISALLOW_COPY_AND_ASSIGN(File);

@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <iostream>
+#include <map>
 //
 // It is strongly recommended not to include this file directly!!!
 #include "jhc_all.hpp"
@@ -33,21 +34,34 @@
             printf("\033[31mFailed:\033[0m " #x "\n"); \
     } while (false)
 
+// Test: uuid generator.
+//
+void UUIDTest() {
+    std::map<std::string, int> values;
+    const int totalNum = 100000;
+
+    for (int i = 0; i < totalNum; i++) {
+        values[jhc::UUID::Create()] = i;
+    }
+
+    EXPECT_TRUE(values.size() == totalNum);
+}
+
 // Test: write/read big file.
 //
 void FileTest1() {
     constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
 
-    jhc::filesystem::path path1(u8"__file_test_文件测试1__.dat");
-    jhc::filesystem::path openMode1(u8"ab+");
+    jhc::fs::path path1(u8"__file_test_文件测试1__.dat");
+    jhc::fs::path openMode1(u8"ab+");
 
     jhc::File file1(path1);
     EXPECT_TRUE(file1.path() == path1);
-    if (jhc::filesystem::exists(file1.path()))
-        EXPECT_TRUE(jhc::filesystem::remove(file1.path()));
+    if (jhc::fs::exists(file1.path()))
+        EXPECT_TRUE(jhc::fs::remove(file1.path()));
 
-    EXPECT_TRUE(jhc::filesystem::exists(file1.path()) == false);
+    EXPECT_TRUE(jhc::fs::exists(file1.path()) == false);
     EXPECT_TRUE(file1.isOpen() == false);
     EXPECT_TRUE(file1.exist() == false);
     EXPECT_TRUE(file1.open(openMode1));
@@ -69,7 +83,7 @@ void FileTest1() {
 
     EXPECT_TRUE(file1.fileSize() == bytes4gb);
     EXPECT_TRUE(file1.close());
-    EXPECT_TRUE(jhc::filesystem::remove(file1.path()));
+    EXPECT_TRUE(jhc::fs::remove(file1.path()));
 }
 
 // Test: string hash.
@@ -259,8 +273,8 @@ void CreateJsonMethod1Test() {
     j["name"] = "Niels";
     j["nothing"] = nullptr;
     j["answer"]["everything"] = 42;
-    j["list"] = {1, 0, 2};
-    j["object"] = {{"currency", "USD"}, {"value", 42.99}};
+    j["list"] = { 1, 0, 2 };
+    j["object"] = { {"currency", "USD"}, {"value", 42.99} };
 
     EXPECT_TRUE(j.dump() == expectJSON);
 }
@@ -277,7 +291,7 @@ void CreateJsonMethod2Test() {
         {"nothing", nullptr},
         {"answer", {{"everything", 42}}},
         {"list", {1, 0, 2}},
-        {"object", {{"currency", "USD"}, {"value", 42.99}}}};
+        {"object", {{"currency", "USD"}, {"value", 42.99}}} };
 
     EXPECT_TRUE(j2.dump() == expectJSON);
 }
@@ -324,8 +338,8 @@ void ParseJsonMethod1Test() {
     j["name"] = "Niels";
     j["nothing"] = nullptr;
     j["answer"]["everything"] = 42;
-    j["list"] = {1, 0, 2};
-    j["object"] = {{"currency", "USD"}, {"value", 42.99}};
+    j["list"] = { 1, 0, 2 };
+    j["object"] = { {"currency", "USD"}, {"value", 42.99} };
 
     const std::string strJson = j.dump();
 
@@ -349,7 +363,7 @@ void ParseJsonMethod1Test() {
 //
 void FileSystemTest1() {
 #ifdef JHC_WIN
-    jhc::filesystem::path path1(u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
+    jhc::fs::path path1(u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
     EXPECT_TRUE(path1.wstring() == L"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
     EXPECT_TRUE(path1.generic_wstring() == L"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
@@ -387,10 +401,10 @@ void FileSystemTest1() {
     EXPECT_TRUE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
     path1 = L"C:\\testoi89hk8\\..\\123\\.\\__filesystem_test1__.dat";
-    jhc::filesystem::path path2 = jhc::filesystem::absolute(path1);
+    jhc::fs::path path2 = jhc::fs::absolute(path1);
     EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test1__.dat");
 #else
-    jhc::filesystem::path path1(u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    jhc::fs::path path1(u8"./testoi89hk8/abc/__filesystem_test1__.dat");
     EXPECT_TRUE(path1.wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
     EXPECT_TRUE(path1.generic_wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
 
@@ -428,7 +442,7 @@ void FileSystemTest1() {
     path1.replace_filename(u8"__filesystem_test1__.dat");
     EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-    jhc::filesystem::path path2 = jhc::filesystem::absolute(path1);
+    jhc::fs::path path2 = jhc::fs::absolute(path1);
     std::wcout << "absolute:" << path2.wstring() << std::endl;
     EXPECT_TRUE(path2.wstring().length() > 4);
 #endif
@@ -439,18 +453,18 @@ void FileSystemTest1() {
 void FileSystemTest2() {
 #ifdef JHC_WIN
     std::error_code ec;
-    jhc::filesystem::path path2(L"C:\\testuy763e\\abc\\__filesystem_test2_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(path2, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(path2, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(path2, ec) == true);
-    EXPECT_TRUE(jhc::filesystem::remove(path2, ec) == true);
+    jhc::fs::path path2(L"C:\\testuy763e\\abc\\__filesystem_test2_" + std::to_wstring(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(path2, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(path2, ec));
+    EXPECT_TRUE(jhc::fs::exists(path2, ec) == true);
+    EXPECT_TRUE(jhc::fs::remove(path2, ec) == true);
 #else
     std::error_code ec;
-    jhc::filesystem::path path2("./testuy763e/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(path2, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(path2, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(path2, ec) == true);
-    EXPECT_TRUE(jhc::filesystem::remove(path2, ec) == true);
+    jhc::fs::path path2("./testuy763e/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(path2, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(path2, ec));
+    EXPECT_TRUE(jhc::fs::exists(path2, ec) == true);
+    EXPECT_TRUE(jhc::fs::remove(path2, ec) == true);
 #endif
 }
 
@@ -459,14 +473,14 @@ void FileSystemTest2() {
 void FileSystemTest3() {
 #ifdef JHC_WIN
     std::error_code ec;
-    jhc::filesystem::path path3(L"C:\\testuy763e\\abc\\__filesystem_test3_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(path3, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == true);
+    jhc::fs::path path3(L"C:\\testuy763e\\abc\\__filesystem_test3_" + std::to_wstring(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(path3, ec));
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == true);
 
     const std::string strWritten = "hello world";
 
-    jhc::filesystem::path path4 = path3;
+    jhc::fs::path path4 = path3;
     path4.append("path4.txt");
 
     jhc::File file4(path4);
@@ -474,20 +488,20 @@ void FileSystemTest3() {
     EXPECT_TRUE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
     EXPECT_TRUE(file4.close());
 
-    EXPECT_TRUE(jhc::filesystem::remove(path3, ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::filesystem::remove_all(path3, ec) == 2);  // return remove item count
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::exists(path3.parent_path(), ec) == true);
+    EXPECT_TRUE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
+    EXPECT_TRUE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
+    EXPECT_TRUE(jhc::fs::exists(path3.parent_path(), ec) == true);
 #else
     std::error_code ec;
-    jhc::filesystem::path path3(L"./testuy763e/abc/__filesystem_test3_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(path3, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == true);
+    jhc::fs::path path3(L"./testuy763e/abc/__filesystem_test3_" + std::to_wstring(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(path3, ec));
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == true);
 
     const std::string strWritten = "hello world";
 
-    jhc::filesystem::path path4 = path3;
+    jhc::fs::path path4 = path3;
     path4.append("path4.txt");
 
     jhc::File file4(path4);
@@ -495,11 +509,11 @@ void FileSystemTest3() {
     EXPECT_TRUE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
     EXPECT_TRUE(file4.close());
 
-    EXPECT_TRUE(jhc::filesystem::remove(path3, ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::filesystem::remove_all(path3, ec) == 2);  // return remove item count
-    EXPECT_TRUE(jhc::filesystem::exists(path3, ec) == false);
+    EXPECT_TRUE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
+    EXPECT_TRUE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
+    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
 
-    EXPECT_TRUE(jhc::filesystem::exists(path3.parent_path(), ec) == true);
+    EXPECT_TRUE(jhc::fs::exists(path3.parent_path(), ec) == true);
 #endif
 }
 
@@ -508,15 +522,15 @@ void FileSystemTest3() {
 void FileSystemTest4() {
 #ifdef JHC_WIN
     std::error_code ec;
-    jhc::filesystem::path p1(L"C:\\test87w232\\abc\\__filesystem_test4_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(p1, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(p1, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(p1, ec) == true);
+    jhc::fs::path p1(L"C:\\test87w232\\abc\\__filesystem_test4_" + std::to_wstring(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(p1, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(p1, ec));
+    EXPECT_TRUE(jhc::fs::exists(p1, ec) == true);
 
     const std::string strWritten = "hello world";
 
     // create C:\test\abc\__filesystem_test4_xxx\p2.txt
-    jhc::filesystem::path p2 = p1;
+    jhc::fs::path p2 = p1;
     p2.append("p2.txt");
 
     jhc::File f2(p2);
@@ -525,7 +539,7 @@ void FileSystemTest4() {
     EXPECT_TRUE(f2.close());
 
     // create C:\test\abc\p3.txt
-    jhc::filesystem::path p3 = p1;
+    jhc::fs::path p3 = p1;
     p3.append("..\\p2.txt");
 
     jhc::File f3(p3);
@@ -534,7 +548,7 @@ void FileSystemTest4() {
     EXPECT_TRUE(f3.close());
 
     // create C:\test\p4.txt
-    jhc::filesystem::path p4 = p1;
+    jhc::fs::path p4 = p1;
     p4.append("..\\..\\p4.txt");
 
     jhc::File f4(p4);
@@ -542,20 +556,20 @@ void FileSystemTest4() {
     EXPECT_TRUE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
     EXPECT_TRUE(f4.close());
 
-    EXPECT_TRUE(jhc::filesystem::remove(L"C:\\test87w232", ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::filesystem::remove_all(L"C:\\test87w232", ec) == 6);  // return remove item count
-    EXPECT_TRUE(jhc::filesystem::exists(L"C:\\test87w232", ec) == false);
+    EXPECT_TRUE(jhc::fs::remove(L"C:\\test87w232", ec) == false);  // remove can only delete empty directory
+    EXPECT_TRUE(jhc::fs::remove_all(L"C:\\test87w232", ec) == 6);  // return remove item count
+    EXPECT_TRUE(jhc::fs::exists(L"C:\\test87w232", ec) == false);
 #else
     std::error_code ec;
-    jhc::filesystem::path p1("~/test87w232/abc/__filesystem_test4_" + std::to_string(time(nullptr)));
-    EXPECT_TRUE(jhc::filesystem::exists(p1, ec) == false);
-    EXPECT_TRUE(jhc::filesystem::create_directories(p1, ec));
-    EXPECT_TRUE(jhc::filesystem::exists(p1, ec) == true);
+    jhc::fs::path p1("~/test87w232/abc/__filesystem_test4_" + std::to_string(time(nullptr)));
+    EXPECT_TRUE(jhc::fs::exists(p1, ec) == false);
+    EXPECT_TRUE(jhc::fs::create_directories(p1, ec));
+    EXPECT_TRUE(jhc::fs::exists(p1, ec) == true);
 
     const std::string strWritten = "hello world";
 
     // create ~/test87w232/abc/__filesystem_test4_xxx/p2.txt
-    jhc::filesystem::path p2 = p1;
+    jhc::fs::path p2 = p1;
     p2.append("p2.txt");
 
     jhc::File f2(p2);
@@ -564,7 +578,7 @@ void FileSystemTest4() {
     EXPECT_TRUE(f2.close());
 
     // create ~/test87w232/abc/p3.txt
-    jhc::filesystem::path p3 = p1;
+    jhc::fs::path p3 = p1;
     p3.append("../p2.txt");
 
     jhc::File f3(p3);
@@ -573,7 +587,7 @@ void FileSystemTest4() {
     EXPECT_TRUE(f3.close());
 
     // create ~/test87w232/p4.txt
-    jhc::filesystem::path p4 = p1;
+    jhc::fs::path p4 = p1;
     p4.append("../../p4.txt");
 
     jhc::File f4(p4);
@@ -581,9 +595,9 @@ void FileSystemTest4() {
     EXPECT_TRUE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
     EXPECT_TRUE(f4.close());
 
-    EXPECT_TRUE(jhc::filesystem::remove("~/test87w232", ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::filesystem::remove_all("~/test87w232", ec) == 6);  // return remove item count
-    EXPECT_TRUE(jhc::filesystem::exists("~/test87w232", ec) == false);
+    EXPECT_TRUE(jhc::fs::remove("~/test87w232", ec) == false);  // remove can only delete empty directory
+    EXPECT_TRUE(jhc::fs::remove_all("~/test87w232", ec) == 6);  // return remove item count
+    EXPECT_TRUE(jhc::fs::exists("~/test87w232", ec) == false);
 #endif
 }
 
@@ -603,7 +617,7 @@ void ProcessTest() {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
         },
-        true);
+            true);
 
     EXPECT_TRUE(proc.successed());
 
@@ -629,7 +643,7 @@ void ProcessTest() {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
         },
-        true);
+            true);
 
     EXPECT_TRUE(proc.successed());
 
@@ -723,6 +737,37 @@ void VersionTest() {
     EXPECT_TRUE(v4 > v1);
 }
 
+// Test: Process singleton
+//
+void ProcessSingletonTest() {
+    jhc::SingletonProcess sp1;
+    jhc::SingletonProcess sp1_1 = sp1;
+    EXPECT_TRUE(sp1.uniqueName() == sp1_1.uniqueName());
+    EXPECT_TRUE(sp1());
+    EXPECT_TRUE(sp1_1());
+
+
+    jhc::SingletonProcess sp2("test_process");
+    jhc::SingletonProcess sp2_2 = sp2;
+    EXPECT_TRUE(sp2.uniqueName() == sp2_2.uniqueName());
+    EXPECT_TRUE(sp2());
+    EXPECT_TRUE(sp2_2());
+
+
+    jhc::SingletonProcess sp3;
+    std::string sp3_uniqueName = sp3.uniqueName();
+    jhc::SingletonProcess sp3_2 = std::move(sp3);
+    EXPECT_TRUE(sp3_uniqueName == sp3_2.uniqueName());
+    EXPECT_TRUE(sp3.uniqueName().empty());
+    EXPECT_TRUE(sp3());
+    EXPECT_TRUE(sp3_2());
+
+
+    jhc::SingletonProcess sp4(sp3_2.uniqueName());
+    EXPECT_TRUE(sp3_2());
+    EXPECT_TRUE(!sp4());
+}
+
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", jhc::TimeUtil::GetCurrentTimestampByMicroSec());
 
@@ -732,6 +777,7 @@ int main() {
     const std::string strCurExePath = jhc::ProcessUtil::GetCurrentProcessPath();
     printf("Current Path: %s\n", strCurExePath.c_str());
 
+    UUIDTest();
     FileTest1();
     HashTest1();
     HashTest2();
@@ -756,5 +802,7 @@ int main() {
     WinHttpPostRequestTest();
 #endif
     VersionTest();
+    ProcessSingletonTest();
+
     return 0;
 }

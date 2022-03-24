@@ -42,9 +42,9 @@ class PathUtil {
         wchar_t szBuf[MAX_PATH] = {0};
         const DWORD result = ::GetWindowsDirectoryW(szBuf, MAX_PATH);
         if (result == 0)
-            return filesystem::path::string_type();
+            return fs::path::string_type();
 
-        filesystem::path::string_type tempPath = szBuf;
+        fs::path::string_type tempPath = szBuf;
         if (!tempPath.empty())
             if (tempPath.back() != L'\\')
                 tempPath.push_back(L'\\');
