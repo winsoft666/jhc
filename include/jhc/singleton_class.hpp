@@ -32,7 +32,8 @@ class SingletonClass {
     SingletonClass() {}
     SingletonClass(const SingletonClass&) {}
     SingletonClass& operator=(const SingletonClass&) {}
-
+    SingletonClass(SingletonClass&&){}
+    SingletonClass& operator=(SingletonClass&&) {}
    private:
     static T* this_;
     static std::mutex m_;
@@ -45,7 +46,7 @@ template <class T>
 std::mutex SingletonClass<T>::m_;
 
 template <class T>
-T* SingletonClass<T>::Instance(void) {
+T* SingletonClass<T>::Instance() {
     // double-check
     if (this_ == nullptr) {
         std::lock_guard<std::mutex> lg(m_);
@@ -57,11 +58,12 @@ T* SingletonClass<T>::Instance(void) {
 }
 
 template <class T>
-void SingletonClass<T>::Release(void) {
+void SingletonClass<T>::Release() {
     if (this_) {
         delete this_;
+        this_ = nullptr;
     }
 }
 }  // namespace jhc
-#define SINGLETON_CLASS_DECLARE(class_name) friend class ::jhc::SingletonClass<##class_name>;
+#define JHC_SINGLETON_CLASS_DECLARE(class_name) friend class ::jhc::SingletonClass<##class_name>;
 #endif  // !JHC_SINGLETON_CLASS_HPP_

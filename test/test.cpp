@@ -740,32 +740,12 @@ void VersionTest() {
 // Test: Process singleton
 //
 void ProcessSingletonTest() {
-    jhc::SingletonProcess sp1;
-    jhc::SingletonProcess sp1_1 = sp1;
-    EXPECT_TRUE(sp1.uniqueName() == sp1_1.uniqueName());
-    EXPECT_TRUE(sp1());
-    EXPECT_TRUE(sp1_1());
-
-
-    jhc::SingletonProcess sp2("test_process");
-    jhc::SingletonProcess sp2_2 = sp2;
-    EXPECT_TRUE(sp2.uniqueName() == sp2_2.uniqueName());
-    EXPECT_TRUE(sp2());
-    EXPECT_TRUE(sp2_2());
-
-
-    jhc::SingletonProcess sp3;
-    std::string sp3_uniqueName = sp3.uniqueName();
-    jhc::SingletonProcess sp3_2 = std::move(sp3);
-    EXPECT_TRUE(sp3_uniqueName == sp3_2.uniqueName());
-    EXPECT_TRUE(sp3.uniqueName().empty());
-    EXPECT_TRUE(sp3());
-    EXPECT_TRUE(sp3_2());
-
-
-    jhc::SingletonProcess sp4(sp3_2.uniqueName());
-    EXPECT_TRUE(sp3_2());
-    EXPECT_TRUE(!sp4());
+    jhc::SingletonProcess::Instance()->markProcessStartup("test");
+    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+    jhc::SingletonProcess::Release();
+    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
 }
 
 int main() {

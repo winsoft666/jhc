@@ -30,72 +30,41 @@
 #include <sys/file.h>
 #include <fcntl.h>
 #endif
-#include "jhc/macros.hpp"
-#include "jhc/uuid.hpp"
+#include "jhc/string_helper.hpp"
+#include "jhc/singleton_class.hpp"
 
 namespace jhc {
-class SingletonProcess {
+class SingletonProcess : public SingletonClass<SingletonProcess> {
    public:
-    SingletonProcess() {
-        uniqueName_ = jhc::UUID::Create();
-        assert(!uniqueName_.empty());
-        check();
-    }
-
-    SingletonProcess(const std::string& uniqueName) :
-        uniqueName_(uniqueName) {
-        assert(!uniqueName_.empty());
-        check();
-    }
-
-    SingletonProcess(std::string&& uniqueName) :
-        uniqueName_(std::move(uniqueName)) {
-        assert(!uniqueName_.empty());
-        check();
-    }
-
-    SingletonProcess(const SingletonProcess& that) {
-        uniqueName_ = that.uniqueName_;
-        isPrimary_ = that.isPrimary_;
-    }
-
-    SingletonProcess(SingletonProcess&& that) noexcept {
-        uniqueName_ = std::move(that.uniqueName_);
-        isPrimary_ = that.isPrimary_;
-    }
-
-    ~SingletonProcess() = default;
-
-    SingletonProcess& operator=(const SingletonProcess& that) {
-        uniqueName_ = that.uniqueName_;
-        isPrimary_ = that.isPrimary_;
-        return *this;
-    }
-
-    SingletonProcess& operator=(SingletonProcess&& that) {
-        uniqueName_ = std::move(that.uniqueName_);
-        isPrimary_ = that.isPrimary_;
-        return *this;
+    void markProcessStartup(const std::string& uniqueName) {
+        if (uniqueName_.empty() && !uniqueName.empty()) {
+            uniqueName_ = uniqueName;
+            check();
+        }
     }
 
     const std::string& uniqueName() const {
         return uniqueName_;
     }
 
-    bool operator()() const {
+    bool isPrimary() const {
+        assert(!uniqueName_.empty());
         return isPrimary_;
     }
 
    protected:
     void check() {
 #ifdef JHC_WIN
-        HANDLE mutex = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
+        if(StringHelper::IsStartsWith(uniqueName_, "Global\\"))
+            mutex_ = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
+        else
+            mutex_ = CreateEventA(NULL, TRUE, FALSE, ("Global\\" + uniqueName_).c_str());
+
         const DWORD gle = GetLastError();
         isPrimary_ = true;
 
-        if (mutex) {
+        if (mutex_) {
             if (gle == ERROR_ALREADY_EXISTS) {
-                CloseHandle(mutex);
                 isPrimary_ = false;
             }
         }
@@ -103,10 +72,9 @@ class SingletonProcess {
             if (gle == ERROR_ACCESS_DENIED)
                 isPrimary_ = false;
         }
-        // NOT CloseHandle
 #else
-        int pid_file = open(("/tmp/" + uniqueName_ + ".pid").c_str(), O_CREAT | O_RDWR, 0666);
-        int rc = flock(pid_file, LOCK_EX | LOCK_NB);
+        pidFile_ = open(("/tmp/" + uniqueName_ + ".pid").c_str(), O_CREAT | O_RDWR, 0666);
+        int rc = flock(pidFile_, LOCK_EX | LOCK_NB);
         if (rc) {
             if (EWOULDBLOCK == errno)
                 isPrimary_ = false;
@@ -116,8 +84,28 @@ class SingletonProcess {
     }
 
    private:
+    ~SingletonProcess() {
+#ifdef JHC_WIN
+        if(mutex_) {
+            CloseHandle(mutex_);
+            mutex_ = NULL;
+        }
+#else
+        if(pidFile_ != -1) {
+            close(pidFile_);
+            pidFile_ = -1;
+        }
+#endif
+    }
+
     std::string uniqueName_;
     bool isPrimary_ = true;
+#ifdef JHC_WIN
+    HANDLE mutex_ = NULL;
+#else
+    int pidFile_ = -1;
+#endif
+    JHC_SINGLETON_CLASS_DECLARE(SingletonProcess);
 };
 }  // namespace jhc
 #endif  // !JHC_SINGLETON_PROCESS_HPP__
