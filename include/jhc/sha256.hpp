@@ -243,8 +243,7 @@ class SHA256 {
         return result;
     }
 
-    static std::string
-    GetDataSHA256(const unsigned char* data, size_t dataSize) {
+    static std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
         SHA256 sha256;
         sha256.init();
 

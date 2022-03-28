@@ -40,6 +40,7 @@
 #include "jhc/crc32.hpp"
 #include "jhc/sha1.hpp"
 #include "jhc/sha256.hpp"
+#include "jhc/sha512.hpp"
 #include "jhc/memory_pool.hpp"
 #include "jhc/os_ver.hpp"
 #include "jhc/path_util.hpp"

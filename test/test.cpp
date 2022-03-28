@@ -94,6 +94,7 @@ void HashTest1() {
     EXPECT_TRUE(jhc::MD5::GetDataMD5((const unsigned char*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
     EXPECT_TRUE(jhc::SHA1::GetDataSHA1((const unsigned char*)str.c_str(), str.length()) == "8233f28c479ff758b3b4ba9ad66069db68811e59");
     EXPECT_TRUE(jhc::SHA256::GetDataSHA256((const unsigned char*)str.c_str(), str.length()) == "a5f4396b45548597f81681147f53c66065d5137f2fbd85e6758a8983107228e4");
+    EXPECT_TRUE(jhc::SHA512::GetDataSHA512((const unsigned char*)str.c_str(), str.length()) == "dfa6b727753e96a9dffb10947f99b8457ef51a634ea8baa0db0f22712f0bb19ac6719d4446109dc19dfc9629a3b225c0aeeebd61175464a95e35c437cd979a64");
 }
 
 // Test: file hash.
@@ -109,11 +110,13 @@ void HashTest2() {
     EXPECT_TRUE(jhc::MD5::GetFileMD5(file1.path().wstring()) == "c9a34cfc85d982698c6ac89f76071abd");
     EXPECT_TRUE(jhc::SHA1::GetFileSHA1(file1.path().wstring()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
     EXPECT_TRUE(jhc::SHA256::GetFileSHA256(file1.path().wstring()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    EXPECT_TRUE(jhc::SHA512::GetFileSHA512(file1.path().wstring()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #else
     EXPECT_TRUE(jhc::CRC32::GetFileCRC32(file1.path().string()) == "7c5597b9");
     EXPECT_TRUE(jhc::MD5::GetFileMD5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
     EXPECT_TRUE(jhc::SHA1::GetFileSHA1(file1.path().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
     EXPECT_TRUE(jhc::SHA256::GetFileSHA256(file1.path().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    EXPECT_TRUE(jhc::SHA512::GetFileSHA512(file1.path().string()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #endif
 }
 
@@ -273,8 +276,8 @@ void CreateJsonMethod1Test() {
     j["name"] = "Niels";
     j["nothing"] = nullptr;
     j["answer"]["everything"] = 42;
-    j["list"] = { 1, 0, 2 };
-    j["object"] = { {"currency", "USD"}, {"value", 42.99} };
+    j["list"] = {1, 0, 2};
+    j["object"] = {{"currency", "USD"}, {"value", 42.99}};
 
     EXPECT_TRUE(j.dump() == expectJSON);
 }
@@ -291,7 +294,7 @@ void CreateJsonMethod2Test() {
         {"nothing", nullptr},
         {"answer", {{"everything", 42}}},
         {"list", {1, 0, 2}},
-        {"object", {{"currency", "USD"}, {"value", 42.99}}} };
+        {"object", {{"currency", "USD"}, {"value", 42.99}}}};
 
     EXPECT_TRUE(j2.dump() == expectJSON);
 }
@@ -338,8 +341,8 @@ void ParseJsonMethod1Test() {
     j["name"] = "Niels";
     j["nothing"] = nullptr;
     j["answer"]["everything"] = 42;
-    j["list"] = { 1, 0, 2 };
-    j["object"] = { {"currency", "USD"}, {"value", 42.99} };
+    j["list"] = {1, 0, 2};
+    j["object"] = {{"currency", "USD"}, {"value", 42.99}};
 
     const std::string strJson = j.dump();
 
@@ -617,7 +620,7 @@ void ProcessTest() {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
         },
-            true);
+        true);
 
     EXPECT_TRUE(proc.successed());
 
@@ -643,7 +646,7 @@ void ProcessTest() {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
         },
-            true);
+        true);
 
     EXPECT_TRUE(proc.successed());
 
