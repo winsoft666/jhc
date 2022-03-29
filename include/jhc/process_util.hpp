@@ -27,9 +27,9 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
+#endif  // !WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#endif // !_INC_WINDOWS
+#endif  // !_INC_WINDOWS
 #include <tchar.h>
 #include <strsafe.h>
 #include <Shlwapi.h>
@@ -37,6 +37,7 @@
 #elif defined(_GNU_SOURCE)
 #include <errno.h>
 #endif
+#include "jhc/string_encode.hpp"
 
 #pragma warning(disable : 4996)
 
@@ -141,7 +142,9 @@ class ProcessUtil {
 
 #endif
 
-    static std::string GetCurrentProcessPath() {
+    // On windows, path is encoded by ANSI, otherwise, is UTF8.
+    //
+    static std::string GetCurrentExePath() {
         std::string ret;
 #ifdef JHC_WIN
         char* pBuf = NULL;
@@ -173,6 +176,22 @@ class ProcessUtil {
         return program_invocation_name;
 #endif
         return ret;
+    }
+
+    // On windows, directory is encoded by ANSI, otherwise, is UTF8.
+    //
+    static std::string GetCurrentExeDirectory() {
+        const std::string path = GetCurrentExePath();
+#ifdef JHC_WIN
+        const std::wstring pathW = StringEncode::AnsiToUnicode(path);
+        fs::path p(pathW);
+        p.remove_filename();
+        return StringEncode::UnicodeToAnsi(p.wstring());
+#else
+        fs::path p(path);
+        p.remove_filename();
+        return p.u8string();
+#endif
     }
 };
 }  // namespace jhc

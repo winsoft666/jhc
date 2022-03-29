@@ -781,8 +781,11 @@ int main() {
     const std::string strOSVer = jhc::OSVersion::GetOSVersion();
     printf("Current OS Version: %s\n", strOSVer.c_str());
 
-    const std::string strCurExePath = jhc::ProcessUtil::GetCurrentProcessPath();
+    const std::string strCurExePath = jhc::ProcessUtil::GetCurrentExePath();
     printf("Current Path: %s\n", strCurExePath.c_str());
+
+    const std::string strCurExeDir = jhc::ProcessUtil::GetCurrentExeDirectory();
+    printf("Current Directory: %s\n", strCurExeDir.c_str());
 
     UUIDTest();
     FileTest1();
