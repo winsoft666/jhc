@@ -38,6 +38,7 @@
 #include <errno.h>
 #endif
 #include "jhc/string_encode.hpp"
+#include "jhc/filesystem.hpp"
 
 #pragma warning(disable : 4996)
 
