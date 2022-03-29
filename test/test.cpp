@@ -65,9 +65,10 @@ void FileTest1() {
     EXPECT_TRUE(file1.isOpen() == false);
     EXPECT_TRUE(file1.exist() == false);
     EXPECT_TRUE(file1.open(openMode1));
+
     // write 4GB file
     for (size_t i = 0; i < 4 * 1024 * 1024; i++) {
-        file1.writeFrom((void*)str1K.c_str(), str1K.size());
+        file1.writeFrom(str1K.c_str(), str1K.size());
     }
 
     EXPECT_TRUE(file1.flush());
@@ -84,6 +85,29 @@ void FileTest1() {
     EXPECT_TRUE(file1.fileSize() == bytes4gb);
     EXPECT_TRUE(file1.close());
     EXPECT_TRUE(jhc::fs::remove(file1.path()));
+}
+
+// Test: read all of file content
+void FileTest2() {
+    constexpr int64_t bytes4mb = 4LL * 1024LL * 1024LL;
+    const std::string str1K(1024, 'a');
+    jhc::fs::path path2(u8"__file_test_文件测试2__.dat");
+    if (jhc::fs::exists(path2))
+        EXPECT_TRUE(jhc::fs::remove(path2));
+
+    jhc::File file2(path2);
+    EXPECT_TRUE(file2.open("ab+"));
+
+    // write 4MB file
+    for (size_t i = 0; i < 4 * 1024; i++) {
+        file2.writeFrom(str1K.c_str(), str1K.size());
+    }
+
+    EXPECT_TRUE(file2.flush());
+    EXPECT_TRUE(file2.fileSize() == bytes4mb);
+    std::string strAll;
+    EXPECT_TRUE(file2.readAll(strAll));
+    EXPECT_TRUE(strAll.size() == bytes4mb);
 }
 
 // Test: string hash.
@@ -762,6 +786,7 @@ int main() {
 
     UUIDTest();
     FileTest1();
+    FileTest2();
     HashTest1();
     HashTest2();
     Base64Test();

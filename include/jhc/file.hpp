@@ -272,7 +272,7 @@ class File {
     // Must be call open(...) first!
     // This function will change file pointer position.
     // Caller need allocate/free buffer.
-    size_t writeFrom(void* buffer, size_t needWrite, int64_t from = -1) {
+    size_t writeFrom(const void* buffer, size_t needWrite, int64_t from = -1) {
         std::lock_guard<std::recursive_mutex> lg(mutex_);
         if (!f_ || !buffer || needWrite == 0)
             return 0;
@@ -360,6 +360,21 @@ class File {
             free(buffer);
         }
         return ret;
+    }
+
+    // Must be call open(...) first!
+    // This function will NOT change file pointer position.
+    bool readAll(std::string& ret) {
+        void* buffer = nullptr;
+        const size_t read = readAll(&buffer);
+
+        if (buffer) {
+            ret.assign((const char* const)buffer, read);
+            free(buffer);
+            return true;
+        }
+
+        return false;
     }
 
    protected:
