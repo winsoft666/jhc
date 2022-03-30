@@ -36,7 +36,7 @@
 namespace jhc {
 class SingletonProcess : public SingletonClass<SingletonProcess> {
    public:
-    void markProcessStartup(const std::string& uniqueName) {
+    void markAndCheckStartup(const std::string& uniqueName) {
         if (uniqueName_.empty() && !uniqueName.empty()) {
             uniqueName_ = uniqueName;
             check();

@@ -767,7 +767,7 @@ void VersionTest() {
 // Test: Process singleton
 //
 void ProcessSingletonTest() {
-    jhc::SingletonProcess::Instance()->markProcessStartup("test");
+    jhc::SingletonProcess::Instance()->markAndCheckStartup("test");
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
     jhc::SingletonProcess::Release();
