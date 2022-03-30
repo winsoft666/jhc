@@ -775,6 +775,16 @@ void ProcessSingletonTest() {
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
 }
 
+// Test: Windows virtual key convert.
+void WinVirtualKeyTest() {
+    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_SHIFT") == 0x10);
+    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_EXECUTE") == 0x2B);
+    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_RETURN") == 0x0D);
+
+    EXPECT_TRUE(jhc::WinVirtualKey::ToString(0x0D) == "VK_RETURN");
+    EXPECT_TRUE(jhc::WinVirtualKey::ToString(0x2B) == "VK_EXECUTE");
+}
+
 int main() {
     printf("Current timestamp(by microseconds): %" PRId64 "\n", jhc::TimeUtil::GetCurrentTimestampByMicroSec());
 
@@ -811,6 +821,7 @@ int main() {
 #ifdef JHC_WIN
     WinHttpGetRequestTest();
     WinHttpPostRequestTest();
+    WinVirtualKeyTest();
 #endif
     VersionTest();
     ProcessSingletonTest();

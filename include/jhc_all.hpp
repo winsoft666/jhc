@@ -71,6 +71,7 @@
 #include "jhc/win_schedule_task.hpp"
 #include "jhc/win_service_base.hpp"
 #include "jhc/win_env_variable.hpp"
+#include "jhc/win_virtual_key.hpp"
 #include "jhc/xorstr.hpp"
 
 #endif
