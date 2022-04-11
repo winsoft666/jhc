@@ -162,7 +162,7 @@ class RegKey {
         return hr;
     }
 
-    bool deleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) {
+    static bool DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) {
         HKEY hSubKey = NULL;
 
         if (pszSubKey) {
@@ -467,7 +467,7 @@ class RegKey {
         return 0;
     }
 
-    bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) {
+    static bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) {
         REGSAM rsam = (bPrefer64View && OSVersion::IsWin64()) ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
         HMODULE hAdvAPI32 = LoadLibrary(TEXT("AdvAPI32.dll"));
 
@@ -496,7 +496,7 @@ class RegKey {
         return (ls == ERROR_SUCCESS);
     }
 
-    bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View) {
+    static bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View) {
         DWORD dwSubKeyCnt, dwMaxSubKey;
         const int iMaxKeySize = 256;
 
@@ -543,7 +543,7 @@ class RegKey {
         return false;
     }
 
-    BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) {
+    static BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) {
         LPTSTR lpEnd = NULL;
         LONG lResult;
         DWORD dwSize = 0;
