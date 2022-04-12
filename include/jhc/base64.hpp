@@ -61,7 +61,7 @@ class Base64 {
         // the correct character set is chosen by subscripting
         // base64_chars with url.
         //
-        const char* base64_chars_ = base64_chars[url];
+        const char* base64_chars = base64Chars(url ? 1 : 0);
 
         std::string ret;
         ret.reserve(len_encoded);
@@ -69,22 +69,22 @@ class Base64 {
         unsigned int pos = 0;
 
         while (pos < in_len) {
-            ret.push_back(base64_chars_[(bytes_to_encode[pos + 0] & 0xfc) >> 2]);
+            ret.push_back(base64_chars[(bytes_to_encode[pos + 0] & 0xfc) >> 2]);
 
             if (pos + 1 < in_len) {
-                ret.push_back(base64_chars_[((bytes_to_encode[pos + 0] & 0x03) << 4) + ((bytes_to_encode[pos + 1] & 0xf0) >> 4)]);
+                ret.push_back(base64_chars[((bytes_to_encode[pos + 0] & 0x03) << 4) + ((bytes_to_encode[pos + 1] & 0xf0) >> 4)]);
 
                 if (pos + 2 < in_len) {
-                    ret.push_back(base64_chars_[((bytes_to_encode[pos + 1] & 0x0f) << 2) + ((bytes_to_encode[pos + 2] & 0xc0) >> 6)]);
-                    ret.push_back(base64_chars_[bytes_to_encode[pos + 2] & 0x3f]);
+                    ret.push_back(base64_chars[((bytes_to_encode[pos + 1] & 0x0f) << 2) + ((bytes_to_encode[pos + 2] & 0xc0) >> 6)]);
+                    ret.push_back(base64_chars[bytes_to_encode[pos + 2] & 0x3f]);
                 }
                 else {
-                    ret.push_back(base64_chars_[(bytes_to_encode[pos + 1] & 0x0f) << 2]);
+                    ret.push_back(base64_chars[(bytes_to_encode[pos + 1] & 0x0f) << 2]);
                     ret.push_back(trailing_char);
                 }
             }
             else {
-                ret.push_back(base64_chars_[(bytes_to_encode[pos + 0] & 0x03) << 4]);
+                ret.push_back(base64_chars[(bytes_to_encode[pos + 0] & 0x03) << 4]);
                 ret.push_back(trailing_char);
                 ret.push_back(trailing_char);
             }
@@ -114,12 +114,23 @@ class Base64 {
 #endif  // __cplusplus >= 201703L
 
    private:
-    //
-    // Depending on the url parameter in base64_chars, one of
-    // two sets of base64 characters needs to be chosen.
-    // They differ in their last two characters.
-    //
-    static const char* base64_chars[2];
+    static const char* base64Chars(int index) {
+        //
+        // Depending on the url parameter in base64_chars, one of
+        // two sets of base64 characters needs to be chosen.
+        // They differ in their last two characters.
+        //
+        static const char* base64_chars[2] = {
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789"
+            "+/",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789"
+            "-_"};
+        return base64_chars[index];
+    }
 
     static unsigned int getPosOfChar(const unsigned char chr) {
         //
@@ -259,16 +270,5 @@ class Base64 {
         return ret;
     }
 };
-
-const char* Base64::base64_chars[2] = {
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789"
-    "+/",
-
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789"
-    "-_"};
 }  // namespace jhc
 #endif  // !JHC_BASE64_HPP__

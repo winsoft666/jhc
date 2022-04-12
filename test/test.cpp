@@ -770,7 +770,9 @@ void ProcessSingletonTest() {
     jhc::SingletonProcess::Instance()->markAndCheckStartup("test");
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+
     jhc::SingletonProcess::Release();
+    jhc::SingletonProcess::Instance()->markAndCheckStartup("test");
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
     EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
 }

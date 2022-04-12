@@ -61,7 +61,6 @@
 #include "jhc/uuid.hpp"
 #include "jhc/version.hpp"
 #include "jhc/win_criticalsection.hpp"
-#include "jhc/win_directory_monitor.hpp"
 #include "jhc/win_driver_info.hpp"
 #include "jhc/win_env_variable.hpp"
 #include "jhc/win_exception_catch.hpp"
