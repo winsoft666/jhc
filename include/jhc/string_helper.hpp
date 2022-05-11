@@ -115,7 +115,25 @@ class StringHelper {
                std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
     }
 
-    static std::string Trim(const std::string& s, const std::string &whitespaces = " \t\f\v\n\r") {
+    static bool IsLetterOrDigit(const char& c) {
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    static bool IsLetterOrDigit(const wchar_t& c) {
+        return (c >= L'0' && c <= L'9') || (c >= L'a' && c <= L'z') || (c >= L'A' && c <= L'Z');
+    }
+
+    static bool IsLetterOrDigit(const std::string& s) {
+        return !s.empty() &&
+               std::find_if(s.begin(), s.end(), [](char c) { return !IsLetterOrDigit(c); }) == s.end();
+    }
+
+    static bool IsLetterOrDigit(const std::wstring& s) {
+        return !s.empty() &&
+               std::find_if(s.begin(), s.end(), [](wchar_t c) { return !IsLetterOrDigit(c); }) == s.end();
+    }
+
+    static std::string Trim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r") {
         const std::string::size_type pos = s.find_first_not_of(whitespaces);
         if (pos == std::string::npos) {
             return std::string();
