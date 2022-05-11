@@ -114,6 +114,26 @@ class PathUtil {
 
         return tempPath;
     }
+
+    static bool OpenWinExplorerAndLocate(const std::wstring& path) {
+        bool result = false;
+        ITEMIDLIST* pidl = ILCreateFromPathW(path.c_str());
+        if (pidl) {
+            result = (S_OK == SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
+            ILFree(pidl);
+        }
+        return result;
+    }
+
+    static std::wstring GetWinExplorerDisplayName(const std::wstring& path) {
+        SHFILEINFOW sfi;
+        ZeroMemory(&sfi, sizeof(SHFILEINFOW));
+        DWORD_PTR dwRet = ::SHGetFileInfoW(path.c_str(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFOW), SHGFI_DISPLAYNAME);
+        if (dwRet != 0) {
+            return std::wstring(sfi.szDisplayName);
+        }
+        return std::wstring();
+    }
 #endif
 };
 
