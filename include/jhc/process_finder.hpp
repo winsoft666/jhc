@@ -28,7 +28,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #include <TlHelp32.h>
 #endif
 
@@ -40,8 +40,8 @@ namespace jhc {
 #ifdef JHC_WIN
 class WinProcessFinder {
    public:
-    JHC_DISALLOW_COPY_AND_ASSIGN(WinProcessFinder);
-    JHC_DISALLOW_MOVE_AND_ASSIGN(WinProcessFinder);
+    JHC_DISALLOW_COPY_MOVE(WinProcessFinder);
+
     // dwFlags can be one or more of the following values.
     // TH32CS_SNAPHEAPLIST
     // TH32CS_SNAPPROCESS

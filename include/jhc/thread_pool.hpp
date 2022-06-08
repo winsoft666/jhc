@@ -104,7 +104,7 @@ class ThreadPool {
     std::condition_variable condition;
     bool stop;
 
-    JHC_DISALLOW_COPY_AND_ASSIGN(ThreadPool);
+    JHC_DISALLOW_COPY_MOVE(ThreadPool);
 };
 }  // namespace jhc
 

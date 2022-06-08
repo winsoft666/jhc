@@ -38,8 +38,7 @@
 namespace jhc {
 class RegKey {
    public:
-    JHC_DISALLOW_COPY_AND_ASSIGN(RegKey);
-    JHC_DISALLOW_MOVE_AND_ASSIGN(RegKey);
+    JHC_DISALLOW_COPY_MOVE(RegKey);
 
     // hkeyRoot can be one of :
     // HKEY_CLASSES_ROOT

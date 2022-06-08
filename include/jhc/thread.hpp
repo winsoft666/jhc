@@ -49,8 +49,7 @@
 namespace jhc {
 class Thread {
    public:
-    JHC_DISALLOW_COPY_AND_ASSIGN(Thread);
-    JHC_DISALLOW_MOVE_AND_ASSIGN(Thread);
+    JHC_DISALLOW_COPY_MOVE(Thread);
 
     Thread() :
         thread_id_(0), exit_(false) { running_.store(false); }

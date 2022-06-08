@@ -27,7 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #else
 #endif  // JHC_WIN
 #include "jhc/macros.hpp"
@@ -65,7 +65,7 @@ class ScopedHandle {
     const HANDLE kInvalidHandle_;
     HANDLE handle_;
 
-    JHC_DISALLOW_COPY_AND_ASSIGN(ScopedHandle);
+    JHC_DISALLOW_COPY_MOVE(ScopedHandle);
 };
 
 #else

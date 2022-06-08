@@ -28,8 +28,8 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
+#endif // !_INC_WINDOWS
 #include <strsafe.h>
-#endif
 #elif defined(JHC_MACOS)
 #include <sys/sysctl.h>
 #elif defined(JHC_LINUX)

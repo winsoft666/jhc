@@ -44,8 +44,7 @@
 namespace jhc {
 class File {
    public:
-    JHC_DISALLOW_COPY_AND_ASSIGN(File);
-    JHC_DISALLOW_MOVE_AND_ASSIGN(File);
+    JHC_DISALLOW_COPY_MOVE(File);
 
     File(const fs::path& path) :
         path_(path) {

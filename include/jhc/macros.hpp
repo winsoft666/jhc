@@ -87,16 +87,22 @@
     } while (false)
 #endif
 
-#ifndef JHC_DISALLOW_MOVE_AND_ASSIGN
-#define JHC_DISALLOW_MOVE_AND_ASSIGN(TypeName) \
-    TypeName(const TypeName&&) = delete;       \
+#ifndef JHC_DISALLOW_MOVE
+#define JHC_DISALLOW_MOVE(TypeName)      \
+    TypeName(const TypeName&&) = delete; \
     TypeName& operator=(const TypeName&&) = delete
 #endif
 
-#ifndef JHC_DISALLOW_COPY_AND_ASSIGN
-#define JHC_DISALLOW_COPY_AND_ASSIGN(TypeName) \
-    TypeName(const TypeName&) = delete;        \
+#ifndef JHC_DISALLOW_COPY
+#define JHC_DISALLOW_COPY(TypeName)     \
+    TypeName(const TypeName&) = delete; \
     TypeName& operator=(const TypeName&) = delete
+#endif
+
+#ifndef JHC_DISALLOW_COPY_MOVE
+#define JHC_DISALLOW_COPY_MOVE(TypeName) \
+    JHC_DISALLOW_MOVE(TypeName);         \
+    JHC_DISALLOW_COPY(TypeName)
 #endif
 
 #endif  // ! JHC_MACROS_HPP__

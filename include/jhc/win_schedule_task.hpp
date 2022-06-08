@@ -42,8 +42,7 @@
 namespace jhc {
 class ScheduleTask {
    public:
-    JHC_DISALLOW_COPY_AND_ASSIGN(ScheduleTask);
-    JHC_DISALLOW_MOVE_AND_ASSIGN(ScheduleTask);
+    JHC_DISALLOW_COPY_MOVE(ScheduleTask);
 
     ScheduleTask() {
         m_lpITS = NULL;

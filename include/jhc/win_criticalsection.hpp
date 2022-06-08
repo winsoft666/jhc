@@ -36,6 +36,8 @@
 namespace jhc {
 class WinCriticalSection {
    public:
+    JHC_DISALLOW_COPY_MOVE(WinCriticalSection);
+
     WinCriticalSection() { InitializeCriticalSection(&crit_); }
     ~WinCriticalSection() { DeleteCriticalSection(&crit_); }
     void enter() const { EnterCriticalSection(&crit_); }
@@ -43,19 +45,19 @@ class WinCriticalSection {
     bool tryEnter() const { return TryEnterCriticalSection(&crit_) != FALSE; }
 
    private:
-    JHC_DISALLOW_COPY_AND_ASSIGN(WinCriticalSection);
     mutable CRITICAL_SECTION crit_;
 };
 
 class ScopedWinCriticalSection {
    public:
+    JHC_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
+
     explicit ScopedWinCriticalSection(const WinCriticalSection* pCS) :
         crit_(pCS) { crit_->enter(); }
     ~ScopedWinCriticalSection() { crit_->leave(); }
 
    private:
     const WinCriticalSection* const crit_;
-    JHC_DISALLOW_COPY_AND_ASSIGN(ScopedWinCriticalSection);
 };
 }  // namespace jhc
 #endif  // !JHC_WIN

@@ -29,8 +29,8 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
-#endif
+#endif // !_INC_WINDOWS
+#endif // JHC_WIN
 
 #pragma warning(disable : 4309)
 

@@ -228,7 +228,7 @@ class Process {
     void async_read() noexcept;
     void close_fds() noexcept;
 
-    JHC_DISALLOW_COPY_AND_ASSIGN(Process);
+    JHC_DISALLOW_COPY_MOVE(Process);
 };
 
 #ifdef JHC_WIN

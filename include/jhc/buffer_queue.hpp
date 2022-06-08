@@ -502,7 +502,7 @@ class BufferQueue {
     std::string queue_name_;
     std::recursive_mutex queue_mutex_;
 
-    JHC_DISALLOW_COPY_AND_ASSIGN(BufferQueue);
+    JHC_DISALLOW_COPY_MOVE(BufferQueue);
 };
 }  // namespace jhc
 #endif  //! JHC_BUFFER_QUEUE_HPP__

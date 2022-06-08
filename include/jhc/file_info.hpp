@@ -27,7 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-#endif
+#endif // !_INC_WINDOWS
 #include <stdio.h>
 #include <tchar.h>
 #include <strsafe.h>
