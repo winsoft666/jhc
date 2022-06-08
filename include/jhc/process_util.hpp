@@ -22,6 +22,7 @@
 
 #include "jhc/arch.hpp"
 #include <string>
+#include <list>
 
 #ifdef JHC_WIN
 #ifndef _INC_WINDOWS
@@ -194,6 +195,42 @@ class ProcessUtil {
         return p.u8string();
 #endif
     }
+
+#ifdef JHC_WIN
+    static BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
+        std::list<std::string>* pList = (std::list<std::string>*)lParam;
+
+        HRSRC hResInfo = FindResource(hModule, lpName, lpType);
+        DWORD cbResource = SizeofResource(hModule, hResInfo);
+
+        HGLOBAL hResData = LoadResource(hModule, hResInfo);
+        if (hResData) {
+            const BYTE* pResource = (const BYTE*)LockResource(hResData);
+
+            if (pResource) {
+                std::string strU8;
+                strU8.assign((const char*)pResource, cbResource);
+                pList->push_back(strU8);
+            }
+
+            UnlockResource(hResData);
+            FreeResource(hResData);
+        }
+
+        return TRUE;  // Keep going
+    }
+
+    static bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests) {
+        HMODULE hModule = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
+        if (!hModule)
+            return false;
+
+        EnumResourceNamesW(hModule, RT_MANIFEST, EnumResourceNameCallback, (LONG_PTR)&manifests);
+        FreeLibrary(hModule);
+
+        return true;
+    }
+#endif
 };
 }  // namespace jhc
 

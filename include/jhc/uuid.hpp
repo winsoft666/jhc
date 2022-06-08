@@ -58,7 +58,8 @@ class UUID {
     static std::string Create() {
 #ifdef JHC_WIN
         GUID guid;
-        CoCreateGuid(&guid);
+        if (S_OK != CoCreateGuid(&guid))
+            return std::string();
 
         return StringHelper::StringPrintf(
             "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
