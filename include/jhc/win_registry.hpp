@@ -25,7 +25,10 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // !WIN32_LEAN_AND_MEAN
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
 #include <Windows.h>
 #endif
 #include <vector>

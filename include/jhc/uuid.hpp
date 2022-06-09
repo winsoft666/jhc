@@ -22,6 +22,9 @@
 #include "jhc/arch.hpp"
 #include <string>
 #ifdef JHC_WIN
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
 #include <combaseapi.h>
 #else
 #include <cstdint>

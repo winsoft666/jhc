@@ -33,7 +33,15 @@
 #include <TlHelp32.h>
 #include <strsafe.h>
 #include <tchar.h>
-#include <windows.h>
+#ifndef _INC_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif  // !WIN32_LEAN_AND_MEAN
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
+#include <Windows.h>
+#endif  // !_INC_WINDOWS
 #include <cstring>
 #include <stdexcept>
 #include <Psapi.h>
@@ -62,6 +70,7 @@
 #endif
 #include "jhc/macros.hpp"
 #include "jhc/scoped_object.hpp"
+#include "jhc/singleton_class.hpp"
 
 namespace jhc {
 /// Platform independent class for creating processes.
@@ -72,6 +81,7 @@ namespace jhc {
 //
 class Process {
    public:
+    JHC_DISALLOW_COPY_MOVE(Process);
     /// Additional parameters to Process constructors.
     struct Config {
         /// Buffer size for reading stdout and stderr. Default is 131072 (128 kB).
@@ -192,7 +202,17 @@ class Process {
     /// force=true is only supported on Unix-like systems.
     static bool Kill(id_type id, bool force = false) noexcept;
 
+    static std::string GetProcessPath(id_type id) noexcept;
+
    private:
+#ifdef JHC_WIN
+    class ProcessMutex : public SingletonClass<ProcessMutex> {
+       public:
+        // Based on the discussion thread:
+        // https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
+        std::mutex create_process_mutex;
+    };
+#endif
     Data data_;
     bool closed_;
     std::mutex close_mutex_;
@@ -203,9 +223,6 @@ class Process {
 #else
     std::thread stdout_thread_;
     std::thread stderr_thread_;
-    // Based on the discussion thread:
-    // https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
-    static std::mutex create_process_mutex;
 #endif
     bool open_stdin_;
     std::mutex stdin_mutex_;
@@ -227,13 +244,7 @@ class Process {
 #endif
     void async_read() noexcept;
     void close_fds() noexcept;
-
-    JHC_DISALLOW_COPY_MOVE(Process);
 };
-
-#ifdef JHC_WIN
-std::mutex Process::create_process_mutex;
-#endif
 
 /////////////////////////////////////////////////////////////////
 /// Implement
@@ -343,7 +354,7 @@ inline Process::id_type Process::open(const string_type& command,
     security_attributes.bInheritHandle = TRUE;
     security_attributes.lpSecurityDescriptor = nullptr;
 
-    std::lock_guard<std::mutex> lock(Process::create_process_mutex);
+    std::lock_guard<std::mutex> lock(ProcessMutex::Instance()->create_process_mutex);
     if (stdin_fd_) {
         if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0) ||
             !SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0))
@@ -624,6 +635,30 @@ inline bool Process::Kill(id_type id, bool /*force*/) noexcept {
     if (!process_handle)
         return false;
     return !!TerminateProcess(process_handle, 2);
+}
+
+inline std::string Process::GetProcessPath(id_type id) noexcept {
+    std::string strPath;
+    char Filename[MAX_PATH] = {0};
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    if (hProcess == NULL)
+        return strPath;
+    HMODULE hModule = NULL;
+    DWORD cbNeeded;
+    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+        if (GetModuleFileNameExA(hProcess, hModule, Filename, MAX_PATH)) {
+            strPath = Filename;
+        }
+    }
+    else {
+        DWORD size = MAX_PATH;
+        if (QueryFullProcessImageNameA(hProcess, 0, Filename, &size)) {
+            strPath = Filename;
+        }
+    }
+    CloseHandle(hProcess);
+
+    return strPath;
 }
 #else
 inline Process::Data::Data() noexcept :
@@ -1007,6 +1042,21 @@ inline bool Process::Kill(id_type id, bool force) noexcept {
     if (force)
         return ::kill(id, SIGTERM) == 0;
     return ::kill(id, SIGINT) == 0;
+}
+
+std::string Process::GetProcessPath(Process::id_type id) noexcept {
+    std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
+    std::ifstream cmdFile(cmdPath.c_str());
+
+    std::string cmdLine;
+    std::getline(cmdFile, cmdLine);
+    if (!cmdLine.empty()) {
+        // Keep first cmdline item which contains the program path
+        size_t pos = cmdLine.find('\0');
+        if (pos != string_type::npos)
+            cmdLine = cmdLine.substr(0, pos);
+    }
+    return cmdLine;
 }
 #endif
 }  // namespace jhc

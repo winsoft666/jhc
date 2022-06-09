@@ -23,6 +23,9 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
 #include <windows.h>
 #else
 #include <sys/types.h>

@@ -26,7 +26,10 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // !WIN32_LEAN_AND_MEAN
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
 #include <Windows.h>
 #endif // !_INC_WINDOWS
 #include <TlHelp32.h>
@@ -94,7 +97,7 @@ class WinProcessFinder {
     }
 
     // Don't forgot pe.dwSize = sizeof(PROCESSENTRY32);
-    bool ProcessFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
+    bool processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
         BOOL fFound = FALSE;
 
         for (BOOL fOk = processFirst(ppe); fOk; fOk = processNext(ppe)) {

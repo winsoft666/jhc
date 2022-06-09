@@ -24,6 +24,9 @@
 #include <vector>
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif  // !_WINSOCKAPI_
 #include <shlobj_core.h>
 #endif
 #include "jhc/os_ver.hpp"
