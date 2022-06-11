@@ -25,15 +25,6 @@
 
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
-#ifndef _INC_WINDOWS
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
-#include <Windows.h>
-#endif  // !_INC_WINDOWS
 #include "jhc/macros.hpp"
 
 namespace jhc {
@@ -41,14 +32,15 @@ class WinCriticalSection {
    public:
     JHC_DISALLOW_COPY_MOVE(WinCriticalSection);
 
-    WinCriticalSection() { InitializeCriticalSection(&crit_); }
-    ~WinCriticalSection() { DeleteCriticalSection(&crit_); }
-    void enter() const { EnterCriticalSection(&crit_); }
-    void leave() const { LeaveCriticalSection(&crit_); }
-    bool tryEnter() const { return TryEnterCriticalSection(&crit_) != FALSE; }
+    WinCriticalSection();
+    ~WinCriticalSection();
+    void enter() const;
+    void leave() const;
+    bool tryEnter() const;
 
    private:
-    mutable CRITICAL_SECTION crit_;
+    class Private;
+    Private* p_ = nullptr;
 };
 
 class ScopedWinCriticalSection {
@@ -63,5 +55,9 @@ class ScopedWinCriticalSection {
     const WinCriticalSection* const crit_;
 };
 }  // namespace jhc
+
+#ifndef JHC_NOT_HEADER_ONLY
+#include "impl/win_criticalsection.cc"
+#endif
 #endif  // !JHC_WIN
 #endif  // !JHC_WIN_CRITICAL_SECTION_HPP__

@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2022 JiangXueqiao <winsoft666@outlook.com>.
@@ -17,118 +17,67 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef JHC_TIMER_HPP_
-#define JHC_TIMER_HPP_
+#ifndef JHC_TIMER_HPP__
+#define JHC_TIMER_HPP__
+#pragma once
 
-#include "jhc/arch.hpp"
-#ifdef JHC_WIN
-#ifndef _INC_WINDOWS
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
-#include <Windows.h>
-#endif
 #include <functional>
+#include <chrono>
 
 namespace jhc {
-class TimerBase {
+using handler_t = std::function<void(std::size_t)>;
+using clock = std::chrono::steady_clock;
+using timestamp = std::chrono::time_point<clock>;
+using duration = std::chrono::microseconds;
+
+class Timer {
    public:
-    TimerBase() {
-        m_hTimer = NULL;
-        m_pTimer = NULL;
+    Timer();
+    ~Timer();
+
+    /**
+	 * Add a new timer.
+	 *
+	 * \param when The time at which the handler is invoked.
+	 * \param handler The callable that is invoked when the timer fires.
+	 * \param period The periodicity at which the timer fires. Only used for periodic timers.
+	 */
+    std::size_t add(
+        const timestamp& when,
+        handler_t&& handler,
+        const duration& period = duration::zero());
+
+    /**
+	 * Overloaded `add` function that uses a `std::chrono::duration` instead of a
+	 * `time_point` for the first timeout.
+	 */
+    template <class Rep, class Period>
+    inline std::size_t add(const std::chrono::duration<Rep, Period>& when, handler_t&& handler, const duration& period = duration::zero()) {
+        return add(clock::now() + std::chrono::duration_cast<std::chrono::microseconds>(when),
+                   std::move(handler), period);
     }
 
-    virtual ~TimerBase() = default;
+    /**
+	 * Overloaded `add` function that uses a uint64_t instead of a `time_point` for
+	 * the first timeout and the period.
+	 */
+    std::size_t add(const uint64_t when, handler_t&& handler, const uint64_t period = 0);
 
-    static void CALLBACK TimerProc(void* param, BOOLEAN timerCalled) {
-        UNREFERENCED_PARAMETER(timerCalled);
-        TimerBase* timer = static_cast<TimerBase*>(param);
-
-        if (timer)
-            timer->onTimedEvent();
-    }
-
-    // About dwFlags, see:
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682485(v=vs.85).aspx
-    //
-    bool start(DWORD ulInterval,  // ulInterval in ms
-               BOOL bImmediately,
-               BOOL bOnce,
-               ULONG dwFlags = WT_EXECUTELONGFUNCTION) {
-        bool bRet = false;
-
-        if (!m_hTimer) {
-            bRet = !!CreateTimerQueueTimer(&m_hTimer, NULL, TimerProc, (PVOID)this,
-                                           bImmediately ? 0 : ulInterval, bOnce ? 0 : ulInterval, dwFlags);
-        }
-
-        return bRet;
-    }
-
-    void stop(bool bWait) {
-        if (m_hTimer) {
-            BOOL b = DeleteTimerQueueTimer(NULL, m_hTimer, bWait ? INVALID_HANDLE_VALUE : NULL);
-            assert(b);
-            m_hTimer = NULL;
-        }
-    }
-
-    virtual void onTimedEvent() {}
-
-   private:
-    HANDLE m_hTimer;
-    PTP_TIMER m_pTimer;
-};
-
-template <class T>
-class TTimer : public TimerBase {
-   public:
-    typedef void (T::*POnTimer)(void);
-
-    TTimer() {
-        m_pClass = NULL;
-        m_pfnOnTimer = NULL;
-    }
-
-    void setTimedEvent(T* pClass, POnTimer pFunc) {
-        m_pClass = pClass;
-        m_pfnOnTimer = pFunc;
-    }
+    /**
+	 * Removes the timer with the given id.
+	 */
+    bool remove(std::size_t id);
 
    protected:
-    void onTimedEvent() override {
-        if (m_pfnOnTimer && m_pClass) {
-            (m_pClass->*m_pfnOnTimer)();
-        }
-    }
+    class Private;
+    Private* p_ = nullptr;
 
    private:
-    T* m_pClass;
-    POnTimer m_pfnOnTimer;
-};
-
-class Timer : public TimerBase {
-   public:
-    typedef std::function<void()> FN_CB;
-    Timer() {}
-
-    Timer(FN_CB cb) { setTimedEvent(cb); }
-
-    void setTimedEvent(FN_CB cb) { m_cb = cb; }
-
-   protected:
-    void onTimedEvent() override {
-        if (m_cb) {
-            m_cb();
-        }
-    }
-
-   private:
-    FN_CB m_cb;
+    void run();
 };
 }  // namespace jhc
+
+#ifndef JHC_NOT_HEADER_ONLY
+#include "impl/timer.cc"
 #endif
-#endif  // !JHC_WIN_TIMER_HPP_
+#endif

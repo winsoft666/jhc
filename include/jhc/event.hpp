@@ -22,45 +22,33 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "macros.hpp"
 
 namespace jhc {
 class Event {
    public:
-    Event(bool setted = false) :
-        setted_(setted) {}
+    JHC_DISALLOW_COPY_MOVE(Event);
+    Event(bool setted = false);
 
     ~Event() = default;
 
-    void set() noexcept {
-        std::unique_lock<std::mutex> ul(setted_mutex_);
-        setted_ = true;
-        setted_cond_var_.notify_all();
-    }
+    void set() noexcept;
 
-    void unset() noexcept {
-        std::unique_lock<std::mutex> ul(setted_mutex_);
-        setted_ = false;
-        setted_cond_var_.notify_all();
-    }
+    void unset() noexcept;
 
-    bool isSetted() noexcept {
-        std::unique_lock<std::mutex> ul(setted_mutex_);
-        return setted_;
-    }
+    bool isSetted() noexcept;
 
-    bool wait(int32_t millseconds) noexcept {
-        std::unique_lock<std::mutex> ul(setted_mutex_);
-        setted_cond_var_.wait_for(ul, std::chrono::milliseconds(millseconds),
-                                  [this] { return setted_; });
-        return setted_;
-    }
+    bool wait(int32_t millseconds) noexcept;
 
    protected:
-    Event(const Event&) = delete;
-    Event& operator=(const Event&) = delete;
     bool setted_;
     std::mutex setted_mutex_;
     std::condition_variable setted_cond_var_;
 };
 }  // namespace jhc
+
+#ifndef JHC_NOT_HEADER_ONLY
+#include "impl/event.cc"
+#endif
+
 #endif  //!JHC_EVENT_HPP__

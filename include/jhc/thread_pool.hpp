@@ -38,6 +38,7 @@
 namespace jhc {
 class ThreadPool {
    public:
+    JHC_DISALLOW_COPY_MOVE(ThreadPool);
     ThreadPool(size_t threads) :
         stop(false) {
         for (size_t i = 0; i < threads; ++i)
@@ -103,8 +104,6 @@ class ThreadPool {
     std::mutex queue_mutex;
     std::condition_variable condition;
     bool stop;
-
-    JHC_DISALLOW_COPY_MOVE(ThreadPool);
 };
 }  // namespace jhc
 

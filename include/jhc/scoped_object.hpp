@@ -30,7 +30,7 @@
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
 #include <Windows.h>
-#endif // !_INC_WINDOWS
+#endif  // !_INC_WINDOWS
 #else
 #endif  // JHC_WIN
 #include "jhc/macros.hpp"
@@ -40,6 +40,7 @@ namespace jhc {
 // Simple HANDLE wrapper to close it automatically from the destructor.
 class ScopedHandle {
    public:
+    JHC_DISALLOW_COPY_MOVE(ScopedHandle);
     ScopedHandle(bool isNullInvalid = true) noexcept :
         kInvalidHandle_(isNullInvalid ? NULL : INVALID_HANDLE_VALUE) {
         handle_ = kInvalidHandle_;
@@ -67,10 +68,7 @@ class ScopedHandle {
    private:
     const HANDLE kInvalidHandle_;
     HANDLE handle_;
-
-    JHC_DISALLOW_COPY_MOVE(ScopedHandle);
 };
-
 #else
 #endif
 }  // namespace jhc
