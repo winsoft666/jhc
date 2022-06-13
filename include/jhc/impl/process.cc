@@ -172,7 +172,7 @@ Process::id_type Process::open(const string_type& command,
     }
 
     PROCESS_INFORMATION process_info;
-    STARTUPINFO startup_info;
+    STARTUPINFOW startup_info;
 
     ZeroMemory(&process_info, sizeof(PROCESS_INFORMATION));
 

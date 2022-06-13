@@ -173,7 +173,7 @@ std::string ProcessUtil::GetCurrentExeDirectory() {
 BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
     std::list<std::string>* pList = (std::list<std::string>*)lParam;
 
-    HRSRC hResInfo = FindResource(hModule, lpName, lpType);
+    HRSRC hResInfo = FindResourceW(hModule, lpName, lpType);
     DWORD cbResource = SizeofResource(hModule, hResInfo);
 
     HGLOBAL hResData = LoadResource(hModule, hResInfo);
@@ -198,7 +198,7 @@ BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpT
     if (!hModule)
         return false;
 
-    EnumResourceNamesW(hModule, RT_MANIFEST, EnumResourceNameCallback, (LONG_PTR)&manifests);
+    EnumResourceNames(hModule, RT_MANIFEST, EnumResourceNameCallback, (LONG_PTR)&manifests);
     FreeLibrary(hModule);
 
     return true;

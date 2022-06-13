@@ -80,7 +80,7 @@ std::wstring PathUtil::GetLocalAppDataFolder() {
         // On Windows XP, CSIDL_LOCAL_APPDATA represents "{user}\Local Settings\Application Data"
         // while CSIDL_APPDATA represents "{user}\Application Data"
         wchar_t buffer[MAX_PATH] = {0};
-        if (S_OK == ::SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, buffer))
+        if (S_OK == ::SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, buffer))
             tempPath = buffer;
     }
 

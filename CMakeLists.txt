@@ -39,18 +39,17 @@ message(STATUS "USE_STATIC_CRT=${USE_STATIC_CRT}")
 message(STATUS "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 message(STATUS "VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 
+# Unicode Support
+add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set (CMAKE_CXX_STANDARD 11)
+    
 if (JHC_NOT_HEADER_ONLY)
     set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
     mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
-    # Unicode Support
-    add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
-
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
     include_directories(./include)
 
-    set (CMAKE_CXX_STANDARD 11)
     set(LIB_NAME jhc-static)
 
     if (MSVC AND USE_STATIC_CRT)
