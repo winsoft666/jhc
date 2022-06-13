@@ -70,13 +70,13 @@ class Timer::Private {
     std::stack<std::size_t> free_ids_;
 };
 
-Timer::Timer() :
+JHC_INLINE Timer::Timer() :
     p_(new Private()) {
     std::unique_lock<std::mutex> lock(p_->m_);
     p_->worker_ = std::thread([this] { run(); });
 }
 
-Timer::~Timer() {
+JHC_INLINE Timer::~Timer() {
     std::unique_lock<std::mutex> lock(p_->m_);
     p_->done_ = true;
     lock.unlock();
@@ -92,7 +92,7 @@ Timer::~Timer() {
     p_ = nullptr;
 }
 
-std::size_t Timer::add(
+JHC_INLINE std::size_t Timer::add(
     const std::chrono::time_point<std::chrono::steady_clock>& when,
     handler_t&& handler,
     const std::chrono::microseconds& period) {
@@ -117,11 +117,11 @@ std::size_t Timer::add(
     return id;
 }
 
-std::size_t Timer::add(const uint64_t afterMicroseconds, handler_t&& handler, const uint64_t periodMicroseconds) {
+JHC_INLINE std::size_t Timer::add(const uint64_t afterMicroseconds, handler_t&& handler, const uint64_t periodMicroseconds) {
     return add(std::chrono::microseconds(afterMicroseconds), std::move(handler), std::chrono::microseconds(periodMicroseconds));
 }
 
-bool Timer::remove(std::size_t id) {
+JHC_INLINE bool Timer::remove(std::size_t id) {
     std::unique_lock<std::mutex> lock(p_->m_);
     if (p_->events_.size() == 0 || p_->events_.size() <= id) {
         return false;
@@ -138,7 +138,7 @@ bool Timer::remove(std::size_t id) {
     return true;
 }
 
-void Timer::run() {
+JHC_INLINE void Timer::run() {
     std::unique_lock<std::mutex> lock(p_->m_);
 
     while (!p_->done_) {

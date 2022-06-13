@@ -4,5 +4,10 @@
 
 #cmakedefine JHC_NOT_HEADER_ONLY
 
+#ifdef JHC_NOT_HEADER_ONLY
+#define JHC_INLINE
+#else
+#define JHC_INLINE inline
+#endif
 
 #endif //!JHC_CONFIG_HPP__

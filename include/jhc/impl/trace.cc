@@ -23,7 +23,7 @@
 #include "jhc/string_helper.hpp"
 
 namespace jhc {
-void Trace::MsgW(const wchar_t* lpFormat, ...) {
+JHC_INLINE void Trace::MsgW(const wchar_t* lpFormat, ...) {
     std::wstring output;
     va_list args;
     va_start(args, lpFormat);
@@ -39,7 +39,7 @@ void Trace::MsgW(const wchar_t* lpFormat, ...) {
     }
 }
 
-void Trace::MsgA(const char* lpFormat, ...) {
+JHC_INLINE void Trace::MsgA(const char* lpFormat, ...) {
     std::string output;
     va_list args;
     va_start(args, lpFormat);

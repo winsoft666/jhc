@@ -6,7 +6,7 @@
 #include "jhc/file.hpp"
 
 namespace jhc {
-SHA512::uint64 SHA512::getSha512K(int i) {
+JHC_INLINE SHA512::uint64 SHA512::getSha512K(int i) {
     static const SHA512::uint64 sha512K[80] =
         {0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
          0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
@@ -60,15 +60,15 @@ SHA512::uint64 SHA512::getSha512K(int i) {
 #define SHA512_F2(x) (SHA2_ROTR(x, 14) ^ SHA2_ROTR(x, 18) ^ SHA2_ROTR(x, 41))
 #define SHA512_F3(x) (SHA2_ROTR(x, 1) ^ SHA2_ROTR(x, 8) ^ SHA2_SHFR(x, 7))
 #define SHA512_F4(x) (SHA2_ROTR(x, 19) ^ SHA2_ROTR(x, 61) ^ SHA2_SHFR(x, 6))
-#define SHA2_UNPACK32(x, str)              \
-    {                                      \
+#define SHA2_UNPACK32(x, str)                      \
+    {                                              \
         *((str) + 3) = (SHA512::uint8)((x));       \
         *((str) + 2) = (SHA512::uint8)((x) >> 8);  \
         *((str) + 1) = (SHA512::uint8)((x) >> 16); \
         *((str) + 0) = (SHA512::uint8)((x) >> 24); \
     }
-#define SHA2_UNPACK64(x, str)              \
-    {                                      \
+#define SHA2_UNPACK64(x, str)                      \
+    {                                              \
         *((str) + 7) = (SHA512::uint8)((x));       \
         *((str) + 6) = (SHA512::uint8)((x) >> 8);  \
         *((str) + 5) = (SHA512::uint8)((x) >> 16); \
@@ -79,12 +79,12 @@ SHA512::uint64 SHA512::getSha512K(int i) {
         *((str) + 0) = (SHA512::uint8)((x) >> 56); \
     }
 
-#define SHA2_PACK64(str, x)                                                                                                                                                                                                                                                    \
-    {                                                                                                                                                                                                                                                                          \
+#define SHA2_PACK64(str, x)                                                                                                                                                                                                                                                                                                                    \
+    {                                                                                                                                                                                                                                                                                                                                          \
         *(x) = ((SHA512::uint64) * ((str) + 7)) | ((SHA512::uint64) * ((str) + 6) << 8) | ((SHA512::uint64) * ((str) + 5) << 16) | ((SHA512::uint64) * ((str) + 4) << 24) | ((SHA512::uint64) * ((str) + 3) << 32) | ((SHA512::uint64) * ((str) + 2) << 40) | ((SHA512::uint64) * ((str) + 1) << 48) | ((SHA512::uint64) * ((str) + 0) << 56); \
     }
 
-void SHA512::init() {
+JHC_INLINE void SHA512::init() {
     m_h[0] = 0x6a09e667f3bcc908ULL;
     m_h[1] = 0xbb67ae8584caa73bULL;
     m_h[2] = 0x3c6ef372fe94f82bULL;
@@ -97,7 +97,7 @@ void SHA512::init() {
     m_tot_len = 0;
 }
 
-void SHA512::update(const unsigned char* message, unsigned int len) {
+JHC_INLINE void SHA512::update(const unsigned char* message, unsigned int len) {
     unsigned int block_nb;
     unsigned int new_len, rem_len, tmp_len;
     const unsigned char* shifted_message;
@@ -119,7 +119,7 @@ void SHA512::update(const unsigned char* message, unsigned int len) {
     m_tot_len += (block_nb + 1) << 7;
 }
 
-void SHA512::final(unsigned char* digest) {
+JHC_INLINE void SHA512::final(unsigned char* digest) {
     unsigned int block_nb;
     unsigned int pm_len;
     unsigned int len_b;
@@ -136,7 +136,7 @@ void SHA512::final(unsigned char* digest) {
     }
 }
 
-void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
+JHC_INLINE void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
     SHA512::uint64 w[80];
     SHA512::uint64 wv[8];
     SHA512::uint64 t1, t2;
@@ -171,7 +171,7 @@ void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
     }
 }
 
-std::string SHA512::GetFileSHA512(const fs::path& filePath) {
+JHC_INLINE std::string SHA512::GetFileSHA512(const fs::path& filePath) {
     std::string result;
 
     File file(filePath);
@@ -202,7 +202,7 @@ std::string SHA512::GetFileSHA512(const fs::path& filePath) {
     return std::string(buf);
 }
 
-std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
+JHC_INLINE std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
     unsigned char digest[SHA512::DIGEST_SIZE];
     memset(digest, 0, SHA512::DIGEST_SIZE);
     SHA512 ctx;

@@ -8,7 +8,7 @@
 
 // Support large memory.
 //
-std::string jhc::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
+JHC_INLINE std::string jhc::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
     unsigned char md5Sig[16] = {0};
     char szMd5[33] = {0};
 
@@ -32,7 +32,7 @@ std::string jhc::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size
     return szMd5;
 }
 
-std::string jhc::MD5::GetFileMD5(const jhc::fs::path& file_path) {
+JHC_INLINE std::string jhc::MD5::GetFileMD5(const jhc::fs::path& file_path) {
 #ifdef JHC_WIN
     FILE* f = nullptr;
     _wfopen_s(&f, file_path.wstring().c_str(), L"rb");
@@ -69,7 +69,7 @@ std::string jhc::MD5::GetFileMD5(const jhc::fs::path& file_path) {
        * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
        * initialization constants.
        */
-void jhc::MD5::MD5Init(struct MD5Context* ctx) {
+JHC_INLINE void jhc::MD5::MD5Init(struct MD5Context* ctx) {
     bigEndian_ = ByteOrder::IsHostBigEndian();
 
     ctx->buf[0] = 0x67452301;
@@ -85,7 +85,7 @@ void jhc::MD5::MD5Init(struct MD5Context* ctx) {
        * Update context to reflect the concatenation of another buffer full
        * of bytes.
        */
-void jhc::MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len) {
+JHC_INLINE void jhc::MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len) {
     unsigned int t;
 
     /* Update byte count */
@@ -126,7 +126,7 @@ void jhc::MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsig
        * Final wrapup - pad to 64-byte boundary with the bit pattern
        * 1 0* (64-bit count of bits processed, MSB-first)
        */
-void jhc::MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
+JHC_INLINE void jhc::MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
     int count = ctx->bytes[0] & 0x3f; /* Number of bytes in ctx->in */
     unsigned char* p = (unsigned char*)ctx->in + count;
 
@@ -157,14 +157,14 @@ void jhc::MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
     memset(ctx, 0, sizeof(*ctx)); /* In case it's sensitive */
 }
 
-void jhc::MD5::MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]) {
+JHC_INLINE void jhc::MD5::MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]) {
     struct MD5Context md5;
     MD5Init(&md5);
     MD5Update(&md5, buf, len);
     MD5Final(sig, &md5);
 }
 
-void jhc::MD5::MD5SigToString(unsigned char signature[16], char* str, int len) {
+JHC_INLINE void jhc::MD5::MD5SigToString(unsigned char signature[16], char* str, int len) {
     unsigned char* sig_p;
     char *str_p, *max_p;
     unsigned int high, low;
@@ -209,7 +209,7 @@ void jhc::MD5::MD5SigToString(unsigned char signature[16], char* str, int len) {
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
-void jhc::MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
+JHC_INLINE void jhc::MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
     unsigned int a, b, c, d;
 
     a = buf[0];
@@ -293,7 +293,7 @@ void jhc::MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
 
 #endif
 
-void jhc::MD5::byteSwap(unsigned int* buf, unsigned words) {
+JHC_INLINE void jhc::MD5::byteSwap(unsigned int* buf, unsigned words) {
     unsigned char* p;
 
     if (!bigEndian_)

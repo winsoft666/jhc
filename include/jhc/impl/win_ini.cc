@@ -19,21 +19,21 @@
 #include <vector>
 
 namespace jhc {
-Ini::Ini(const std::wstring& file_path) :
+JHC_INLINE Ini::Ini(const std::wstring& file_path) :
     ini_file_path_(file_path) {}
 
-Ini::Ini(std::wstring&& file_path) :
+JHC_INLINE Ini::Ini(std::wstring&& file_path) :
     ini_file_path_(std::move(file_path)) {}
 
-void Ini::setIniFilePath(const std::wstring& file_path) noexcept {
+JHC_INLINE void Ini::setIniFilePath(const std::wstring& file_path) noexcept {
     ini_file_path_ = file_path;
 }
 
-std::wstring Ini::iniFilePath() const noexcept {
+JHC_INLINE std::wstring Ini::iniFilePath() const noexcept {
     return ini_file_path_;
 }
 
-bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
+JHC_INLINE bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
     if (ini_file_path_.length() == 0)
         return false;
     INT iDefault = 0;
@@ -48,9 +48,9 @@ bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsign
     return false;
 }
 
-UINT Ini::readInt(const std::wstring& item,
-                  const std::wstring& sub_item,
-                  UINT default_value) noexcept {
+JHC_INLINE UINT Ini::readInt(const std::wstring& item,
+                             const std::wstring& sub_item,
+                             UINT default_value) noexcept {
     if (ini_file_path_.length() == 0)
         return default_value;
 
@@ -59,9 +59,9 @@ UINT Ini::readInt(const std::wstring& item,
                                  ini_file_path_.c_str());
 }
 
-std::wstring Ini::readString(const std::wstring& item,
-                             const std::wstring& sub_item,
-                             const std::wstring& default_value) noexcept {
+JHC_INLINE std::wstring Ini::readString(const std::wstring& item,
+                                        const std::wstring& sub_item,
+                                        const std::wstring& default_value) noexcept {
     if (ini_file_path_.length() == 0)
         return default_value;
 
@@ -75,9 +75,9 @@ std::wstring Ini::readString(const std::wstring& item,
     return result;
 }
 
-bool Ini::readString(const std::wstring& item,
-                     const std::wstring& sub_item,
-                     std::wstring& result) noexcept {
+JHC_INLINE bool Ini::readString(const std::wstring& item,
+                                const std::wstring& sub_item,
+                                std::wstring& result) noexcept {
     if (ini_file_path_.length() == 0)
         return false;
 
@@ -110,14 +110,14 @@ bool Ini::readString(const std::wstring& item,
     } while (true);
 
     if (ret) {
-            result = pBuf;
+        result = pBuf;
     }
     free(pBuf);
 
     return ret;
 }
 
-bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
+JHC_INLINE bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
     if (ini_file_path_.length() == 0)
         return false;
 
@@ -126,9 +126,9 @@ bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsig
     return writeString(item, sub_item, szValue);
 }
 
-bool Ini::writeString(const std::wstring& item,
-                      const std::wstring& sub_item,
-                      const std::wstring& value) noexcept {
+JHC_INLINE bool Ini::writeString(const std::wstring& item,
+                                 const std::wstring& sub_item,
+                                 const std::wstring& value) noexcept {
     if (ini_file_path_.length() == 0)
         return false;
 

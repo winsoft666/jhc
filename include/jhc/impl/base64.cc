@@ -4,23 +4,23 @@
 #include "../base64.hpp"
 #endif
 
-std::string jhc::Base64::Encode(std::string const& s, bool url) {
+JHC_INLINE std::string jhc::Base64::Encode(std::string const& s, bool url) {
 	return _Encode(s, url);
 }
 
-std::string jhc::Base64::EncodeWithPEM(std::string const& s) {
+JHC_INLINE std::string jhc::Base64::EncodeWithPEM(std::string const& s) {
 	return _EncodeWithPEM(s);
 }
 
-std::string jhc::Base64::EncodeWithMIME(std::string const& s) {
+JHC_INLINE std::string jhc::Base64::EncodeWithMIME(std::string const& s) {
 	return _EncodeWithMIME(s);
 }
 
-std::string jhc::Base64::Decode(std::string const& s, bool remove_linebreaks) {
+JHC_INLINE std::string jhc::Base64::Decode(std::string const& s, bool remove_linebreaks) {
 	return _Decode(s, remove_linebreaks);
 }
 
-std::string jhc::Base64::Encode(unsigned char const* bytes_to_encode, size_t in_len, bool url) {
+JHC_INLINE std::string jhc::Base64::Encode(unsigned char const* bytes_to_encode, size_t in_len, bool url) {
 	const size_t len_encoded = (in_len + 2) / 3 * 4;
 	const unsigned char trailing_char = url ? '.' : '=';
 
@@ -68,24 +68,24 @@ std::string jhc::Base64::Encode(unsigned char const* bytes_to_encode, size_t in_
 }
 
 #if __cplusplus >= 201703L
-std::string jhc::Base64::Encode(std::string_view s, bool url) {
+JHC_INLINE std::string jhc::Base64::Encode(std::string_view s, bool url) {
 	return _Encode(s, url);
 }
 
-std::string jhc::Base64::EncodeWithPEM(std::string_view s) {
+JHC_INLINE std::string jhc::Base64::EncodeWithPEM(std::string_view s) {
 	return _EncodeWithPEM(s);
 }
 
-std::string jhc::Base64::EncodeWithMIME(std::string_view s) {
+JHC_INLINE std::string jhc::Base64::EncodeWithMIME(std::string_view s) {
 	return _EncodeWithMIME(s);
 }
 
-std::string jhc::Base64::Decode(std::string_view s, bool remove_linebreaks) {
+JHC_INLINE std::string jhc::Base64::Decode(std::string_view s, bool remove_linebreaks) {
 	return _Decode(s, remove_linebreaks);
 }
 #endif  // __cplusplus >= 201703L
 
-const char* jhc::Base64::base64Chars(int index) {
+JHC_INLINE const char* jhc::Base64::base64Chars(int index) {
 	//
 	// Depending on the url parameter in base64_chars, one of
 	// two sets of base64 characters needs to be chosen.
@@ -103,7 +103,7 @@ const char* jhc::Base64::base64Chars(int index) {
 	return base64_chars[index];
 }
 
-unsigned int jhc::Base64::getPosOfChar(const unsigned char chr) {
+JHC_INLINE unsigned int jhc::Base64::getPosOfChar(const unsigned char chr) {
 	//
 	// Return the position of chr within base64_encode()
 	//
@@ -126,7 +126,7 @@ unsigned int jhc::Base64::getPosOfChar(const unsigned char chr) {
 		throw std::runtime_error("Input is not valid base64-encoded data.");
 }
 
-std::string jhc::Base64::insertLineBreaks(std::string str, size_t distance) {
+JHC_INLINE std::string jhc::Base64::insertLineBreaks(std::string str, size_t distance) {
 	//
 	// Provided by https://github.com/JomaCorpFX, adapted by me.
 	//

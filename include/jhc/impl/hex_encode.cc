@@ -5,13 +5,13 @@
 #endif
 
 namespace jhc {
-char HexEncode::Encode(unsigned char val) {
+JHC_INLINE char HexEncode::Encode(unsigned char val) {
     const char HEX[] = "0123456789abcdef";
     assert(val < 16);
     return (val < 16) ? HEX[val] : '!';
 }
 
-bool HexEncode::Decode(char ch, unsigned char* val) {
+JHC_INLINE bool HexEncode::Decode(char ch, unsigned char* val) {
     if ((ch >= '0') && (ch <= '9')) {
         *val = ch - '0';
     }
@@ -28,11 +28,11 @@ bool HexEncode::Decode(char ch, unsigned char* val) {
     return true;
 }
 
-size_t HexEncode::EncodeWithDelimiter(char* buffer,
-                                      size_t buflen,
-                                      const char* csource,
-                                      size_t srclen,
-                                      char delimiter) {
+JHC_INLINE size_t HexEncode::EncodeWithDelimiter(char* buffer,
+                                                 size_t buflen,
+                                                 const char* csource,
+                                                 size_t srclen,
+                                                 char delimiter) {
     assert(buffer);
     if (buflen == 0)
         return 0;
@@ -63,15 +63,15 @@ size_t HexEncode::EncodeWithDelimiter(char* buffer,
     return bufpos;
 }
 
-std::string HexEncode::Encode(const std::string& str) {
+JHC_INLINE std::string HexEncode::Encode(const std::string& str) {
     return Encode(str.c_str(), str.size());
 }
 
-std::string HexEncode::Encode(const char* source, size_t srclen) {
+JHC_INLINE std::string HexEncode::Encode(const char* source, size_t srclen) {
     return EncodeWithDelimiter(source, srclen, 0);
 }
 
-std::string HexEncode::EncodeWithDelimiter(const char* source, size_t srclen, char delimiter) {
+JHC_INLINE std::string HexEncode::EncodeWithDelimiter(const char* source, size_t srclen, char delimiter) {
     const size_t kBufferSize = srclen * 3;
 
     char* buffer = static_cast<char*>(::malloc((kBufferSize) * sizeof(char)));
@@ -85,11 +85,11 @@ std::string HexEncode::EncodeWithDelimiter(const char* source, size_t srclen, ch
     return ret;
 }
 
-size_t HexEncode::DecodeWithDelimiter(char* cbuffer,
-                                      size_t buflen,
-                                      const char* source,
-                                      size_t srclen,
-                                      char delimiter) {
+JHC_INLINE size_t HexEncode::DecodeWithDelimiter(char* cbuffer,
+                                                 size_t buflen,
+                                                 const char* source,
+                                                 size_t srclen,
+                                                 char delimiter) {
     assert(cbuffer);
     if (buflen == 0)
         return 0;
@@ -128,11 +128,11 @@ size_t HexEncode::DecodeWithDelimiter(char* cbuffer,
     return bufpos;
 }
 
-size_t HexEncode::Decode(char* buffer, size_t buflen, const std::string& source) {
+JHC_INLINE size_t HexEncode::Decode(char* buffer, size_t buflen, const std::string& source) {
     return DecodeWithDelimiter(buffer, buflen, source, 0);
 }
 
-std::string HexEncode::Decode(const std::string& str) {
+JHC_INLINE std::string HexEncode::Decode(const std::string& str) {
     if (str.length() == 0)
         return "";
     const size_t kBufferSize = str.length();
@@ -145,10 +145,10 @@ std::string HexEncode::Decode(const std::string& str) {
     return ret;
 }
 
-size_t HexEncode::DecodeWithDelimiter(char* buffer,
-                                      size_t buflen,
-                                      const std::string& source,
-                                      char delimiter) {
+JHC_INLINE size_t HexEncode::DecodeWithDelimiter(char* buffer,
+                                                 size_t buflen,
+                                                 const std::string& source,
+                                                 char delimiter) {
     return DecodeWithDelimiter(buffer, buflen, source.c_str(), source.length(), delimiter);
 }
 }  // namespace jhc

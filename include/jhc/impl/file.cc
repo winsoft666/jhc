@@ -23,28 +23,28 @@
 #include <fcntl.h>
 #endif  // !JHC_WIN
 
-jhc::File::File(const fs::path& path) :
+JHC_INLINE jhc::File::File(const fs::path& path) :
     path_(path) {
 }
 
-jhc::File::File(fs::path&& path) :
+JHC_INLINE jhc::File::File(fs::path&& path) :
     path_(std::move(path)) {
 }
 
-jhc::File::~File() {
+JHC_INLINE jhc::File::~File() {
     close();
 }
 
-jhc::fs::path jhc::File::path() const {
+JHC_INLINE jhc::fs::path jhc::File::path() const {
     return path_;
 }
 
-bool jhc::File::isOpen() {
+JHC_INLINE bool jhc::File::isOpen() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     return (f_ != nullptr);
 }
 
-bool jhc::File::open(const jhc::fs::path& openMode) {
+JHC_INLINE bool jhc::File::open(const jhc::fs::path& openMode) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_ != nullptr)
         return true;
@@ -61,7 +61,7 @@ bool jhc::File::open(const jhc::fs::path& openMode) {
     return (f_ != nullptr);
 }
 
-bool jhc::File::close() {
+JHC_INLINE bool jhc::File::close() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
         const int err = fclose(f_);
@@ -72,14 +72,14 @@ bool jhc::File::close() {
     return false;
 }
 
-bool jhc::File::flush() {
+JHC_INLINE bool jhc::File::flush() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_)
         return (fflush(f_) == 0);
     return false;
 }
 
-bool jhc::File::exist() const {
+JHC_INLINE bool jhc::File::exist() const {
     if (path_.empty())
         return false;
 #ifdef JHC_WIN
@@ -89,7 +89,7 @@ bool jhc::File::exist() const {
 #endif
 }
 
-bool jhc::File::canRW() const {
+JHC_INLINE bool jhc::File::canRW() const {
     if (path_.empty())
         return false;
 
@@ -100,7 +100,7 @@ bool jhc::File::canRW() const {
 #endif
 }
 
-int64_t jhc::File::fileSize() {
+JHC_INLINE int64_t jhc::File::fileSize() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_)
         return -1;
@@ -133,7 +133,7 @@ int64_t jhc::File::fileSize() {
 }
 
 // Must be call open(...) first!
-bool jhc::File::seekFromCurrent(int64_t offset) {
+JHC_INLINE bool jhc::File::seekFromCurrent(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef JHC_WIN
@@ -146,7 +146,7 @@ bool jhc::File::seekFromCurrent(int64_t offset) {
 }
 
 // Return: -1 is failed
-int64_t jhc::File::currentPointerPos() {
+JHC_INLINE int64_t jhc::File::currentPointerPos() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_)
         return -1;
@@ -157,7 +157,7 @@ int64_t jhc::File::currentPointerPos() {
 #endif
 }
 
-bool jhc::File::seekFromBeginning(int64_t offset) {
+JHC_INLINE bool jhc::File::seekFromBeginning(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef JHC_WIN
@@ -169,7 +169,7 @@ bool jhc::File::seekFromBeginning(int64_t offset) {
     return false;
 }
 
-bool jhc::File::seekFromEnd(int64_t offset) {
+JHC_INLINE bool jhc::File::seekFromEnd(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef JHC_WIN
@@ -181,7 +181,7 @@ bool jhc::File::seekFromEnd(int64_t offset) {
     return false;
 }
 
-size_t jhc::File::readFrom(void* buffer, size_t needRead, int64_t from) {
+JHC_INLINE size_t jhc::File::readFrom(void* buffer, size_t needRead, int64_t from) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer || needRead == 0)
         return 0;
@@ -200,7 +200,7 @@ size_t jhc::File::readFrom(void* buffer, size_t needRead, int64_t from) {
     return read;
 }
 
-size_t jhc::File::writeFrom(const void* buffer, size_t needWrite, int64_t from) {
+JHC_INLINE size_t jhc::File::writeFrom(const void* buffer, size_t needWrite, int64_t from) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer || needWrite == 0)
         return 0;
@@ -219,7 +219,7 @@ size_t jhc::File::writeFrom(const void* buffer, size_t needWrite, int64_t from) 
     return written;
 }
 
-size_t jhc::File::readAll(void** buffer) {
+JHC_INLINE size_t jhc::File::readAll(void** buffer) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer)
         return 0;
@@ -273,7 +273,7 @@ size_t jhc::File::readAll(void** buffer) {
 #endif
 }
 
-std::string jhc::File::readAll() {
+JHC_INLINE std::string jhc::File::readAll() {
     std::string ret;
     void* buffer = nullptr;
     const size_t read = readAll(&buffer);
@@ -285,7 +285,7 @@ std::string jhc::File::readAll() {
     return ret;
 }
 
-bool jhc::File::readAll(std::string& ret) {
+JHC_INLINE bool jhc::File::readAll(std::string& ret) {
     void* buffer = nullptr;
     const size_t read = readAll(&buffer);
 

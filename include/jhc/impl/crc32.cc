@@ -5,11 +5,11 @@
 #endif
 #include "jhc/file.hpp"
 
-void jhc::CRC32::init() {
+JHC_INLINE void jhc::CRC32::init() {
     ulCRC32_ = 0xFFFFFFFF;
 }
 
-void jhc::CRC32::update(const unsigned char* pData, uint32_t uSize) {
+JHC_INLINE void jhc::CRC32::update(const unsigned char* pData, uint32_t uSize) {
     // CRC-32 table for the following polynominal:
     // X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X+1
     static uint32_t crc32tab[] = {
@@ -56,17 +56,17 @@ void jhc::CRC32::update(const unsigned char* pData, uint32_t uSize) {
         ulCRC32_ = ((ulCRC32_) >> 8) ^ crc32tab[(pData[i]) ^ ((ulCRC32_)&0x000000FF)];
 }
 
-void jhc::CRC32::finish() {
+JHC_INLINE void jhc::CRC32::finish() {
     ulCRC32_ = ~(ulCRC32_);
 }
 
-std::string jhc::CRC32::digest() {
+JHC_INLINE std::string jhc::CRC32::digest() {
     char szCRC[10] = {0};
     snprintf(szCRC, sizeof(szCRC), "%08x", ulCRC32_);
     return szCRC;
 }
 
-std::string jhc::CRC32::GetFileCRC32(const jhc::fs::path& filePath) {
+JHC_INLINE std::string jhc::CRC32::GetFileCRC32(const jhc::fs::path& filePath) {
     File file(filePath);
     if (!file.open("rb"))
         return "";
@@ -87,7 +87,7 @@ std::string jhc::CRC32::GetFileCRC32(const jhc::fs::path& filePath) {
     return crc32.digest();
 }
 
-std::string jhc::CRC32::GetDataCRC32(const unsigned char* data, size_t dataSize) {
+JHC_INLINE std::string jhc::CRC32::GetDataCRC32(const unsigned char* data, size_t dataSize) {
     CRC32 crc32;
     crc32.init();
 

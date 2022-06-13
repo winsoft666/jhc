@@ -18,13 +18,13 @@
 #include "jhc/trace.hpp"
 
 namespace jhc {
-void WinServiceHelper::Install(const wchar_t* pszServiceName,
-                               const wchar_t* pszDisplayName,
-                               const wchar_t* pszDecription,
-                               unsigned int dwStartType,
-                               const wchar_t* pszDependencies,
-                               const wchar_t* pszAccount,
-                               const wchar_t* pszPassword) {
+JHC_INLINE void WinServiceHelper::Install(const wchar_t* pszServiceName,
+                                          const wchar_t* pszDisplayName,
+                                          const wchar_t* pszDecription,
+                                          unsigned int dwStartType,
+                                          const wchar_t* pszDependencies,
+                                          const wchar_t* pszAccount,
+                                          const wchar_t* pszPassword) {
     wchar_t szPath[MAX_PATH] = {0};
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
@@ -87,7 +87,7 @@ Cleanup:
     }
 }
 
-void WinServiceHelper::Uninstall(const wchar_t* pszServiceName) {
+JHC_INLINE void WinServiceHelper::Uninstall(const wchar_t* pszServiceName) {
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
     SERVICE_STATUS ssSvcStatus = {};
@@ -148,7 +148,7 @@ Cleanup:
     }
 }
 
-void WinServiceHelper::Start(const wchar_t* pszServiceName) {
+JHC_INLINE void WinServiceHelper::Start(const wchar_t* pszServiceName) {
     if (NULL == pszServiceName)
         return;
 
@@ -170,7 +170,7 @@ void WinServiceHelper::Start(const wchar_t* pszServiceName) {
     CloseServiceHandle(schService);
 }
 
-void WinServiceHelper::Stop(const wchar_t* pszServiceName) {
+JHC_INLINE void WinServiceHelper::Stop(const wchar_t* pszServiceName) {
     if (NULL == pszServiceName)
         return;
 

@@ -4,7 +4,7 @@
 #endif
 
 namespace jhc {
-std::string UrlEncode::Encode(const std::string& str) {
+JHC_INLINE std::string UrlEncode::Encode(const std::string& str) {
     char hex[] = "0123456789ABCDEF";
     std::string dst;
 
@@ -26,7 +26,7 @@ std::string UrlEncode::Encode(const std::string& str) {
     return dst;
 }
 
-size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t srclen) {
+JHC_INLINE size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t srclen) {
     if (nullptr == buffer)
         return srclen + 1;
 
@@ -56,12 +56,12 @@ size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t
     return bufpos;
 }
 
-std::string UrlEncode::Decode(const std::string& source) {
+JHC_INLINE std::string UrlEncode::Decode(const std::string& source) {
     return s_transform(source, Decode);
 }
 
 // Return the result of applying transform t to source.
-std::string UrlEncode::s_transform(const std::string& source, UrlEncode::Transform t) {
+JHC_INLINE std::string UrlEncode::s_transform(const std::string& source, UrlEncode::Transform t) {
     // Ask transformation function to approximate the destination size (returns upper bound)
     size_t maxlen = t(nullptr, 0, source.data(), source.length());
     char* buffer = static_cast<char*>(::malloc((maxlen) * sizeof(char)));

@@ -5,19 +5,19 @@
 #include "jhc/string_encode.hpp"
 
 namespace jhc {
-WinProcessFinder::WinProcessFinder(DWORD dwFlags, DWORD dwProcessID) {
+JHC_INLINE WinProcessFinder::WinProcessFinder(DWORD dwFlags, DWORD dwProcessID) {
     m_hSnapShot = INVALID_HANDLE_VALUE;
     createSnapShot(dwFlags, dwProcessID);
 }
 
-WinProcessFinder::~WinProcessFinder() {
+JHC_INLINE WinProcessFinder::~WinProcessFinder() {
     if (m_hSnapShot != INVALID_HANDLE_VALUE) {
         CloseHandle(m_hSnapShot);
         m_hSnapShot = INVALID_HANDLE_VALUE;
     }
 }
 
-bool WinProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
+JHC_INLINE bool WinProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
     if (m_hSnapShot != INVALID_HANDLE_VALUE)
         CloseHandle(m_hSnapShot);
 
@@ -29,7 +29,7 @@ bool WinProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
     return (m_hSnapShot != INVALID_HANDLE_VALUE);
 }
 
-bool WinProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
+JHC_INLINE bool WinProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
     BOOL fOk = Process32First(m_hSnapShot, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
@@ -38,7 +38,7 @@ bool WinProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
     return fOk;
 }
 
-bool WinProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
+JHC_INLINE bool WinProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
     BOOL fOk = Process32Next(m_hSnapShot, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
@@ -48,7 +48,7 @@ bool WinProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
 }
 
 // Don't forgot pe.dwSize = sizeof(PROCESSENTRY32);
-bool WinProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
+JHC_INLINE bool WinProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
     BOOL fFound = FALSE;
 
     for (BOOL fOk = processFirst(ppe); fOk; fOk = processNext(ppe)) {
@@ -61,7 +61,7 @@ bool WinProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const
     return fFound;
 }
 
-bool WinProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf) const {
+JHC_INLINE bool WinProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf) const {
     BOOL fFound = FALSE;
     const DWORD dwCurrentPID = GetCurrentProcessId();
 
@@ -82,15 +82,15 @@ bool WinProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL 
     return fFound;
 }
 
-bool WinProcessFinder::moduleFirst(PMODULEENTRY32 pme) const {
+JHC_INLINE bool WinProcessFinder::moduleFirst(PMODULEENTRY32 pme) const {
     return (Module32First(m_hSnapShot, pme));
 }
 
-bool WinProcessFinder::moduleNext(PMODULEENTRY32 pme) const {
+JHC_INLINE bool WinProcessFinder::moduleNext(PMODULEENTRY32 pme) const {
     return (Module32Next(m_hSnapShot, pme));
 }
 
-bool WinProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
+JHC_INLINE bool WinProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
     BOOL fFound = FALSE;
 
     for (BOOL fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
@@ -103,7 +103,7 @@ bool WinProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
     return fFound;
 }
 
-bool WinProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
+JHC_INLINE bool WinProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
     BOOL fFound = FALSE;
 
     for (BOOL fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
@@ -117,7 +117,7 @@ bool WinProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
     return fFound;
 }
 
-bool WinProcessFinder::IsExist(const std::wstring& processName) {
+JHC_INLINE bool WinProcessFinder::IsExist(const std::wstring& processName) {
     WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
@@ -125,7 +125,7 @@ bool WinProcessFinder::IsExist(const std::wstring& processName) {
     return !!b;
 }
 
-bool WinProcessFinder::IsExist(const std::string& processName) {
+JHC_INLINE bool WinProcessFinder::IsExist(const std::string& processName) {
     WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};

@@ -22,23 +22,23 @@
 #include "jhc/string_helper.hpp"
 
 namespace jhc {
-void SingletonProcess::markAndCheckStartup(const std::string& uniqueName) {
+JHC_INLINE void SingletonProcess::markAndCheckStartup(const std::string& uniqueName) {
     if (uniqueName_.empty() && !uniqueName.empty()) {
         uniqueName_ = uniqueName;
         check();
     }
 }
 
-const std::string& SingletonProcess::uniqueName() const {
+JHC_INLINE const std::string& SingletonProcess::uniqueName() const {
     return uniqueName_;
 }
 
-bool SingletonProcess::isPrimary() const {
+JHC_INLINE bool SingletonProcess::isPrimary() const {
     assert(!uniqueName_.empty());
     return isPrimary_;
 }
 
-void SingletonProcess::check() {
+JHC_INLINE void SingletonProcess::check() {
 #ifdef JHC_WIN
     if (StringHelper::IsStartsWith(uniqueName_, "Global\\"))
         mutex_ = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
@@ -68,7 +68,7 @@ void SingletonProcess::check() {
 #endif
 }
 
-SingletonProcess::~SingletonProcess() {
+JHC_INLINE SingletonProcess::~SingletonProcess() {
 #ifdef JHC_WIN
     if (mutex_) {
         CloseHandle(mutex_);

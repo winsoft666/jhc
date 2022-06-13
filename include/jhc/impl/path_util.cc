@@ -14,7 +14,7 @@
 
 namespace jhc {
 #ifdef JHC_WIN
-std::wstring PathUtil::GetWindowsFolder() {
+JHC_INLINE std::wstring PathUtil::GetWindowsFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetWindowsDirectoryW(szBuf, MAX_PATH);
     if (result == 0)
@@ -27,7 +27,7 @@ std::wstring PathUtil::GetWindowsFolder() {
     return tempPath;
 }
 
-std::wstring PathUtil::GetSystemFolder() {
+JHC_INLINE std::wstring PathUtil::GetSystemFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetSystemDirectoryW(szBuf, MAX_PATH);
     if (result == 0)
@@ -40,7 +40,7 @@ std::wstring PathUtil::GetSystemFolder() {
     return tempPath;
 }
 
-std::wstring PathUtil::GetTempFolder() {
+JHC_INLINE std::wstring PathUtil::GetTempFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetTempPathW(MAX_PATH, szBuf);
     if (result == 0)
@@ -53,7 +53,7 @@ std::wstring PathUtil::GetTempFolder() {
     return tempPath;
 }
 
-std::wstring PathUtil::GetLocalAppDataFolder() {
+JHC_INLINE std::wstring PathUtil::GetLocalAppDataFolder() {
 #if (NTDDI_VERSION < NTDDI_VISTA)
 #ifndef KF_FLAG_CREATE
 #define KF_FLAG_CREATE 0x00008000
@@ -91,7 +91,7 @@ std::wstring PathUtil::GetLocalAppDataFolder() {
     return tempPath;
 }
 
-bool PathUtil::OpenWinExplorerAndLocate(const std::wstring& path) {
+JHC_INLINE bool PathUtil::OpenWinExplorerAndLocate(const std::wstring& path) {
     bool result = false;
     ITEMIDLIST* pidl = ILCreateFromPathW(path.c_str());
     if (pidl) {
@@ -101,7 +101,7 @@ bool PathUtil::OpenWinExplorerAndLocate(const std::wstring& path) {
     return result;
 }
 
-std::wstring PathUtil::GetWinExplorerDisplayName(const std::wstring& path) {
+JHC_INLINE std::wstring PathUtil::GetWinExplorerDisplayName(const std::wstring& path) {
     SHFILEINFOW sfi;
     ZeroMemory(&sfi, sizeof(SHFILEINFOW));
     DWORD_PTR dwRet = ::SHGetFileInfoW(path.c_str(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFOW), SHGFI_DISPLAYNAME);

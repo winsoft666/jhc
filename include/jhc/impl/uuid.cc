@@ -18,12 +18,12 @@
 
 namespace jhc {
 #ifndef JHC_WIN
-uint32_t UUID::Rand32() {
+JHC_INLINE uint32_t UUID::Rand32() {
     return ((rand() & 0x3) << 30) | ((rand() & 0x7fff) << 15) |
            (rand() & 0x7fff);
 }
 
- std::string UUID::GenUuid4() {
+JHC_INLINE std::string UUID::GenUuid4() {
     return StringHelper::StringPrintf(
         "%08x-%04x-%04x-%04x-%04x%08x",
         Rand32(),           // Generates a 32-bit Hex number
@@ -38,7 +38,7 @@ uint32_t UUID::Rand32() {
 }
 #endif
 
- std::string UUID::Create() {
+JHC_INLINE std::string UUID::Create() {
 #ifdef JHC_WIN
     GUID guid;
     if (S_OK != CoCreateGuid(&guid))
@@ -61,4 +61,4 @@ uint32_t UUID::Rand32() {
     return GenUuid4();
 #endif
 }
-}
+}  // namespace jhc

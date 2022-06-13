@@ -4,7 +4,7 @@
 #include "../buffer_queue.hpp"
 #endif
 
-jhc::BufferQueue::BufferQueue(const std::string& name) {
+JHC_INLINE jhc::BufferQueue::BufferQueue(const std::string& name) {
     queue_name_ = name;
     first_element_ = nullptr;
     last_element_ = nullptr;
@@ -12,15 +12,15 @@ jhc::BufferQueue::BufferQueue(const std::string& name) {
     total_data_size_ = 0;
 }
 
-jhc::BufferQueue::~BufferQueue() {
+JHC_INLINE jhc::BufferQueue::~BufferQueue() {
     clear();
 }
 
-std::string jhc::BufferQueue::getQueueName() const {
+JHC_INLINE std::string jhc::BufferQueue::getQueueName() const {
     return queue_name_;
 }
 
-bool jhc::BufferQueue::pushElementToFront(void* pData, size_t nDataSize) {
+JHC_INLINE bool jhc::BufferQueue::pushElementToFront(void* pData, size_t nDataSize) {
     if (pData == nullptr || nDataSize == 0)
         return false;
 
@@ -65,7 +65,7 @@ bool jhc::BufferQueue::pushElementToFront(void* pData, size_t nDataSize) {
     return true;
 }
 
-bool jhc::BufferQueue::pushElementToLast(void* pData, size_t nDataSize) {
+JHC_INLINE bool jhc::BufferQueue::pushElementToLast(void* pData, size_t nDataSize) {
     if (pData == nullptr || nDataSize == 0)
         return false;
 
@@ -112,7 +112,7 @@ bool jhc::BufferQueue::pushElementToLast(void* pData, size_t nDataSize) {
     return true;
 }
 
-size_t jhc::BufferQueue::popElementFromFront(void* pBuffer, size_t nBufferSize) {
+JHC_INLINE size_t jhc::BufferQueue::popElementFromFront(void* pBuffer, size_t nBufferSize) {
     size_t rvalue = 0;
 
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
@@ -153,7 +153,7 @@ size_t jhc::BufferQueue::popElementFromFront(void* pBuffer, size_t nBufferSize) 
     return rvalue;
 }
 
-size_t jhc::BufferQueue::popElementFromLast(void* pBuffer, size_t nBufferSize) {
+JHC_INLINE size_t jhc::BufferQueue::popElementFromLast(void* pBuffer, size_t nBufferSize) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     size_t rvalue = 0;
 
@@ -193,7 +193,7 @@ size_t jhc::BufferQueue::popElementFromLast(void* pBuffer, size_t nBufferSize) {
     return rvalue;
 }
 
-size_t jhc::BufferQueue::getDataFromFrontElement(void* pBuffer, size_t nBufferSize) {
+JHC_INLINE size_t jhc::BufferQueue::getDataFromFrontElement(void* pBuffer, size_t nBufferSize) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     size_t rvalue = 0;
 
@@ -215,7 +215,7 @@ size_t jhc::BufferQueue::getDataFromFrontElement(void* pBuffer, size_t nBufferSi
     return rvalue;
 }
 
-size_t jhc::BufferQueue::getDataFromLastElement(void* pBuffer, size_t nBufferSize) {
+JHC_INLINE size_t jhc::BufferQueue::getDataFromLastElement(void* pBuffer, size_t nBufferSize) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     size_t rvalue = 0;
 
@@ -237,7 +237,7 @@ size_t jhc::BufferQueue::getDataFromLastElement(void* pBuffer, size_t nBufferSiz
     return rvalue;
 }
 
-size_t jhc::BufferQueue::clear() {
+JHC_INLINE size_t jhc::BufferQueue::clear() {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     const size_t rvalue = element_num_;
 
@@ -263,17 +263,17 @@ size_t jhc::BufferQueue::clear() {
     return rvalue;
 }
 
-size_t jhc::BufferQueue::getElementCount() {
+JHC_INLINE size_t jhc::BufferQueue::getElementCount() {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     return element_num_;
 }
 
-size_t jhc::BufferQueue::getTotalDataSize() {
+JHC_INLINE size_t jhc::BufferQueue::getTotalDataSize() {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     return total_data_size_;
 }
 
-size_t jhc::BufferQueue::popDataCrossElement(void* pOutputBuffer, size_t nBytesToRead, size_t* pBufferIsThrown) {
+JHC_INLINE size_t jhc::BufferQueue::popDataCrossElement(void* pOutputBuffer, size_t nBytesToRead, size_t* pBufferIsThrown) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     size_t nOutBufferNum = 0;
     size_t rvalue = 0;
@@ -334,7 +334,7 @@ size_t jhc::BufferQueue::popDataCrossElement(void* pOutputBuffer, size_t nBytesT
     return rvalue;
 }
 
-size_t jhc::BufferQueue::removeData(size_t nBytesToRemove) {
+JHC_INLINE size_t jhc::BufferQueue::removeData(size_t nBytesToRemove) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     size_t rvalue = 1;
     size_t nByteNeed = nBytesToRemove;
@@ -369,17 +369,17 @@ size_t jhc::BufferQueue::removeData(size_t nBytesToRemove) {
     return rvalue;
 }
 
-size_t jhc::BufferQueue::getFrontElementDataSize() {
+JHC_INLINE size_t jhc::BufferQueue::getFrontElementDataSize() {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     return first_element_->size;
 }
 
-size_t jhc::BufferQueue::getLastElementDataSize() {
+JHC_INLINE size_t jhc::BufferQueue::getLastElementDataSize() {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     return last_element_->size;
 }
 
-size_t jhc::BufferQueue::toOneBuffer(char** ppBuf) {
+JHC_INLINE size_t jhc::BufferQueue::toOneBuffer(char** ppBuf) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     if (ppBuf == nullptr)
         return 0;
@@ -405,7 +405,7 @@ size_t jhc::BufferQueue::toOneBuffer(char** ppBuf) {
     return iBufSize;
 }
 
-size_t jhc::BufferQueue::toOneBufferWithNullEnding(char** ppBuf) {
+JHC_INLINE size_t jhc::BufferQueue::toOneBufferWithNullEnding(char** ppBuf) {
     std::lock_guard<std::recursive_mutex> lg(queue_mutex_);
     if (ppBuf == nullptr)
         return 0;

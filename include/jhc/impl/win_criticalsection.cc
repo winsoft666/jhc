@@ -21,27 +21,27 @@ class WinCriticalSection::Private {
     CRITICAL_SECTION crit_;
 };
 
-WinCriticalSection::WinCriticalSection() :
+JHC_INLINE WinCriticalSection::WinCriticalSection() :
     p_(new WinCriticalSection::Private()) {
     InitializeCriticalSection(&p_->crit_);
 }
 
-WinCriticalSection::~WinCriticalSection() {
+JHC_INLINE WinCriticalSection::~WinCriticalSection() {
     DeleteCriticalSection(&p_->crit_);
 
     delete p_;
     p_ = nullptr;
 }
 
-void WinCriticalSection::enter() const {
+JHC_INLINE void WinCriticalSection::enter() const {
     EnterCriticalSection(&p_->crit_);
 }
 
-void WinCriticalSection::leave() const {
+JHC_INLINE void WinCriticalSection::leave() const {
     LeaveCriticalSection(&p_->crit_);
 }
 
-bool WinCriticalSection::tryEnter() const {
+JHC_INLINE bool WinCriticalSection::tryEnter() const {
     return TryEnterCriticalSection(&p_->crit_) != FALSE;
 }
 }  // namespace jhc

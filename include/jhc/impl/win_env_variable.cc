@@ -29,7 +29,7 @@ wchar_t const* systemEnvSubKey =
     L"Session Manager\\Environment";
 }  // namespace
 
-EnvVar::EnvVar(EnvScope scope, std::wstring const& name) :
+JHC_INLINE EnvVar::EnvVar(EnvScope scope, std::wstring const& name) :
     name_(name),
     scope_(es_invalid) {
     PBYTE data = NULL;
@@ -73,15 +73,15 @@ EnvVar::EnvVar(EnvScope scope, std::wstring const& name) :
     RegCloseKey(key);
 }
 
-EnvVar::EnvVar(EnvVar const& other) {
+JHC_INLINE EnvVar::EnvVar(EnvVar const& other) {
     copy(other);
 }
 
-EnvVar::~EnvVar() {
+JHC_INLINE EnvVar::~EnvVar() {
     destroy();
 }
 
-EnvVar& EnvVar::operator=(EnvVar const& other) {
+JHC_INLINE EnvVar& EnvVar::operator=(EnvVar const& other) {
     if (this != &other) {
         destroy();
         copy(other);
@@ -90,7 +90,7 @@ EnvVar& EnvVar::operator=(EnvVar const& other) {
     return *this;
 }
 
-unsigned int EnvVar::cut(std::wstring const& text) {
+JHC_INLINE unsigned int EnvVar::cut(std::wstring const& text) {
     size_t const sizeMax = std::numeric_limits<size_t>::max();
 
     unsigned int count = 0;
@@ -141,7 +141,7 @@ unsigned int EnvVar::cut(std::wstring const& text) {
     return count;
 }
 
-void EnvVar::paste(std::wstring const& text) {
+JHC_INLINE void EnvVar::paste(std::wstring const& text) {
     HKEY key;
     HKEY subKey;
     wchar_t const* subKeyName;
@@ -179,7 +179,7 @@ void EnvVar::paste(std::wstring const& text) {
     broadcastChange();
 }
 
-void EnvVar::set(std::wstring const& text) {
+JHC_INLINE void EnvVar::set(std::wstring const& text) {
     HKEY key;
     HKEY subKey;
     wchar_t const* subKeyName;
@@ -218,7 +218,7 @@ void EnvVar::set(std::wstring const& text) {
 }
 
 // Deletes the variable from the environment.
-void EnvVar::unset() {
+JHC_INLINE void EnvVar::unset() {
     HKEY key;
     HKEY subKey;
     wchar_t const* subKeyName;
@@ -251,11 +251,11 @@ void EnvVar::unset() {
     broadcastChange();
 }
 
-std::wstring EnvVar::value() const {
+JHC_INLINE std::wstring EnvVar::value() const {
     return value_;
 }
 
-void EnvVar::broadcastChange() const {
+JHC_INLINE void EnvVar::broadcastChange() const {
     DWORD_PTR result = 0;
     SendMessageTimeout(HWND_BROADCAST,
                        WM_SETTINGCHANGE,
@@ -266,41 +266,41 @@ void EnvVar::broadcastChange() const {
                        &result);
 }
 
-void EnvVar::copy(EnvVar const& other) {
+JHC_INLINE void EnvVar::copy(EnvVar const& other) {
     name_ = other.name_;
     scope_ = other.scope_;
     value_ = other.value_;
 }
 
-void EnvVar::destroy() {
+JHC_INLINE void EnvVar::destroy() {
 }
 
-unsigned int EnvHelper::EnvCut(EnvScope scope, wchar_t const* name, wchar_t const* value) {
+JHC_INLINE unsigned int EnvHelper::EnvCut(EnvScope scope, wchar_t const* name, wchar_t const* value) {
     EnvVar var(scope, name);
     return var.cut(value);
 }
 
-void EnvHelper::EnvPaste(EnvScope scope, wchar_t const* name, wchar_t const* value) {
+JHC_INLINE void EnvHelper::EnvPaste(EnvScope scope, wchar_t const* name, wchar_t const* value) {
     EnvVar var(scope, name);
     var.paste(value);
 }
 
-void EnvHelper::EnvSet(EnvScope scope, wchar_t const* name, wchar_t const* value) {
+JHC_INLINE void EnvHelper::EnvSet(EnvScope scope, wchar_t const* name, wchar_t const* value) {
     EnvVar var(scope, name);
     var.set(value);
 }
 
-void EnvHelper::EnvUnset(EnvScope scope, wchar_t const* name) {
+JHC_INLINE void EnvHelper::EnvUnset(EnvScope scope, wchar_t const* name) {
     EnvVar var(scope, name);
     var.unset();
 }
 
-std::wstring EnvHelper::QueryValue(EnvScope scope, wchar_t const* name) {
+JHC_INLINE std::wstring EnvHelper::QueryValue(EnvScope scope, wchar_t const* name) {
     EnvVar var(scope, name);
     return var.value();
 }
 
-void EnvHelper::PathAdd(EnvScope scope, wchar_t const* path) {
+JHC_INLINE void EnvHelper::PathAdd(EnvScope scope, wchar_t const* path) {
     size_t const sizeMax = std::numeric_limits<size_t>::max();
 
     size_t length = std::wstring(path).length();
@@ -330,7 +330,7 @@ void EnvHelper::PathAdd(EnvScope scope, wchar_t const* path) {
     }
 }
 
-unsigned int EnvHelper::PathRemove(EnvScope scope, wchar_t const* path) {
+JHC_INLINE unsigned int EnvHelper::PathRemove(EnvScope scope, wchar_t const* path) {
     size_t const sizeMax = std::numeric_limits<size_t>::max();
 
     unsigned int count = 0;

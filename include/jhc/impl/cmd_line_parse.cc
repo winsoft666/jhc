@@ -16,39 +16,39 @@ const wchar_t value_sep[] = L" :=";  // don't forget space!!
 }  // namespace
 }  // namespace jhc
 
-jhc::CmdLineParser::CmdLineParser(const std::wstring& cmdline) {
+JHC_INLINE jhc::CmdLineParser::CmdLineParser(const std::wstring& cmdline) {
     if (cmdline.length() > 0) {
         cmdline_ = cmdline;
         parse();
     }
 }
 
-jhc::CmdLineParser::CmdLineParser(std::wstring&& cmdline) {
+JHC_INLINE jhc::CmdLineParser::CmdLineParser(std::wstring&& cmdline) {
     if (cmdline.length() > 0) {
         cmdline_ = std::move(cmdline);
         parse();
     }
 }
 
-jhc::CmdLineParser::CmdLineParser(const CmdLineParser& that) {
+JHC_INLINE jhc::CmdLineParser::CmdLineParser(const CmdLineParser& that) {
     cmdline_ = that.cmdline_;
     value_map_ = that.value_map_;
 }
 
-jhc::CmdLineParser::CmdLineParser(CmdLineParser&& that) noexcept {
+JHC_INLINE jhc::CmdLineParser::CmdLineParser(CmdLineParser&& that) noexcept {
     cmdline_ = std::move(that.cmdline_);
     value_map_ = std::move(that.value_map_);
 }
 
-jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::begin() const {
+JHC_INLINE jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::begin() const {
     return value_map_.begin();
 }
 
-jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::end() const {
+JHC_INLINE jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::end() const {
     return value_map_.end();
 }
 
-bool jhc::CmdLineParser::hasKey(const std::wstring& key) const {
+JHC_INLINE bool jhc::CmdLineParser::hasKey(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -57,7 +57,7 @@ bool jhc::CmdLineParser::hasKey(const std::wstring& key) const {
     return true;
 }
 
-bool jhc::CmdLineParser::hasVal(const std::wstring& key) const {
+JHC_INLINE bool jhc::CmdLineParser::hasVal(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -69,7 +69,7 @@ bool jhc::CmdLineParser::hasVal(const std::wstring& key) const {
     return true;
 }
 
-std::wstring jhc::CmdLineParser::getVal(const std::wstring& key) const {
+JHC_INLINE std::wstring jhc::CmdLineParser::getVal(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -78,11 +78,11 @@ std::wstring jhc::CmdLineParser::getVal(const std::wstring& key) const {
     return it->second;
 }
 
-int jhc::CmdLineParser::getKeyCount() const {
+JHC_INLINE int jhc::CmdLineParser::getKeyCount() const {
     return value_map_.size();
 }
 
-void jhc::CmdLineParser::parse() {
+JHC_INLINE void jhc::CmdLineParser::parse() {
     value_map_.clear();
 
     std::wstring strW = cmdline_;
@@ -166,7 +166,7 @@ void jhc::CmdLineParser::parse() {
     }
 }
 
-jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::findKey(const std::wstring& key) const {
+JHC_INLINE jhc::CmdLineParser::ITERPOS jhc::CmdLineParser::findKey(const std::wstring& key) const {
     const std::wstring keyLower = StringHelper::ToLower(key);
     return value_map_.find(keyLower);
 }

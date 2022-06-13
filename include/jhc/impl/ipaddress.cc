@@ -9,28 +9,28 @@
 #pragma comment(lib, "ws2_32.lib")
 #endif
 
-jhc::IPAddress::IPAddress() :
+JHC_INLINE jhc::IPAddress::IPAddress() :
     family_(AF_UNSPEC) {
     memset(&u_, 0, sizeof(u_));
 }
 
-jhc::IPAddress::IPAddress(const in_addr& ip4) :
+JHC_INLINE jhc::IPAddress::IPAddress(const in_addr& ip4) :
     family_(AF_INET) {
     memset(&u_, 0, sizeof(u_));
     u_.ip4 = ip4;
 }
 
-jhc::IPAddress::IPAddress(const in6_addr& ip6) :
+JHC_INLINE jhc::IPAddress::IPAddress(const in6_addr& ip6) :
     family_(AF_INET6) {
     u_.ip6 = ip6;
 }
 
-jhc::IPAddress::IPAddress(const IPAddress& other) :
+JHC_INLINE jhc::IPAddress::IPAddress(const IPAddress& other) :
     family_(other.family_) {
     ::memcpy(&u_, &other.u_, sizeof(u_));
 }
 
-const jhc::IPAddress& jhc::IPAddress::operator=(const jhc::IPAddress& other) {
+JHC_INLINE const jhc::IPAddress& jhc::IPAddress::operator=(const jhc::IPAddress& other) {
     family_ = other.family_;
     memcpy(&u_, &other.u_, sizeof(u_));
     return *this;
@@ -42,7 +42,7 @@ static const in6_addr kTeredoPrefix = {{{0x20, 0x01, 0x00, 0x00}}};
 static const in6_addr kV4CompatibilityPrefix = {{{0}}};
 static const in6_addr k6BonePrefix = {{{0x3f, 0xfe, 0}}};
 
-uint32_t jhc::IPAddress::v4AddressAsHostOrderInteger() const {
+JHC_INLINE uint32_t jhc::IPAddress::v4AddressAsHostOrderInteger() const {
     if (family_ == AF_INET) {
         return ByteOrder::NetworkToHost32(u_.ip4.s_addr);
     }
@@ -51,11 +51,11 @@ uint32_t jhc::IPAddress::v4AddressAsHostOrderInteger() const {
     }
 }
 
-bool jhc::IPAddress::isUnspecifiedIP() const {
+JHC_INLINE bool jhc::IPAddress::isUnspecifiedIP() const {
     return IPIsUnspec(*this);
 }
 
-size_t jhc::IPAddress::size() const {
+JHC_INLINE size_t jhc::IPAddress::size() const {
     switch (family_) {
         case AF_INET:
             return sizeof(in_addr);
@@ -67,7 +67,7 @@ size_t jhc::IPAddress::size() const {
     return 0;
 }
 
-bool jhc::IPAddress::operator==(const jhc::IPAddress& other) const {
+JHC_INLINE bool jhc::IPAddress::operator==(const jhc::IPAddress& other) const {
     if (family_ != other.family_) {
         return false;
     }
@@ -83,21 +83,21 @@ bool jhc::IPAddress::operator==(const jhc::IPAddress& other) const {
     return family_ == AF_UNSPEC;
 }
 
-bool jhc::IPAddress::operator!=(const jhc::IPAddress& other) const {
+JHC_INLINE bool jhc::IPAddress::operator!=(const jhc::IPAddress& other) const {
     return !((*this) == other);
 }
 
-bool jhc::IPAddress::operator>(const jhc::IPAddress& other) const {
+JHC_INLINE bool jhc::IPAddress::operator>(const jhc::IPAddress& other) const {
     return (*this) != other && !((*this) < other);
 }
 
-jhc::IPAddress::IPAddress(uint32_t ip_in_host_byte_order) :
+JHC_INLINE jhc::IPAddress::IPAddress(uint32_t ip_in_host_byte_order) :
     family_(AF_INET) {
     memset(&u_, 0, sizeof(u_));
     u_.ip4.s_addr = jhc::ByteOrder::HostToNetwork32(ip_in_host_byte_order);
 }
 
-jhc::IPAddress::IPAddress(const std::string& str) :
+JHC_INLINE jhc::IPAddress::IPAddress(const std::string& str) :
     family_(AF_INET) {
     memset(&u_, 0, sizeof(u_));
     if (!str.empty()) {
@@ -118,7 +118,7 @@ jhc::IPAddress::IPAddress(const std::string& str) :
     }
 }
 
-bool jhc::IPAddress::operator<(const jhc::IPAddress& other) const {
+JHC_INLINE bool jhc::IPAddress::operator<(const jhc::IPAddress& other) const {
     // IPv4 is 'less than' IPv6
     if (family_ != other.family_) {
         if (family_ == AF_UNSPEC) {
@@ -147,15 +147,15 @@ bool jhc::IPAddress::operator<(const jhc::IPAddress& other) const {
     return false;
 }
 
-in6_addr jhc::IPAddress::getIPv6Address() const {
+JHC_INLINE in6_addr jhc::IPAddress::getIPv6Address() const {
     return u_.ip6;
 }
 
-in_addr jhc::IPAddress::getIPv4Address() const {
+JHC_INLINE in_addr jhc::IPAddress::getIPv4Address() const {
     return u_.ip4;
 }
 
-std::string jhc::IPAddress::toString() const {
+JHC_INLINE std::string jhc::IPAddress::toString() const {
     if (family_ != AF_INET && family_ != AF_INET6) {
         return std::string();
     }
@@ -174,7 +174,7 @@ std::string jhc::IPAddress::toString() const {
     return std::string(buf);
 }
 
-std::string jhc::IPAddress::toSensitiveString() const {
+JHC_INLINE std::string jhc::IPAddress::toSensitiveString() const {
 #if !defined(NDEBUG)
     // Return non-stripped in debug.
     return toString();
@@ -210,7 +210,7 @@ std::string jhc::IPAddress::toSensitiveString() const {
 #endif
 }
 
-jhc::IPAddress jhc::IPAddress::normalized() const {
+JHC_INLINE jhc::IPAddress jhc::IPAddress::normalized() const {
     if (family_ != AF_INET6) {
         return *this;
     }
@@ -223,7 +223,7 @@ jhc::IPAddress jhc::IPAddress::normalized() const {
     return IPAddress(addr);
 }
 
-jhc::IPAddress jhc::IPAddress::asIPv6Address() const {
+JHC_INLINE jhc::IPAddress jhc::IPAddress::asIPv6Address() const {
     if (family_ != AF_INET) {
         return *this;
     }
@@ -233,40 +233,40 @@ jhc::IPAddress jhc::IPAddress::asIPv6Address() const {
     return jhc::IPAddress(v6addr);
 }
 
-bool jhc::InterfaceAddress::operator==(const jhc::InterfaceAddress& other) const {
+JHC_INLINE bool jhc::InterfaceAddress::operator==(const jhc::InterfaceAddress& other) const {
     return ipv6_flags_ == other.ipv6_flags() && static_cast<const IPAddress&>(*this) == other;
 }
 
-bool jhc::InterfaceAddress::operator!=(const jhc::InterfaceAddress& other) const {
+JHC_INLINE bool jhc::InterfaceAddress::operator!=(const jhc::InterfaceAddress& other) const {
     return !((*this) == other);
 }
 
-const jhc::InterfaceAddress& jhc::InterfaceAddress::operator=(const jhc::InterfaceAddress& other) {
+JHC_INLINE const jhc::InterfaceAddress& jhc::InterfaceAddress::operator=(const jhc::InterfaceAddress& other) {
     ipv6_flags_ = other.ipv6_flags_;
     static_cast<jhc::IPAddress&>(*this) = other;
     return *this;
 }
 
-bool jhc::IPAddress::IsPrivateV4(uint32_t ip_in_host_order) {
+JHC_INLINE bool jhc::IPAddress::IsPrivateV4(uint32_t ip_in_host_order) {
     return ((ip_in_host_order >> 24) == 127) || ((ip_in_host_order >> 24) == 10) ||
            ((ip_in_host_order >> 20) == ((172 << 4) | 1)) ||
            ((ip_in_host_order >> 16) == ((192 << 8) | 168)) ||
            ((ip_in_host_order >> 16) == ((169 << 8) | 254));
 }
 
-in_addr jhc::IPAddress::ExtractMappedAddress(const in6_addr& in6) {
+JHC_INLINE in_addr jhc::IPAddress::ExtractMappedAddress(const in6_addr& in6) {
     in_addr ipv4;
     ::memcpy(&ipv4.s_addr, &in6.s6_addr[12], sizeof(ipv4.s_addr));
     return ipv4;
 }
 
-bool jhc::IPAddress::IPIsHelper(const IPAddress& ip, const in6_addr& tomatch, int length) {
+JHC_INLINE bool jhc::IPAddress::IPIsHelper(const IPAddress& ip, const in6_addr& tomatch, int length) {
     // Helper method for checking IP prefix matches (but only on whole byte lengths). Length is in bits.
     in6_addr addr = ip.getIPv6Address();
     return memcmp(&addr, &tomatch, (length >> 3)) == 0;
 }
 
-bool jhc::IPAddress::IPFromAddrInfo(struct addrinfo* info, jhc::IPAddress* out) {
+JHC_INLINE bool jhc::IPAddress::IPFromAddrInfo(struct addrinfo* info, jhc::IPAddress* out) {
     if (!info || !info->ai_addr) {
         return false;
     }
@@ -285,7 +285,7 @@ bool jhc::IPAddress::IPFromAddrInfo(struct addrinfo* info, jhc::IPAddress* out) 
     return false;
 }
 
-bool jhc::IPAddress::IPFromString(const std::string& str, jhc::IPAddress* out) {
+JHC_INLINE bool jhc::IPAddress::IPFromString(const std::string& str, jhc::IPAddress* out) {
     if (!out) {
         return false;
     }
@@ -309,7 +309,7 @@ bool jhc::IPAddress::IPFromString(const std::string& str, jhc::IPAddress* out) {
     return true;
 }
 
-bool jhc::IPAddress::IPIsAny(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsAny(const jhc::IPAddress& ip) {
     switch (ip.getFamily()) {
         case AF_INET:
             return ip == jhc::IPAddress(INADDR_ANY);
@@ -324,7 +324,7 @@ bool jhc::IPAddress::IPIsAny(const jhc::IPAddress& ip) {
     return false;
 }
 
-bool jhc::IPAddress::IPIsLoopback(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsLoopback(const jhc::IPAddress& ip) {
     switch (ip.getFamily()) {
         case AF_INET: {
             return (ip.v4AddressAsHostOrderInteger() >> 24) == 127;
@@ -338,7 +338,7 @@ bool jhc::IPAddress::IPIsLoopback(const jhc::IPAddress& ip) {
     return false;
 }
 
-bool jhc::IPAddress::IPIsPrivate(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsPrivate(const jhc::IPAddress& ip) {
     switch (ip.getFamily()) {
         case AF_INET: {
             return IsPrivateV4(ip.v4AddressAsHostOrderInteger());
@@ -352,11 +352,11 @@ bool jhc::IPAddress::IPIsPrivate(const jhc::IPAddress& ip) {
     return false;
 }
 
-bool jhc::IPAddress::IPIsUnspec(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsUnspec(const jhc::IPAddress& ip) {
     return ip.getFamily() == AF_UNSPEC;
 }
 
-size_t jhc::IPAddress::HashIP(const jhc::IPAddress& ip) {
+JHC_INLINE size_t jhc::IPAddress::HashIP(const jhc::IPAddress& ip) {
     switch (ip.getFamily()) {
         case AF_INET: {
             return ip.getIPv4Address().s_addr;
@@ -372,7 +372,7 @@ size_t jhc::IPAddress::HashIP(const jhc::IPAddress& ip) {
     return 0;
 }
 
-jhc::IPAddress jhc::IPAddress::TruncateIP(const jhc::IPAddress& ip, int length) {
+JHC_INLINE jhc::IPAddress jhc::IPAddress::TruncateIP(const jhc::IPAddress& ip, int length) {
     if (length < 0) {
         return jhc::IPAddress();
     }
@@ -424,7 +424,7 @@ jhc::IPAddress jhc::IPAddress::TruncateIP(const jhc::IPAddress& ip, int length) 
     return jhc::IPAddress();
 }
 
-int jhc::IPAddress::CountIPMaskBits(jhc::IPAddress mask) {
+JHC_INLINE int jhc::IPAddress::CountIPMaskBits(jhc::IPAddress mask) {
     uint32_t word_to_count = 0;
     int bits = 0;
 
@@ -491,15 +491,15 @@ int jhc::IPAddress::CountIPMaskBits(jhc::IPAddress mask) {
     return bits + (32 - zeroes);
 }
 
-bool jhc::IPAddress::IPIs6Bone(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIs6Bone(const jhc::IPAddress& ip) {
     return IPIsHelper(ip, k6BonePrefix, 16);
 }
 
-bool jhc::IPAddress::IPIs6To4(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIs6To4(const jhc::IPAddress& ip) {
     return IPIsHelper(ip, k6To4Prefix, 16);
 }
 
-bool jhc::IPAddress::IPIsLinkLocal(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsLinkLocal(const jhc::IPAddress& ip) {
     // Can't use the helper because the prefix is 10 bits.
     in6_addr addr = ip.getIPv6Address();
     return addr.s6_addr[0] == 0xFE && addr.s6_addr[1] == 0x80;
@@ -507,36 +507,36 @@ bool jhc::IPAddress::IPIsLinkLocal(const jhc::IPAddress& ip) {
 
 // According to http://www.ietf.org/rfc/rfc2373.txt, Appendix A, page 19.  An
 // address which contains MAC will have its 11th and 12th bytes as FF:FE as well as the U/L bit as 1.
-bool jhc::IPAddress::IPIsMacBased(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsMacBased(const jhc::IPAddress& ip) {
     in6_addr addr = ip.getIPv6Address();
     return ((addr.s6_addr[8] & 0x02) && addr.s6_addr[11] == 0xFF && addr.s6_addr[12] == 0xFE);
 }
 
-bool jhc::IPAddress::IPIsSiteLocal(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsSiteLocal(const jhc::IPAddress& ip) {
     // Can't use the helper because the prefix is 10 bits.
     in6_addr addr = ip.getIPv6Address();
     return addr.s6_addr[0] == 0xFE && (addr.s6_addr[1] & 0xC0) == 0xC0;
 }
 
-bool jhc::IPAddress::IPIsULA(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsULA(const jhc::IPAddress& ip) {
     // Can't use the helper because the prefix is 7 bits.
     in6_addr addr = ip.getIPv6Address();
     return (addr.s6_addr[0] & 0xFE) == 0xFC;
 }
 
-bool jhc::IPAddress::IPIsTeredo(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsTeredo(const jhc::IPAddress& ip) {
     return IPIsHelper(ip, kTeredoPrefix, 32);
 }
 
-bool jhc::IPAddress::IPIsV4Compatibility(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsV4Compatibility(const jhc::IPAddress& ip) {
     return IPIsHelper(ip, kV4CompatibilityPrefix, 96);
 }
 
-bool jhc::IPAddress::IPIsV4Mapped(const jhc::IPAddress& ip) {
+JHC_INLINE bool jhc::IPAddress::IPIsV4Mapped(const jhc::IPAddress& ip) {
     return IPIsHelper(ip, kV4MappedPrefix, 96);
 }
 
-int jhc::IPAddress::IPAddressPrecedence(const jhc::IPAddress& ip) {
+JHC_INLINE int jhc::IPAddress::IPAddressPrecedence(const jhc::IPAddress& ip) {
     // Precedence values from RFC 3484-bis. Prefers native v4 over 6to4/Teredo.
     if (ip.getFamily() == AF_INET) {
         return 30;
@@ -569,7 +569,7 @@ int jhc::IPAddress::IPAddressPrecedence(const jhc::IPAddress& ip) {
     return 0;
 }
 
-jhc::IPAddress jhc::IPAddress::GetLoopbackIP(int family) {
+JHC_INLINE jhc::IPAddress jhc::IPAddress::GetLoopbackIP(int family) {
     if (family == AF_INET) {
         return jhc::IPAddress(INADDR_LOOPBACK);
     }
@@ -581,7 +581,7 @@ jhc::IPAddress jhc::IPAddress::GetLoopbackIP(int family) {
     return jhc::IPAddress();
 }
 
-jhc::IPAddress jhc::IPAddress::GetAnyIP(int family) {
+JHC_INLINE jhc::IPAddress jhc::IPAddress::GetAnyIP(int family) {
     if (family == AF_INET) {
         return jhc::IPAddress(INADDR_ANY);
     }
@@ -593,7 +593,7 @@ jhc::IPAddress jhc::IPAddress::GetAnyIP(int family) {
     return jhc::IPAddress();
 }
 
-bool jhc::InterfaceAddress::IPFromString(const std::string& str, int flags, jhc::InterfaceAddress* out) {
+JHC_INLINE bool jhc::InterfaceAddress::IPFromString(const std::string& str, int flags, jhc::InterfaceAddress* out) {
     jhc::IPAddress ip;
 
     if (!jhc::IPAddress::IPFromString(str, &ip)) {

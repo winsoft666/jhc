@@ -5,15 +5,15 @@
 #endif
 #include "jhc/file.hpp"
 
-jhc::SHA1::SHA1() {
+JHC_INLINE jhc::SHA1::SHA1() {
     reset();
 }
 
-jhc::SHA1::~SHA1() {
+JHC_INLINE jhc::SHA1::~SHA1() {
     reset();
 }
 
-void jhc::SHA1::reset() {
+JHC_INLINE void jhc::SHA1::reset() {
     // SHA1 initialization constants
     m_state[0] = 0x67452301;
     m_state[1] = 0xEFCDAB89;
@@ -26,7 +26,7 @@ void jhc::SHA1::reset() {
 }
 
 // Use this function to hash in binary data and strings
-void jhc::SHA1::update(const unsigned char* data, unsigned int len) {
+JHC_INLINE void jhc::SHA1::update(const unsigned char* data, unsigned int len) {
     uint32_t i = 0, j = 0;
 
     j = (m_count[0] >> 3) & 63;
@@ -52,7 +52,7 @@ void jhc::SHA1::update(const unsigned char* data, unsigned int len) {
     memcpy(&m_buffer[j], &data[i], len - i);
 }
 
-void jhc::SHA1::final() {
+JHC_INLINE void jhc::SHA1::final() {
     uint32_t i = 0, j = 0;
     unsigned char finalcount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -83,7 +83,7 @@ void jhc::SHA1::final() {
 }
 
 // Get the final hash as a pre-formatted string
-void jhc::SHA1::reportHash(char* szReport, unsigned char uReportType) {
+JHC_INLINE void jhc::SHA1::reportHash(char* szReport, unsigned char uReportType) {
     unsigned char i = 0;
 
     if (uReportType == REPORT_HEX) {
@@ -102,14 +102,14 @@ void jhc::SHA1::reportHash(char* szReport, unsigned char uReportType) {
 }
 
 // Get the raw message digest
-void jhc::SHA1::getHash(unsigned char* uDest) {
+JHC_INLINE void jhc::SHA1::getHash(unsigned char* uDest) {
     unsigned char i = 0;
 
     for (i = 0; i < 20; i++)
         uDest[i] = m_digest[i];
 }
 
-std::string jhc::SHA1::GetFileSHA1(const jhc::fs::path& filePath) {
+JHC_INLINE std::string jhc::SHA1::GetFileSHA1(const jhc::fs::path& filePath) {
     std::string result;
 
     File file(filePath);
@@ -137,7 +137,7 @@ std::string jhc::SHA1::GetFileSHA1(const jhc::fs::path& filePath) {
     return result;
 }
 
-std::string jhc::SHA1::GetDataSHA1(const unsigned char* data, size_t dataSize) {
+JHC_INLINE std::string jhc::SHA1::GetDataSHA1(const unsigned char* data, size_t dataSize) {
     SHA1 sha1;
     sha1.reset();
 
@@ -199,7 +199,7 @@ std::string jhc::SHA1::GetDataSHA1(const unsigned char* data, size_t dataSize) {
         w = ROL32(w, 30);                                        \
     }
 
-void jhc::SHA1::transform(uint32_t state[5], const unsigned char buffer[64]) {
+JHC_INLINE void jhc::SHA1::transform(uint32_t state[5], const unsigned char buffer[64]) {
     uint32_t a = 0, b = 0, c = 0, d = 0, e = 0;
 
     SHA1_WORKSPACE_BLOCK* block;

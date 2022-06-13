@@ -4,7 +4,7 @@
 #include "../byteorder.hpp"
 #endif
 
-bool jhc::ByteOrder::IsHostBigEndian() {
+JHC_INLINE bool jhc::ByteOrder::IsHostBigEndian() {
     int nl = 0x12345678;
     short ns = 0x1234;
     bool big_endian = false;
@@ -25,83 +25,83 @@ bool jhc::ByteOrder::IsHostBigEndian() {
     return big_endian;
 }
 
-void jhc::ByteOrder::Set8(void* memory, size_t offset, uint8_t v) {
+JHC_INLINE void jhc::ByteOrder::Set8(void* memory, size_t offset, uint8_t v) {
     static_cast<uint8_t*>(memory)[offset] = v;
 }
 
-uint8_t jhc::ByteOrder::Get8(const void* memory, size_t offset) {
+JHC_INLINE uint8_t jhc::ByteOrder::Get8(const void* memory, size_t offset) {
     return static_cast<const uint8_t*>(memory)[offset];
 }
 
-void jhc::ByteOrder::SetBE16(void* memory, uint16_t v) {
+JHC_INLINE void jhc::ByteOrder::SetBE16(void* memory, uint16_t v) {
     *static_cast<uint16_t*>(memory) = htobe16(v);
 }
 
-void jhc::ByteOrder::SetBE32(void* memory, uint32_t v) {
+JHC_INLINE void jhc::ByteOrder::SetBE32(void* memory, uint32_t v) {
     *static_cast<uint32_t*>(memory) = htobe32(v);
 }
 
 #if _WIN32_WINNT >= 0x0602 || WINVER >= 0x0602  // Win8
-void jhc::ByteOrder::SetBE64(void* memory, uint64_t v) {
+JHC_INLINE void jhc::ByteOrder::SetBE64(void* memory, uint64_t v) {
     *static_cast<uint64_t*>(memory) = htobe64(v);
 }
 
-uint64_t jhc::ByteOrder::GetBE64(const void* memory) {
+JHC_INLINE uint64_t jhc::ByteOrder::GetBE64(const void* memory) {
     return be64toh(*static_cast<const uint64_t*>(memory));
 }
 
-uint64_t jhc::ByteOrder::HostToNetwork64(uint64_t n) {
+JHC_INLINE uint64_t jhc::ByteOrder::HostToNetwork64(uint64_t n) {
     return htobe64(n);
 }
 
-uint64_t jhc::ByteOrder::NetworkToHost64(uint64_t n) {
+JHC_INLINE uint64_t jhc::ByteOrder::NetworkToHost64(uint64_t n) {
     return be64toh(n);
 }
 #endif
-uint16_t jhc::ByteOrder::GetBE16(const void* memory) {
+JHC_INLINE uint16_t jhc::ByteOrder::GetBE16(const void* memory) {
     return be16toh(*static_cast<const uint16_t*>(memory));
 }
 
-uint32_t jhc::ByteOrder::GetBE32(const void* memory) {
+JHC_INLINE uint32_t jhc::ByteOrder::GetBE32(const void* memory) {
     return be32toh(*static_cast<const uint32_t*>(memory));
 }
 
-void jhc::ByteOrder::SetLE16(void* memory, uint16_t v) {
+JHC_INLINE void jhc::ByteOrder::SetLE16(void* memory, uint16_t v) {
     *static_cast<uint16_t*>(memory) = htole16(v);
 }
 
-void jhc::ByteOrder::SetLE32(void* memory, uint32_t v) {
+JHC_INLINE void jhc::ByteOrder::SetLE32(void* memory, uint32_t v) {
     *static_cast<uint32_t*>(memory) = htole32(v);
 }
 
-void jhc::ByteOrder::SetLE64(void* memory, uint64_t v) {
+JHC_INLINE void jhc::ByteOrder::SetLE64(void* memory, uint64_t v) {
     *static_cast<uint64_t*>(memory) = htole64(v);
 }
 
-uint16_t jhc::ByteOrder::GetLE16(const void* memory) {
+JHC_INLINE uint16_t jhc::ByteOrder::GetLE16(const void* memory) {
     return le16toh(*static_cast<const uint16_t*>(memory));
 }
 
-uint32_t jhc::ByteOrder::GetLE32(const void* memory) {
+JHC_INLINE uint32_t jhc::ByteOrder::GetLE32(const void* memory) {
     return le32toh(*static_cast<const uint32_t*>(memory));
 }
 
-uint64_t jhc::ByteOrder::GetLE64(const void* memory) {
+JHC_INLINE uint64_t jhc::ByteOrder::GetLE64(const void* memory) {
     return le64toh(*static_cast<const uint64_t*>(memory));
 }
 
-uint16_t jhc::ByteOrder::HostToNetwork16(uint16_t n) {
+JHC_INLINE uint16_t jhc::ByteOrder::HostToNetwork16(uint16_t n) {
     return htobe16(n);
 }
 
-uint32_t jhc::ByteOrder::HostToNetwork32(uint32_t n) {
+JHC_INLINE uint32_t jhc::ByteOrder::HostToNetwork32(uint32_t n) {
     return htobe32(n);
 }
 
-uint16_t jhc::ByteOrder::NetworkToHost16(uint16_t n) {
+JHC_INLINE uint16_t jhc::ByteOrder::NetworkToHost16(uint16_t n) {
     return be16toh(n);
 }
 
-uint32_t jhc::ByteOrder::NetworkToHost32(uint32_t n) {
+JHC_INLINE uint32_t jhc::ByteOrder::NetworkToHost32(uint32_t n) {
     return be32toh(n);
 }

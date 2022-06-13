@@ -18,7 +18,7 @@
 #include "jhc/string_helper.hpp"
 
 namespace jhc {
-WinHttp::~WinHttp() {
+JHC_INLINE WinHttp::~WinHttp() {
     if (m_hRequest) {
         WinHttpCloseHandle(m_hRequest);
         m_hRequest = NULL;
@@ -35,7 +35,7 @@ WinHttp::~WinHttp() {
     }
 }
 
-bool WinHttp::openSession(
+JHC_INLINE bool WinHttp::openSession(
     const std::wstring& userAgent,
     int dwAccessType,
     const std::wstring& proxyName,
@@ -51,7 +51,7 @@ bool WinHttp::openSession(
     return m_hSession;
 }
 
-bool WinHttp::openConnect(const std::wstring& url) {
+JHC_INLINE bool WinHttp::openConnect(const std::wstring& url) {
     if (m_hSession) {
         if (WinHttpCheckPlatform()) {
             URL_COMPONENTS urlComp;
@@ -88,7 +88,7 @@ bool WinHttp::openConnect(const std::wstring& url) {
     return false;
 }
 
-bool WinHttp::openRequest(bool bPost) {
+JHC_INLINE bool WinHttp::openRequest(bool bPost) {
     if (m_hConnect) {
         const wchar_t* pwszVerb = bPost ? L"POST" : L"GET";
         const DWORD dwFlags = (m_nScheme == INTERNET_SCHEME_HTTPS ? WINHTTP_FLAG_SECURE : 0);
@@ -105,7 +105,7 @@ bool WinHttp::openRequest(bool bPost) {
     return true;
 }
 
-bool WinHttp::sendRequest(void* lpBuffer, unsigned int dwSize) {
+JHC_INLINE bool WinHttp::sendRequest(void* lpBuffer, unsigned int dwSize) {
     BOOL bResults = FALSE;
     if (m_hRequest) {
         if (lpBuffer != NULL && dwSize > 0)
@@ -116,14 +116,14 @@ bool WinHttp::sendRequest(void* lpBuffer, unsigned int dwSize) {
     return !!bResults;
 }
 
-bool WinHttp::receiveResponse() {
+JHC_INLINE bool WinHttp::receiveResponse() {
     if (m_hRequest) {
         return WinHttpReceiveResponse(m_hRequest, NULL);
     }
     return false;
 }
 
-std::vector<unsigned char> WinHttp::getResponseBody() {
+JHC_INLINE std::vector<unsigned char> WinHttp::getResponseBody() {
     DWORD dwSize = 0;
     std::vector<unsigned char> list;
     if (!m_hRequest)
@@ -166,7 +166,7 @@ std::vector<unsigned char> WinHttp::getResponseBody() {
     return list;
 }
 
-unsigned int WinHttp::getResponseStatusCode() {
+JHC_INLINE unsigned int WinHttp::getResponseStatusCode() {
     DWORD dwSize = sizeof(DWORD);
     DWORD dwStatusCode = 0;
     std::wstring strStatus;
@@ -182,7 +182,7 @@ unsigned int WinHttp::getResponseStatusCode() {
     return dwStatusCode;
 }
 
-std::wstring WinHttp::getResponseStatusText() {
+JHC_INLINE std::wstring WinHttp::getResponseStatusText() {
     DWORD dwSize = 0;
     WCHAR* lpOutBuffer = NULL;
     std::wstring strStatus;
@@ -199,7 +199,7 @@ std::wstring WinHttp::getResponseStatusText() {
     return strStatus;
 }
 
-std::wstring WinHttp::getResponseRawHeaders() {
+JHC_INLINE std::wstring WinHttp::getResponseRawHeaders() {
     DWORD dwSize = 0;
     WCHAR* lpOutBuffer = NULL;
     std::wstring strResult;
@@ -226,7 +226,7 @@ std::wstring WinHttp::getResponseRawHeaders() {
     return strResult;
 }
 
-std::unordered_map<std::wstring, std::wstring> WinHttp::getResponseHeaders() {
+JHC_INLINE std::unordered_map<std::wstring, std::wstring> WinHttp::getResponseHeaders() {
     std::unordered_map<std::wstring, std::wstring> result;
 
     const std::wstring strHeaders = getResponseRawHeaders();
@@ -240,7 +240,7 @@ std::unordered_map<std::wstring, std::wstring> WinHttp::getResponseHeaders() {
     return result;
 }
 
-bool WinHttp::setRequestHeader(const std::wstring& name, const std::wstring& value) {
+JHC_INLINE bool WinHttp::setRequestHeader(const std::wstring& name, const std::wstring& value) {
     if (name.empty() || value.empty())
         return false;
 
@@ -255,7 +255,7 @@ bool WinHttp::setRequestHeader(const std::wstring& name, const std::wstring& val
     return !!bResults;
 }
 
-bool WinHttp::setTimeout(
+JHC_INLINE bool WinHttp::setTimeout(
     int nResolveTimeout,
     int nConnectTimeout,
     int nSendTimeout,
@@ -265,13 +265,13 @@ bool WinHttp::setTimeout(
     return false;
 }
 
-bool WinHttp::setOption(int Option, int value) {
+JHC_INLINE bool WinHttp::setOption(int Option, int value) {
     if (m_hRequest)
         return WinHttpSetOption(m_hRequest, Option, (LPVOID)&value, 4);
     return false;
 }
 
-bool WinHttp::setAllowRedirect(bool bAllow) {
+JHC_INLINE bool WinHttp::setAllowRedirect(bool bAllow) {
     return setOption(WINHTTP_OPTION_REDIRECT_POLICY,
                      bAllow ? WINHTTP_OPTION_REDIRECT_POLICY_ALWAYS : WINHTTP_OPTION_REDIRECT_POLICY_NEVER);
 }

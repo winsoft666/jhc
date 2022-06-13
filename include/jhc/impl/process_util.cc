@@ -17,10 +17,9 @@
 
 #pragma warning(disable : 4996)
 
-
 namespace jhc {
 #ifdef JHC_WIN
-bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
+JHC_INLINE bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
     BOOL fRet = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -38,7 +37,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
     return !!fRet;
 }
 
- bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) {
+JHC_INLINE bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) {
     HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
     if (!hProcess)
         return false;
@@ -47,7 +46,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
     return ret;
 }
 
- bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) {
+JHC_INLINE bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) {
     OSVERSIONINFO VersionTmp;
     VersionTmp.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&VersionTmp);
@@ -90,7 +89,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
     return !!res;
 }
 
- bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param) {
+JHC_INLINE bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param) {
     WCHAR szDir[MAX_PATH] = {0};
     StringCchPrintfW(szDir, MAX_PATH, L"%s", path.c_str());
     PathRemoveFileSpecW(szDir);
@@ -119,7 +118,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
 
 // On windows, path is encoded by ANSI, otherwise, is UTF8.
 //
-std::string ProcessUtil::GetCurrentExePath() {
+JHC_INLINE std::string ProcessUtil::GetCurrentExePath() {
     std::string ret;
 #ifdef JHC_WIN
     char* pBuf = NULL;
@@ -155,7 +154,7 @@ std::string ProcessUtil::GetCurrentExePath() {
 
 // On windows, directory is encoded by ANSI, otherwise, is UTF8.
 //
-std::string ProcessUtil::GetCurrentExeDirectory() {
+JHC_INLINE std::string ProcessUtil::GetCurrentExeDirectory() {
     const std::string path = GetCurrentExePath();
 #ifdef JHC_WIN
     const std::wstring pathW = StringEncode::AnsiToUnicode(path);
@@ -170,7 +169,7 @@ std::string ProcessUtil::GetCurrentExeDirectory() {
 }
 
 #ifdef JHC_WIN
-BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
+JHC_INLINE BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
     std::list<std::string>* pList = (std::list<std::string>*)lParam;
 
     HRSRC hResInfo = FindResourceW(hModule, lpName, lpType);
@@ -193,7 +192,7 @@ BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpT
     return TRUE;  // Keep going
 }
 
- bool ProcessUtil::GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests) {
+JHC_INLINE bool ProcessUtil::GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests) {
     HMODULE hModule = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
     if (!hModule)
         return false;
@@ -204,4 +203,4 @@ BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpT
     return true;
 }
 #endif
-}
+}  // namespace jhc

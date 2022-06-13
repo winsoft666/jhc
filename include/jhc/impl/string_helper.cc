@@ -35,87 +35,87 @@
 #endif
 
 namespace jhc {
-char StringHelper::ToLower(const char& in) {
+JHC_INLINE char StringHelper::ToLower(const char& in) {
     if (in <= 'Z' && in >= 'A')
         return in - ('Z' - 'z');
     return in;
 }
 
-char StringHelper::ToUpper(const char& in) {
+JHC_INLINE char StringHelper::ToUpper(const char& in) {
     if (in <= 'z' && in >= 'a')
         return in + ('Z' - 'z');
     return in;
 }
 
-wchar_t StringHelper::ToLower(const wchar_t& in) {
+JHC_INLINE wchar_t StringHelper::ToLower(const wchar_t& in) {
     if (in <= 'Z' && in >= 'A')
         return in - (L'Z' - L'z');
     return in;
 }
 
-wchar_t StringHelper::ToUpper(const wchar_t& in) {
+JHC_INLINE wchar_t StringHelper::ToUpper(const wchar_t& in) {
     if (in <= L'z' && in >= L'a')
         return in + (L'Z' - L'z');
     return in;
 }
 
-std::string StringHelper::ToLower(const std::string& s) {
+JHC_INLINE std::string StringHelper::ToLower(const std::string& s) {
     std::string d = s;
     char (*pf)(const char&) = StringHelper::ToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring StringHelper::ToLower(const std::wstring& s) {
+JHC_INLINE std::wstring StringHelper::ToLower(const std::wstring& s) {
     std::wstring d = s;
     wchar_t (*pf)(const wchar_t&) = StringHelper::ToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::string StringHelper::ToUpper(const std::string& s) {
+JHC_INLINE std::string StringHelper::ToUpper(const std::string& s) {
     std::string d = s;
     char (*pf)(const char&) = StringHelper::ToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring StringHelper::ToUpper(const std::wstring& s) {
+JHC_INLINE std::wstring StringHelper::ToUpper(const std::wstring& s) {
     std::wstring d = s;
     wchar_t (*pf)(const wchar_t&) = StringHelper::ToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-bool StringHelper::IsDigit(const std::string& s) {
+JHC_INLINE bool StringHelper::IsDigit(const std::string& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
-bool StringHelper::IsDigit(const std::wstring& s) {
+JHC_INLINE bool StringHelper::IsDigit(const std::wstring& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
 }
 
-bool StringHelper::IsLetterOrDigit(const char& c) {
+JHC_INLINE bool StringHelper::IsLetterOrDigit(const char& c) {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool StringHelper::IsLetterOrDigit(const wchar_t& c) {
+JHC_INLINE bool StringHelper::IsLetterOrDigit(const wchar_t& c) {
     return (c >= L'0' && c <= L'9') || (c >= L'a' && c <= L'z') || (c >= L'A' && c <= L'Z');
 }
 
-bool StringHelper::IsLetterOrDigit(const std::string& s) {
+JHC_INLINE bool StringHelper::IsLetterOrDigit(const std::string& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](char c) { return !IsLetterOrDigit(c); }) == s.end();
 }
 
-bool StringHelper::IsLetterOrDigit(const std::wstring& s) {
+JHC_INLINE bool StringHelper::IsLetterOrDigit(const std::wstring& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !IsLetterOrDigit(c); }) == s.end();
 }
 
-std::string StringHelper::Trim(const std::string& s, const std::string& whitespaces) {
+JHC_INLINE std::string StringHelper::Trim(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -125,7 +125,7 @@ std::string StringHelper::Trim(const std::string& s, const std::string& whitespa
     return s.substr(pos, n);
 }
 
-std::wstring StringHelper::Trim(const std::wstring& s, const std::wstring& whitespaces) {
+JHC_INLINE std::wstring StringHelper::Trim(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -135,7 +135,7 @@ std::wstring StringHelper::Trim(const std::wstring& s, const std::wstring& white
     return s.substr(pos, n);
 }
 
-std::string StringHelper::LeftTrim(const std::string& s, const std::string& whitespaces) {
+JHC_INLINE std::string StringHelper::LeftTrim(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -144,16 +144,16 @@ std::string StringHelper::LeftTrim(const std::string& s, const std::string& whit
     return s.substr(pos);
 }
 
-std::wstring StringHelper::LeftTrim(const std::wstring& s, const std::wstring& whitespaces) {
+JHC_INLINE std::wstring StringHelper::LeftTrim(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
-    return std::wstring();
+        return std::wstring();
     }
 
     return s.substr(pos);
 }
 
-std::string StringHelper::RightTrim(const std::string& s, const std::string& whitespaces) {
+JHC_INLINE std::string StringHelper::RightTrim(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == 0) {
         return std::string();
@@ -162,7 +162,7 @@ std::string StringHelper::RightTrim(const std::string& s, const std::string& whi
     return s.substr(0, pos + 1);
 }
 
-std::wstring StringHelper::RightTrim(const std::wstring& s, const std::wstring& whitespaces) {
+JHC_INLINE std::wstring StringHelper::RightTrim(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == 0) {
         return std::wstring();
@@ -171,37 +171,37 @@ std::wstring StringHelper::RightTrim(const std::wstring& s, const std::wstring& 
     return s.substr(0, pos + 1);
 }
 
-bool StringHelper::IsStartsWith(const std::string& s, const std::string& prefix) {
+JHC_INLINE bool StringHelper::IsStartsWith(const std::string& s, const std::string& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool StringHelper::IsStartsWith(const std::wstring& s, const std::wstring& prefix) {
+JHC_INLINE bool StringHelper::IsStartsWith(const std::wstring& s, const std::wstring& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool StringHelper::IsEndsWith(const std::string& s, const std::string& suffix) {
+JHC_INLINE bool StringHelper::IsEndsWith(const std::string& s, const std::string& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool StringHelper::IsEndsWith(const std::wstring& s, const std::wstring& suffix) {
+JHC_INLINE bool StringHelper::IsEndsWith(const std::wstring& s, const std::wstring& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool StringHelper::IsContains(const std::string& str, const std::string& substring) {
+JHC_INLINE bool StringHelper::IsContains(const std::string& str, const std::string& substring) {
     return (str.find(substring) != std::string::npos);
 }
 
-bool StringHelper::IsContains(const std::wstring& str, const std::wstring& substring) {
+JHC_INLINE bool StringHelper::IsContains(const std::wstring& str, const std::wstring& substring) {
     return (str.find(substring) != std::wstring::npos);
 }
 
-size_t StringHelper::ContainTimes(const std::string& str, const std::string& substring) {
+JHC_INLINE size_t StringHelper::ContainTimes(const std::string& str, const std::string& substring) {
     size_t times = 0;
     size_t pos = std::string::npos;
     size_t offset = 0;
@@ -221,7 +221,7 @@ size_t StringHelper::ContainTimes(const std::string& str, const std::string& sub
     return times;
 }
 
-size_t StringHelper::ContainTimes(const std::wstring& str, const std::wstring& substring) {
+JHC_INLINE size_t StringHelper::ContainTimes(const std::wstring& str, const std::wstring& substring) {
     size_t times = 0;
     size_t pos = std::wstring::npos;
     size_t offset = 0;
@@ -241,7 +241,7 @@ size_t StringHelper::ContainTimes(const std::wstring& str, const std::wstring& s
     return times;
 }
 
-std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
+JHC_INLINE std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -252,7 +252,7 @@ std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& 
     return ret;
 }
 
-std::wstring StringHelper::ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+JHC_INLINE std::wstring StringHelper::ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -263,7 +263,7 @@ std::wstring StringHelper::ReplaceFirst(const std::wstring& s, const std::wstrin
     return ret;
 }
 
-std::string StringHelper::ReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
+JHC_INLINE std::string StringHelper::ReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -274,7 +274,7 @@ std::string StringHelper::ReplaceLast(const std::string& s, const std::string& f
     return ret;
 }
 
-std::wstring StringHelper::ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+JHC_INLINE std::wstring StringHelper::ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -285,7 +285,7 @@ std::wstring StringHelper::ReplaceLast(const std::wstring& s, const std::wstring
     return ret;
 }
 
-std::string StringHelper::Replace(const std::string& s, const std::string& from, const std::string& to) {
+JHC_INLINE std::string StringHelper::Replace(const std::string& s, const std::string& from, const std::string& to) {
     if (from.empty()) {
         return s;
     }
@@ -305,7 +305,7 @@ std::string StringHelper::Replace(const std::string& s, const std::string& from,
     return ret;
 }
 
-std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+JHC_INLINE std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     if (from.empty()) {
         return s;
     }
@@ -325,7 +325,7 @@ std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& fr
     return ret;
 }
 
-std::vector<std::string> StringHelper::Split(const std::string& src, const std::string& delimiter, bool includeEmptyStr) {
+JHC_INLINE std::vector<std::string> StringHelper::Split(const std::string& src, const std::string& delimiter, bool includeEmptyStr) {
     std::vector<std::string> fields;
     typename std::string::size_type offset = 0;
     typename std::string::size_type pos = src.find(delimiter, 0);
@@ -344,7 +344,7 @@ std::vector<std::string> StringHelper::Split(const std::string& src, const std::
     return fields;
 }
 
-std::vector<std::wstring> StringHelper::Split(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr) {
+JHC_INLINE std::vector<std::wstring> StringHelper::Split(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr) {
     std::vector<std::wstring> fields;
     typename std::wstring::size_type offset = 0;
     typename std::wstring::size_type pos = src.find(delimiter, 0);
@@ -363,7 +363,7 @@ std::vector<std::wstring> StringHelper::Split(const std::wstring& src, const std
     return fields;
 }
 
-std::string StringHelper::Join(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr) {
+JHC_INLINE std::string StringHelper::Join(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr) {
     std::stringstream ss;
     for (std::vector<std::string>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
         if (it->length() > 0) {
@@ -382,7 +382,7 @@ std::string StringHelper::Join(const std::vector<std::string>& src, const std::s
     return ss.str();
 }
 
-std::wstring StringHelper::Join(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr) {
+JHC_INLINE std::wstring StringHelper::Join(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr) {
     std::wstringstream ss;
     for (std::vector<std::wstring>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
         if (it->length() > 0) {
@@ -401,7 +401,7 @@ std::wstring StringHelper::Join(const std::vector<std::wstring>& src, const std:
     return ss.str();
 }
 
-bool StringHelper::IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
+JHC_INLINE bool StringHelper::IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
     const std::string::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
@@ -420,7 +420,7 @@ bool StringHelper::IsEqual(const std::string& s1, const std::string& s2, bool ig
     return true;
 }
 
-bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
+JHC_INLINE bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
     const std::wstring::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
@@ -440,7 +440,7 @@ bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool 
 }
 
 // format a string
-bool StringHelper::StringPrintfV(const char* format, va_list argList, std::string& output) {
+JHC_INLINE bool StringHelper::StringPrintfV(const char* format, va_list argList, std::string& output) {
     if (!format)
         return false;
 
@@ -513,7 +513,7 @@ bool StringHelper::StringPrintfV(const char* format, va_list argList, std::strin
 #endif
 }
 
-bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) {
+JHC_INLINE bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) {
     if (!format)
         return false;
 
@@ -586,7 +586,7 @@ bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::ws
 #endif
 }
 
-std::string StringHelper::StringPrintf(const char* format, ...) {
+JHC_INLINE std::string StringHelper::StringPrintf(const char* format, ...) {
     va_list args;
     va_start(args, format);
     std::string output;
@@ -596,7 +596,7 @@ std::string StringHelper::StringPrintf(const char* format, ...) {
     return output;
 }
 
-std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) {
+JHC_INLINE std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) {
     va_list args;
     va_start(args, format);
     std::wstring output;
@@ -606,13 +606,13 @@ std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) {
     return output;
 }
 
-std::string StringHelper::StringPrintfV(const char* format, va_list argList) {
+JHC_INLINE std::string StringHelper::StringPrintfV(const char* format, va_list argList) {
     std::string output;
     StringPrintfV(format, argList, output);
     return output;
 }
 
-std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList) {
+JHC_INLINE std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList) {
     std::wstring output;
     StringPrintfV(format, argList, output);
     return output;
