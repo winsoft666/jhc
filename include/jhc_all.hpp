@@ -21,7 +21,7 @@
 #define JHC_HPP_H__
 
 //
-// It is strongly recommended not to include this file directly!!!
+// It is strongly recommended not to include this file directly in header-only mode!!!
 // 
 
 #include "jhc/config.hpp"
@@ -54,11 +54,12 @@
 #include "jhc/thread.hpp"
 #include "jhc/thread_pool.hpp"
 #include "jhc/time_util.hpp"
-#include "jhc/win_timer.hpp"
+#include "jhc/timer.hpp"
 #include "jhc/trace.hpp"
 #include "jhc/url_encode.hpp"
 #include "jhc/uuid.hpp"
 #include "jhc/version.hpp"
+#include "jhc/win_timer.hpp"
 #include "jhc/win_criticalsection.hpp"
 #include "jhc/win_driver_info.hpp"
 #include "jhc/win_env_variable.hpp"

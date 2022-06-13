@@ -17,16 +17,20 @@ namespace timer_detail {
 // The event structure that holds the information about a timer.
 struct Event {
     std::size_t id;
-    timestamp start;
-    duration period;
-    handler_t handler;
+    std::chrono::time_point<std::chrono::steady_clock> start;
+    std::chrono::microseconds period;
+    Timer::handler_t handler;
     bool valid;
     Event() :
-        id(0), start(duration::zero()), period(duration::zero()), handler(nullptr), valid(false) {
+        id(0),
+        start(std::chrono::microseconds::zero()),
+        period(std::chrono::microseconds::zero()),
+        handler(nullptr),
+        valid(false) {
     }
 
     template <typename Func>
-    Event(std::size_t id, timestamp start, duration period, Func&& handler) :
+    Event(std::size_t id, std::chrono::time_point<std::chrono::steady_clock> start, std::chrono::microseconds period, Func&& handler) :
         id(id), start(start), period(period), handler(std::forward<Func>(handler)), valid(true) {
     }
 
@@ -38,7 +42,7 @@ struct Event {
 
 // A time event structure that holds the next timeout and a reference to its Event struct.
 struct Time_event {
-    timestamp next;
+    std::chrono::time_point<std::chrono::steady_clock> next;
     std::size_t ref;
 };
 
@@ -89,9 +93,9 @@ Timer::~Timer() {
 }
 
 std::size_t Timer::add(
-    const timestamp& when,
+    const std::chrono::time_point<std::chrono::steady_clock>& when,
     handler_t&& handler,
-    const duration& period) {
+    const std::chrono::microseconds& period) {
     std::unique_lock<std::mutex> lock(p_->m_);
     std::size_t id = 0;
     // Add a new event.
@@ -113,8 +117,8 @@ std::size_t Timer::add(
     return id;
 }
 
-std::size_t Timer::add(const uint64_t when, handler_t&& handler, const uint64_t period) {
-    return add(duration(when), std::move(handler), duration(period));
+std::size_t Timer::add(const uint64_t afterMicroseconds, handler_t&& handler, const uint64_t periodMicroseconds) {
+    return add(std::chrono::microseconds(afterMicroseconds), std::move(handler), std::chrono::microseconds(periodMicroseconds));
 }
 
 bool Timer::remove(std::size_t id) {
@@ -144,7 +148,7 @@ void Timer::run() {
         }
         else {
             timer_detail::Time_event te = *(p_->time_events_.begin());
-            if (jhc::clock::now() >= te.next) {
+            if (std::chrono::steady_clock::now() >= te.next) {
                 // Remove time event
                 p_->time_events_.erase(p_->time_events_.begin());
 

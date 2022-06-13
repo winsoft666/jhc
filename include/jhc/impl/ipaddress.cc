@@ -182,7 +182,7 @@ std::string jhc::IPAddress::toSensitiveString() const {
 
     switch (family_) {
         case AF_INET: {
-            std::string address = ToString();
+            std::string address = toString();
             size_t find_pos = address.rfind('.');
 
             if (find_pos == std::string::npos)

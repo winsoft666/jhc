@@ -26,13 +26,12 @@
 #include <chrono>
 
 namespace jhc {
-using handler_t = std::function<void(std::size_t)>;
-using clock = std::chrono::steady_clock;
-using timestamp = std::chrono::time_point<clock>;
-using duration = std::chrono::microseconds;
-
+// On Windows, the Timer has 10ms precision loss.
+//
 class Timer {
    public:
+    using handler_t = std::function<void(std::size_t)>;
+
     Timer();
     ~Timer();
 
@@ -44,25 +43,28 @@ class Timer {
 	 * \param period The periodicity at which the timer fires. Only used for periodic timers.
 	 */
     std::size_t add(
-        const timestamp& when,
+        const std::chrono::time_point<std::chrono::steady_clock>& when,
         handler_t&& handler,
-        const duration& period = duration::zero());
+        const std::chrono::microseconds& period = std::chrono::microseconds::zero());
 
     /**
 	 * Overloaded `add` function that uses a `std::chrono::duration` instead of a
 	 * `time_point` for the first timeout.
 	 */
     template <class Rep, class Period>
-    inline std::size_t add(const std::chrono::duration<Rep, Period>& when, handler_t&& handler, const duration& period = duration::zero()) {
-        return add(clock::now() + std::chrono::duration_cast<std::chrono::microseconds>(when),
-                   std::move(handler), period);
+    inline std::size_t add(const std::chrono::duration<Rep, Period>& when,
+                           handler_t&& handler,
+                           const std::chrono::microseconds& period = std::chrono::microseconds::zero()) {
+        return add(std::chrono::steady_clock::now() + std::chrono::duration_cast<std::chrono::microseconds>(when),
+                   std::move(handler),
+                   period);
     }
 
     /**
 	 * Overloaded `add` function that uses a uint64_t instead of a `time_point` for
 	 * the first timeout and the period.
 	 */
-    std::size_t add(const uint64_t when, handler_t&& handler, const uint64_t period = 0);
+    std::size_t add(const uint64_t afterMicroseconds, handler_t&& handler, const uint64_t periodMicroseconds = 0);
 
     /**
 	 * Removes the timer with the given id.
