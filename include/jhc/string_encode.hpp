@@ -19,7 +19,7 @@
 
 #ifndef JHC_STRING_ENCODE_HPP_
 #define JHC_STRING_ENCODE_HPP_
-
+#include "jhc/config.hpp"
 #include <string>
 #include "jhc/arch.hpp"
 

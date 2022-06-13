@@ -19,7 +19,9 @@
 
 #ifndef JHC_TIMEUTIL_HPP_
 #define JHC_TIMEUTIL_HPP_
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <stdint.h>
 #include <time.h>

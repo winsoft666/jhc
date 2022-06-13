@@ -19,7 +19,7 @@
 
 #ifndef JHC_MD5_HPP__
 #define JHC_MD5_HPP__
-
+#include "jhc/config.hpp"
 #include <string>
 #include <memory.h>
 #ifndef _WINSOCKAPI_

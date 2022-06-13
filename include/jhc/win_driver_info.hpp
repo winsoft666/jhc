@@ -19,6 +19,8 @@
 
 #ifndef JHC_WIN_DRIVER_INFO_HPP_
 #define JHC_WIN_DRIVER_INFO_HPP_
+#pragma once
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #ifdef JHC_WIN

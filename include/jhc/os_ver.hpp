@@ -19,7 +19,7 @@
 
 #ifndef JHC_OS_VER_HPP__
 #define JHC_OS_VER_HPP__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #ifdef JHC_WIN

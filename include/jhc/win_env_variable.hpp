@@ -19,7 +19,9 @@
 
 #ifndef JHC_WIN_ENV_VARIABLE_HPP__
 #define JHC_WIN_ENV_VARIABLE_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #include <string>

@@ -1,3 +1,5 @@
+#include "jhc/config.hpp"
+
 #ifdef JHC_NOT_HEADER_ONLY
 #include "../hex_encode.hpp"
 #endif

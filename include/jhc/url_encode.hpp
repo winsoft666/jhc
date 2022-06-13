@@ -19,6 +19,9 @@
 
 #ifndef JHC_URL_ENCODE_HPP__
 #define JHC_URL_ENCODE_HPP__
+#pragma once
+
+#include "jhc/config.hpp"
 #include <string>
 #include "hex_encode.hpp"
 

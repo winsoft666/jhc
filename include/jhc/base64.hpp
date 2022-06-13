@@ -19,9 +19,12 @@
 
 #ifndef JHC_BASE64_HPP__
 #define JHC_BASE64_HPP__
+#pragma once
+
 //
 // Provided by https://github.com/ReneNyffenegger/cpp-base64, adapted by JiangXueqiao.
 //
+#include "jhc/config.hpp"
 #include <string>
 #if __cplusplus >= 201703L
 #include <string_view>

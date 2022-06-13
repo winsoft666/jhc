@@ -1,3 +1,5 @@
+#include "jhc/config.hpp"
+
 #ifdef JHC_NOT_HEADER_ONLY
 #include "../cmd_line_parse.hpp"
 #endif

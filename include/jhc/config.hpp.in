@@ -1,0 +1,8 @@
+﻿#ifndef JHC_CONFIG_HPP__
+#define JHC_CONFIG_HPP__
+#pragma once
+
+#cmakedefine JHC_NOT_HEADER_ONLY
+
+
+#endif //!JHC_CONFIG_HPP__

@@ -19,11 +19,12 @@
 
 #ifndef THREAD_POOL_HPP__
 #define THREAD_POOL_HPP__
+#pragma once
 
 // borrow from https://github.com/progschj/ThreadPool
 // origin name is ThreadPool.h
 //
-
+#include "jhc/config.hpp"
 #include <vector>
 #include <queue>
 #include <memory>

@@ -19,6 +19,8 @@
 
 #ifndef JHC_VERSION_HPP__
 #define JHC_VERSION_HPP__
+#pragma once
+#include "jhc/config.hpp"
 #include <stdlib.h>
 #include <string>
 #include <vector>

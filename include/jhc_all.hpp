@@ -24,6 +24,7 @@
 // It is strongly recommended not to include this file directly!!!
 // 
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include "jhc/base64.hpp"
 #include "jhc/buffer_queue.hpp"

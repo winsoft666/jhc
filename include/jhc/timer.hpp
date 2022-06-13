@@ -21,6 +21,7 @@
 #define JHC_TIMER_HPP__
 #pragma once
 
+#include "jhc/config.hpp"
 #include <functional>
 #include <chrono>
 

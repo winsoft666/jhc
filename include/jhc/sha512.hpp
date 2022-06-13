@@ -19,6 +19,7 @@
 
 #ifndef JHC_SHA512_HPP__
 #define JHC_SHA512_HPP__
+#include "jhc/config.hpp"
 #include <string>
 #include "jhc/filesystem.hpp"
 

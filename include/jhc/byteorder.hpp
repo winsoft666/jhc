@@ -18,7 +18,9 @@
 ******************************************************************************/
 #ifndef JHC_BYTE_ORDER_HPP__
 #define JHC_BYTE_ORDER_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #include <stdlib.h>

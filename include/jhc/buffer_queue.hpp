@@ -19,7 +19,9 @@
 
 #ifndef JHC_BUFFER_QUEUE_HPP__
 #define JHC_BUFFER_QUEUE_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include <mutex>
 #include <string>
 #include <string.h>

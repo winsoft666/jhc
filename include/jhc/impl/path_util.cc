@@ -1,3 +1,5 @@
+#include "jhc/config.hpp"
+
 #ifdef JHC_NOT_HEADER_ONLY
 #include "../path_util.hpp"
 #endif

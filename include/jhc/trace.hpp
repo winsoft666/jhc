@@ -21,6 +21,8 @@
 #define JHC_TRACE_HPP__
 #pragma once
 
+#include "jhc/config.hpp"
+
 namespace jhc {
 class Trace {
    public:

@@ -19,7 +19,9 @@
 
 #ifndef JHC_EVENT_HPP__
 #define JHC_EVENT_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include <mutex>
 #include <condition_variable>
 #include "macros.hpp"

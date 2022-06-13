@@ -19,7 +19,9 @@
 
 #ifndef JHC_CMDLIBE_PARSE_HPP__
 #define JHC_CMDLIBE_PARSE_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include <unordered_map>
 
 namespace jhc {

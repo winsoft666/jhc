@@ -19,6 +19,7 @@
 
 #ifndef JHC_HEX_ENCODE_HPP__
 #define JHC_HEX_ENCODE_HPP__
+#include "jhc/config.hpp"
 #include <cassert>
 #include <string>
 

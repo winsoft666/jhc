@@ -19,6 +19,9 @@
 
 #ifndef JHC_CRC32_HPP__
 #define JHC_CRC32_HPP__
+#pragma once
+
+#include "jhc/config.hpp"
 #include <stdint.h>
 #include <string>
 #ifndef _WINSOCKAPI_

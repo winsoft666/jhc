@@ -19,7 +19,7 @@
 
 #ifndef JHC_PROCESS_HPP__
 #define JHC_PROCESS_HPP__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <functional>
 #include <memory>

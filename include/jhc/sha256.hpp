@@ -19,6 +19,7 @@
 
 #ifndef JHC_SHA256_HPP__
 #define JHC_SHA256_HPP__
+#include "jhc/config.hpp"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

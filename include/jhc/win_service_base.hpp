@@ -21,6 +21,7 @@
 #define JHC_WIN_SERVICE_BASE_HPP_
 #pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #ifdef JHC_WIN

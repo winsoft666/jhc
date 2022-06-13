@@ -18,6 +18,7 @@
 ******************************************************************************/
 #ifndef JHC_SINGLETON_PROCESS_HPP__
 #define JHC_SINGLETON_PROCESS_HPP__
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <string>
 #include "jhc/singleton_class.hpp"

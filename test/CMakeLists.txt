@@ -1,4 +1,4 @@
-##################################################################################
+#################################################################################
 #    C++ Common Library
 #    ---------------------------------------------------------------------------
 #    Copyright (C) 2022 JiangXueqiao <winsoft666@outlook.com>.
@@ -15,35 +15,40 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##################################################################################
-
-cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
-
-project(jhc CXX)
+#################################################################################
 
 set (CMAKE_CXX_STANDARD 14)
 
-set(EXE_NAME test)
-
-add_definitions(-DUNICODE -D_UNICODE)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(EXE_NAME jhc-test)
 
 file(GLOB JHC_HEADER_FILES ../include/jhc_all.hpp ../include/jhc/*.*)
+file(GLOB JHC_IMPL_FILES ../include/jhc/implied/*.cc)
 file(GLOB TEST_SOURCE_FILES ./*.cpp)
 
-source_group("jhc" FILES ${JHC_HEADER_FILES})
+if (JHC_NOT_HEADER_ONLY)
+	source_group("jhc" FILES ${JHC_HEADER_FILES})
+else()
+	source_group("jhc" FILES ${JHC_HEADER_FILES} ${JHC_IMPL_FILES})
+endif()
 source_group("test" FILES ${TEST_SOURCE_FILES})
 
 include_directories(../include)
 
-add_executable(
-	${EXE_NAME}
-	${JHC_HEADER_FILES}
-	${TEST_SOURCE_FILES}
-	)
+if (JHC_NOT_HEADER_ONLY)
+	add_executable(
+		${EXE_NAME}
+		${JHC_HEADER_FILES}
+		${TEST_SOURCE_FILES})
 	
+	add_dependencies(${EXE_NAME} ${LIB_NAME})
+	target_link_libraries(${EXE_NAME} ${LIB_NAME})
+else()
+	add_executable(
+		${EXE_NAME}
+		${JHC_HEADER_FILES} ${JHC_IMPL_FILES}
+		${TEST_SOURCE_FILES})
+endif()
+
 # Win32 Console
 if (WIN32 OR _WIN32)
 	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")

@@ -19,7 +19,7 @@
 
 #ifndef SCOPED_OBJECT_HPP__
 #define SCOPED_OBJECT_HPP__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #ifndef _INC_WINDOWS

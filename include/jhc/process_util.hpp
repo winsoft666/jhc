@@ -19,7 +19,7 @@
 
 #ifndef JHC_PROCESS_UTIL_H__
 #define JHC_PROCESS_UTIL_H__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <string>
 #include <list>

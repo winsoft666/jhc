@@ -19,7 +19,9 @@
 
 #ifndef JHC_PROCESS_FINDER_HPP__
 #define JHC_PROCESS_FINDER_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #ifdef JHC_WIN

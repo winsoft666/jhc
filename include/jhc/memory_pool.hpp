@@ -19,7 +19,7 @@
 
 #ifndef JHC_MEMORY_POOL_HPP_
 #define JHC_MEMORY_POOL_HPP_
-
+#include "jhc/config.hpp"
 #include <climits>
 #include <cstddef>
 #include <mutex>

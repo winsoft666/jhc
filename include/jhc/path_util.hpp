@@ -19,7 +19,7 @@
 
 #ifndef JHC_PATH_UTIL_HPP_
 #define JHC_PATH_UTIL_HPP_
-
+#include "jhc/config.hpp"
 #include <string>
 #include <vector>
 #include "jhc/arch.hpp"

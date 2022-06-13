@@ -19,7 +19,7 @@
 
 #ifndef JHC_STRING_HELPER_HPP__
 #define JHC_STRING_HELPER_HPP__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <string>
 #include <vector>

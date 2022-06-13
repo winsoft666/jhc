@@ -19,7 +19,9 @@
 
 #ifndef JHC_WIN_SCHEDULE_TASK_HPP__
 #define JHC_WIN_SCHEDULE_TASK_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #include "jhc/macros.hpp"

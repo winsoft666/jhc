@@ -1,3 +1,4 @@
+#include "jhc/config.hpp"
 #ifdef JHC_NOT_HEADER_ONLY
 #include "../win_env_variable.hpp"
 #endif

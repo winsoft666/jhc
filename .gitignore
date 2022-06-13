@@ -34,3 +34,4 @@
 *.user
 Debug/
 Release/
+/include/jhc/config.hpp

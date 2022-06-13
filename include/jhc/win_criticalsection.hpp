@@ -19,10 +19,11 @@
 
 #ifndef JHC_WIN_CRITICAL_SECTION_HPP__
 #define JHC_WIN_CRITICAL_SECTION_HPP__
+#pragma once
 //
 // Windows CriticalSection wrapper.
 //
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #include "jhc/macros.hpp"

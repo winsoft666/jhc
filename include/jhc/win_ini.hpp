@@ -19,7 +19,9 @@
 
 #ifndef JHC_WIN_INI_HPP_
 #define JHC_WIN_INI_HPP_
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #include <string>

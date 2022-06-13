@@ -19,7 +19,7 @@
 
 #ifndef JHC_IP_ADDRESS_HPP__
 #define JHC_IP_ADDRESS_HPP__
-
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #ifdef JHC_WIN
 #include <winsock2.h>

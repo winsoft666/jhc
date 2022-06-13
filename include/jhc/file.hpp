@@ -19,6 +19,7 @@
 
 #ifndef JHC_FILE_UTIL_HPP_
 #define JHC_FILE_UTIL_HPP_
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 #include <stdio.h>
 #include <mutex>

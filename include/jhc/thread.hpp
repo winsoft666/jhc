@@ -19,7 +19,9 @@
 
 #ifndef JHC_THREAD_HPP__
 #define JHC_THREAD_HPP__
+#pragma once
 
+#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #if defined JHC_WIN || defined JHC_LINUX
