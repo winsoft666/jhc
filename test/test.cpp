@@ -22,21 +22,19 @@
 #include <time.h>
 #include <iostream>
 #include <map>
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 //
 // It is strongly recommended not to include this file directly!!!
 #include "jhc_all.hpp"
 
-#define EXPECT_TRUE(x)                                 \
-    do {                                               \
-        if ((x))                                       \
-            printf("\033[32mOK:\033[0m " #x "\n");     \
-        else                                           \
-            printf("\033[31mFailed:\033[0m " #x "\n"); \
-    } while (false)
+int main(int argc, char* argv[]) {
+    return Catch::Session().run(argc, argv);
+}
 
 // Test: uuid generator.
 //
-void UUIDTest() {
+TEST_CASE("UUIDTest") {
     std::map<std::string, int> values;
     const int totalNum = 100000;
 
@@ -44,12 +42,12 @@ void UUIDTest() {
         values[jhc::UUID::Create()] = i;
     }
 
-    EXPECT_TRUE(values.size() == totalNum);
+    REQUIRE(values.size() == totalNum);
 }
 
 // Test: write/read big file.
 //
-void FileTest1() {
+TEST_CASE("FileTest1", "[w/r big file]") {
     constexpr int64_t bytes4gb = 4LL * 1024LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
 
@@ -57,222 +55,199 @@ void FileTest1() {
     jhc::fs::path openMode1(u8"ab+");
 
     jhc::File file1(path1);
-    EXPECT_TRUE(file1.path() == path1);
+    REQUIRE(file1.path() == path1);
     if (jhc::fs::exists(file1.path()))
-        EXPECT_TRUE(jhc::fs::remove(file1.path()));
+        REQUIRE(jhc::fs::remove(file1.path()));
 
-    EXPECT_TRUE(jhc::fs::exists(file1.path()) == false);
-    EXPECT_TRUE(file1.isOpen() == false);
-    EXPECT_TRUE(file1.exist() == false);
-    EXPECT_TRUE(file1.open(openMode1));
+    REQUIRE(jhc::fs::exists(file1.path()) == false);
+    REQUIRE(file1.isOpen() == false);
+    REQUIRE(file1.exist() == false);
+    REQUIRE(file1.open(openMode1));
 
     // write 4GB file
     for (size_t i = 0; i < 4 * 1024 * 1024; i++) {
         file1.writeFrom(str1K.c_str(), str1K.size());
     }
 
-    EXPECT_TRUE(file1.flush());
-    EXPECT_TRUE(file1.fileSize() == bytes4gb);
+    REQUIRE(file1.flush());
+    REQUIRE(file1.fileSize() == bytes4gb);
 
     std::string strRead(1024, '\0');
-    EXPECT_TRUE(file1.readFrom((void*)&strRead[0], 1024, 0) == 1024);
-    EXPECT_TRUE(strRead == str1K);
+    REQUIRE(file1.readFrom((void*)&strRead[0], 1024, 0) == 1024);
+    REQUIRE(strRead == str1K);
 
     std::string strRead2(1024, '\0');
-    EXPECT_TRUE(file1.readFrom((void*)&strRead2[0], 1024, 3LL * 1024LL * 1024LL * 1024LL) == 1024);
-    EXPECT_TRUE(strRead2 == str1K);
+    REQUIRE(file1.readFrom((void*)&strRead2[0], 1024, 3LL * 1024LL * 1024LL * 1024LL) == 1024);
+    REQUIRE(strRead2 == str1K);
 
-    EXPECT_TRUE(file1.fileSize() == bytes4gb);
-    EXPECT_TRUE(file1.close());
-    EXPECT_TRUE(jhc::fs::remove(file1.path()));
+    REQUIRE(file1.fileSize() == bytes4gb);
+    REQUIRE(file1.close());
+    REQUIRE(jhc::fs::remove(file1.path()));
 }
 
 // Test: read all of file content
-void FileTest2() {
+TEST_CASE("FileTest2", "[read all content]") {
     constexpr int64_t bytes4mb = 4LL * 1024LL * 1024LL;
     const std::string str1K(1024, 'a');
     jhc::fs::path path2(u8"__file_test_文件测试2__.dat");
     if (jhc::fs::exists(path2))
-        EXPECT_TRUE(jhc::fs::remove(path2));
+        REQUIRE(jhc::fs::remove(path2));
 
     jhc::File file2(path2);
-    EXPECT_TRUE(file2.open("ab+"));
+    REQUIRE(file2.open("ab+"));
 
     // write 4MB file
     for (size_t i = 0; i < 4 * 1024; i++) {
         file2.writeFrom(str1K.c_str(), str1K.size());
     }
 
-    EXPECT_TRUE(file2.flush());
-    EXPECT_TRUE(file2.fileSize() == bytes4mb);
+    REQUIRE(file2.flush());
+    REQUIRE(file2.fileSize() == bytes4mb);
     std::string strAll;
-    EXPECT_TRUE(file2.readAll(strAll));
-    EXPECT_TRUE(strAll.size() == bytes4mb);
+    REQUIRE(file2.readAll(strAll));
+    REQUIRE(strAll.size() == bytes4mb);
 }
 
 // Test: string hash.
 //
-void HashTest1() {
+TEST_CASE("HashTest1", "[stirng hash]") {
     const std::string str = "hello world!!!";
-    EXPECT_TRUE(jhc::CRC32::GetDataCRC32((const unsigned char*)str.c_str(), str.length()) == "2416a280");
-    EXPECT_TRUE(jhc::MD5::GetDataMD5((const unsigned char*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
-    EXPECT_TRUE(jhc::SHA1::GetDataSHA1((const unsigned char*)str.c_str(), str.length()) == "8233f28c479ff758b3b4ba9ad66069db68811e59");
-    EXPECT_TRUE(jhc::SHA256::GetDataSHA256((const unsigned char*)str.c_str(), str.length()) == "a5f4396b45548597f81681147f53c66065d5137f2fbd85e6758a8983107228e4");
-    EXPECT_TRUE(jhc::SHA512::GetDataSHA512((const unsigned char*)str.c_str(), str.length()) == "dfa6b727753e96a9dffb10947f99b8457ef51a634ea8baa0db0f22712f0bb19ac6719d4446109dc19dfc9629a3b225c0aeeebd61175464a95e35c437cd979a64");
+    REQUIRE(jhc::CRC32::GetDataCRC32((const unsigned char*)str.c_str(), str.length()) == "2416a280");
+    REQUIRE(jhc::MD5::GetDataMD5((const unsigned char*)str.c_str(), str.length()) == "f6835168c4823ac89c1bc97154a675a8");
+    REQUIRE(jhc::SHA1::GetDataSHA1((const unsigned char*)str.c_str(), str.length()) == "8233f28c479ff758b3b4ba9ad66069db68811e59");
+    REQUIRE(jhc::SHA256::GetDataSHA256((const unsigned char*)str.c_str(), str.length()) == "a5f4396b45548597f81681147f53c66065d5137f2fbd85e6758a8983107228e4");
+    REQUIRE(jhc::SHA512::GetDataSHA512((const unsigned char*)str.c_str(), str.length()) == "dfa6b727753e96a9dffb10947f99b8457ef51a634ea8baa0db0f22712f0bb19ac6719d4446109dc19dfc9629a3b225c0aeeebd61175464a95e35c437cd979a64");
 }
 
 // Test: file hash.
 //
-void HashTest2() {
+TEST_CASE("HashTest2", "[file hash]") {
     const std::string str1K(1024, 'a');
     jhc::File file1("hash_test_file.dat");
-    EXPECT_TRUE(file1.open("wb"));
-    EXPECT_TRUE(file1.writeFrom((void*)str1K.c_str(), str1K.size(), 0) == str1K.size());
-    EXPECT_TRUE(file1.close());
+    REQUIRE(file1.open("wb"));
+    REQUIRE(file1.writeFrom((void*)str1K.c_str(), str1K.size(), 0) == str1K.size());
+    REQUIRE(file1.close());
 #ifdef JHC_WIN
-    EXPECT_TRUE(jhc::CRC32::GetFileCRC32(file1.path()) == "7c5597b9");
-    EXPECT_TRUE(jhc::MD5::GetFileMD5(file1.path()) == "c9a34cfc85d982698c6ac89f76071abd");
-    EXPECT_TRUE(jhc::SHA1::GetFileSHA1(file1.path()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
-    EXPECT_TRUE(jhc::SHA256::GetFileSHA256(file1.path()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
-    EXPECT_TRUE(jhc::SHA512::GetFileSHA512(file1.path()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
+    REQUIRE(jhc::CRC32::GetFileCRC32(file1.path()) == "7c5597b9");
+    REQUIRE(jhc::MD5::GetFileMD5(file1.path()) == "c9a34cfc85d982698c6ac89f76071abd");
+    REQUIRE(jhc::SHA1::GetFileSHA1(file1.path()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    REQUIRE(jhc::SHA256::GetFileSHA256(file1.path()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    REQUIRE(jhc::SHA512::GetFileSHA512(file1.path()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #else
-    EXPECT_TRUE(jhc::CRC32::GetFileCRC32(file1.path().string()) == "7c5597b9");
-    EXPECT_TRUE(jhc::MD5::GetFileMD5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
-    EXPECT_TRUE(jhc::SHA1::GetFileSHA1(file1.path().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
-    EXPECT_TRUE(jhc::SHA256::GetFileSHA256(file1.path().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
-    EXPECT_TRUE(jhc::SHA512::GetFileSHA512(file1.path().string()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
+    REQUIRE(jhc::CRC32::GetFileCRC32(file1.path().string()) == "7c5597b9");
+    REQUIRE(jhc::MD5::GetFileMD5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
+    REQUIRE(jhc::SHA1::GetFileSHA1(file1.path().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    REQUIRE(jhc::SHA256::GetFileSHA256(file1.path().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    REQUIRE(jhc::SHA512::GetFileSHA512(file1.path().string()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #endif
 }
 
 // Test: string base64 encode/decode.
 //
-void Base64Test() {
-    EXPECT_TRUE(jhc::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
-    EXPECT_TRUE(jhc::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
+TEST_CASE("Base64Test") {
+    REQUIRE(jhc::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
+    REQUIRE(jhc::Base64::Decode("aGVsbG8gd29ybGQh") == "hello world!");
 }
 
 // Test: ip address check.
 //
-void IpAddressTest() {
-    EXPECT_TRUE(jhc::IPAddress::IPIsLoopback(jhc::IPAddress("192.168.50.12")) == false);
-    EXPECT_TRUE(jhc::IPAddress::IPIsLoopback(jhc::IPAddress("127.0.0.1")));
+TEST_CASE("IpAddressTest") {
+    REQUIRE(jhc::IPAddress::IPIsLoopback(jhc::IPAddress("192.168.50.12")) == false);
+    REQUIRE(jhc::IPAddress::IPIsLoopback(jhc::IPAddress("127.0.0.1")));
 }
 
 // Test: string operate.
 //
-void StringHelperTest() {
-    EXPECT_TRUE(jhc::StringHelper::ToLower('c') == 'c');
-    EXPECT_TRUE(jhc::StringHelper::ToLower('C') == 'c');
-    EXPECT_TRUE(jhc::StringHelper::ToUpper('A') == 'A');
-    EXPECT_TRUE(jhc::StringHelper::ToUpper('a') == 'A');
-    EXPECT_TRUE(jhc::StringHelper::ToLower(L'c') == L'c');
-    EXPECT_TRUE(jhc::StringHelper::ToLower(L'C') == L'c');
-    EXPECT_TRUE(jhc::StringHelper::ToUpper(L'A') == L'A');
-    EXPECT_TRUE(jhc::StringHelper::ToUpper(L'a') == L'A');
-    EXPECT_TRUE(jhc::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
-    EXPECT_TRUE(jhc::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
-    EXPECT_TRUE(jhc::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
-    EXPECT_TRUE(jhc::StringHelper::ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
+TEST_CASE("StringHelperTest") {
+    REQUIRE(jhc::StringHelper::ToLower('c') == 'c');
+    REQUIRE(jhc::StringHelper::ToLower('C') == 'c');
+    REQUIRE(jhc::StringHelper::ToUpper('A') == 'A');
+    REQUIRE(jhc::StringHelper::ToUpper('a') == 'A');
+    REQUIRE(jhc::StringHelper::ToLower(L'c') == L'c');
+    REQUIRE(jhc::StringHelper::ToLower(L'C') == L'c');
+    REQUIRE(jhc::StringHelper::ToUpper(L'A') == L'A');
+    REQUIRE(jhc::StringHelper::ToUpper(L'a') == L'A');
+    REQUIRE(jhc::StringHelper::ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
+    REQUIRE(jhc::StringHelper::ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
+    REQUIRE(jhc::StringHelper::ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
+    REQUIRE(jhc::StringHelper::ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
 
-    EXPECT_TRUE(jhc::StringHelper::IsDigit("3.14") == false);
-    EXPECT_TRUE(jhc::StringHelper::IsDigit("3a12") == false);
-    EXPECT_TRUE(jhc::StringHelper::IsDigit("134") == true);
+    REQUIRE(jhc::StringHelper::IsDigit("3.14") == false);
+    REQUIRE(jhc::StringHelper::IsDigit("3a12") == false);
+    REQUIRE(jhc::StringHelper::IsDigit("134") == true);
 
-    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"3.14") == false);
-    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"3a12") == false);
-    EXPECT_TRUE(jhc::StringHelper::IsDigit(L"134") == true);
+    REQUIRE(jhc::StringHelper::IsDigit(L"3.14") == false);
+    REQUIRE(jhc::StringHelper::IsDigit(L"3a12") == false);
+    REQUIRE(jhc::StringHelper::IsDigit(L"134") == true);
 
-    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces");
-    EXPECT_TRUE(jhc::StringHelper::Trim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces");
-    EXPECT_TRUE(jhc::StringHelper::LeftTrim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces   \n");
-    EXPECT_TRUE(jhc::StringHelper::LeftTrim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces   \n");
-    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
-    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
-    EXPECT_TRUE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
-    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
-    EXPECT_TRUE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "\r\f") == " erase\n\t white-spaces   \n");
+    REQUIRE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces");
+    REQUIRE(jhc::StringHelper::Trim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces");
+    REQUIRE(jhc::StringHelper::LeftTrim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces   \n");
+    REQUIRE(jhc::StringHelper::LeftTrim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces   \n");
+    REQUIRE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
+    REQUIRE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n") == "\r\f erase\n\t white-spaces");
+    REQUIRE(jhc::StringHelper::RightTrim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
+    REQUIRE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
+    REQUIRE(jhc::StringHelper::Trim("\r\f erase\n\t white-spaces   \n", "\r\f") == " erase\n\t white-spaces   \n");
 
-    EXPECT_TRUE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
-    EXPECT_TRUE(!jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
-    EXPECT_TRUE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
+    REQUIRE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
+    REQUIRE(!jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
+    REQUIRE(jhc::StringHelper::IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
 
-    EXPECT_TRUE(jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
-    EXPECT_TRUE(!jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
-    EXPECT_TRUE(jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
+    REQUIRE(jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
+    REQUIRE(!jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
+    REQUIRE(jhc::StringHelper::IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
 
-    EXPECT_TRUE(jhc::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "1234567890"));
-    EXPECT_TRUE(jhc::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
-    EXPECT_TRUE(!jhc::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
-    EXPECT_TRUE(!jhc::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
+    REQUIRE(jhc::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "1234567890"));
+    REQUIRE(jhc::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
+    REQUIRE(!jhc::StringHelper::IsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
+    REQUIRE(!jhc::StringHelper::IsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
 
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes("123456712", "12") == 2);
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes(L"123456712", L"12") == 2);
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes("1234567121", "121") == 1);
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes(L"1234567121", L"121") == 1);
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes("123 4567 121", " ") == 2);
-    EXPECT_TRUE(jhc::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
+    REQUIRE(jhc::StringHelper::ContainTimes("123456712", "12") == 2);
+    REQUIRE(jhc::StringHelper::ContainTimes(L"123456712", L"12") == 2);
+    REQUIRE(jhc::StringHelper::ContainTimes("1234567121", "121") == 1);
+    REQUIRE(jhc::StringHelper::ContainTimes(L"1234567121", L"121") == 1);
+    REQUIRE(jhc::StringHelper::ContainTimes("123 4567 121", " ") == 2);
+    REQUIRE(jhc::StringHelper::ContainTimes(L"123 4567 121", L" ") == 2);
 
     const std::string s1 = jhc::StringHelper::StringPrintf("%s's age is %d", "jack", 18);
-    EXPECT_TRUE(s1 == "jack's age is 18");
+    REQUIRE(s1 == "jack's age is 18");
 
     const std::wstring ws1 = jhc::StringHelper::StringPrintf(L"%ls's age is %d", L"jack", 18);
-    EXPECT_TRUE(ws1 == L"jack's age is 18");
+    REQUIRE(ws1 == L"jack's age is 18");
 
     std::string bigStrA(2048, 'a');
     bigStrA += "[end]";
     const std::string s2 = jhc::StringHelper::StringPrintf("%s length is %d", bigStrA.c_str(), bigStrA.length());
-    EXPECT_TRUE(s2 == bigStrA + " length is " + std::to_string(bigStrA.length()));
+    REQUIRE(s2 == bigStrA + " length is " + std::to_string(bigStrA.length()));
 
     std::wstring bigStrW(2048, L'a');
     bigStrW += L"[end]";
     const std::wstring ws2 = jhc::StringHelper::StringPrintf(L"%ls length is %d", bigStrW.c_str(), bigStrW.length());
-    EXPECT_TRUE(ws2 == bigStrW + L" length is " + std::to_wstring(bigStrW.length()));
+    REQUIRE(ws2 == bigStrW + L" length is " + std::to_wstring(bigStrW.length()));
 
     std::string bigStrA2(1024, 'c');
     const std::string s3 = jhc::StringHelper::StringPrintf("%s", bigStrA2.c_str());
-    EXPECT_TRUE(s3 == bigStrA2);
+    REQUIRE(s3 == bigStrA2);
 
     std::wstring bigStrW2(1024, L'c');
     const std::wstring sw3 = jhc::StringHelper::StringPrintf(L"%ls", bigStrW2.c_str());
-    EXPECT_TRUE(sw3 == bigStrW2);
+    REQUIRE(sw3 == bigStrW2);
 }
 
 // Test: string encode, utf8/utf16
 //
-void StringEncodeTest() {
+TEST_CASE("StringEncodeTest") {
     const std::string u8str = u8"中国china";
     const std::wstring wstr = L"中国china";
-    EXPECT_TRUE(jhc::StringEncode::Utf8ToUnicode(u8str) == wstr);
-    EXPECT_TRUE(jhc::StringEncode::UnicodeToUtf8(wstr) == u8str);
+    REQUIRE(jhc::StringEncode::Utf8ToUnicode(u8str) == wstr);
+    REQUIRE(jhc::StringEncode::UnicodeToUtf8(wstr) == u8str);
 }
 
-// Test: common folder getter.
-//
-void PathTest() {
-#ifdef JHC_WIN
-    printf("Windows Folder: %" PATH_FS "\n", jhc::PathUtil::GetWindowsFolder().c_str());
-    printf("System Folder: %" PATH_FS "\n", jhc::PathUtil::GetSystemFolder().c_str());
-    printf("Temp Folder: %" PATH_FS "\n", jhc::PathUtil::GetTempFolder().c_str());
-    printf("LocalAppData Folder: %" PATH_FS "\n", jhc::PathUtil::GetLocalAppDataFolder().c_str());
-#endif
-}
-
-// Test: char/wchar_t trace output.
-//
-void TraceTest() {
-    std::string bigStrA(1080, 's');
-    bigStrA += "[end]";
-
-    std::wstring bigStrW(1080, L's');
-    bigStrW += L"[end]";
-
-    jhc::Trace::MsgA("[%" PRId64 "] this big message output by jhc::Trace::MsgA: %s\n", time(nullptr), bigStrA.c_str());
-    jhc::Trace::MsgW(L"[%" PRId64 "] this big message output by jhc::Trace::MsgW: %ls\n", time(nullptr), bigStrW.c_str());
-}
 
 // Test: command line parser.
 //
-void CmdLineParserTest() {
+TEST_CASE("CommandLineParseTest") {
     std::wstring wparam = L"\"C:\\Program Files (x86)\\Google\\Chrome.exe\" -k1=v1 -k2:v2 /k3=v3 /k4:v4 /k5 -k6=v6= /k7=\"v7 /v=-'\"";
     jhc::CmdLineParser clp(wparam);
     printf("Key-Value list:\n");
@@ -280,18 +255,18 @@ void CmdLineParserTest() {
         printf("Key:%ls, Value:%ls\n", it->first.c_str(), it->second.c_str());
     printf("\n");
 
-    EXPECT_TRUE(clp.getVal(L"k1") == L"v1");
-    EXPECT_TRUE(clp.getVal(L"k2") == L"v2");
-    EXPECT_TRUE(clp.getVal(L"k3") == L"v3");
-    EXPECT_TRUE(clp.getVal(L"k4") == L"v4");
-    EXPECT_TRUE(clp.getVal(L"k5") == L"");
-    EXPECT_TRUE(clp.getVal(L"k6") == L"v6=");
-    EXPECT_TRUE(clp.getVal(L"k7") == L"v7 /v=-'");
+    REQUIRE(clp.getVal(L"k1") == L"v1");
+    REQUIRE(clp.getVal(L"k2") == L"v2");
+    REQUIRE(clp.getVal(L"k3") == L"v3");
+    REQUIRE(clp.getVal(L"k4") == L"v4");
+    REQUIRE(clp.getVal(L"k5") == L"");
+    REQUIRE(clp.getVal(L"k6") == L"v6=");
+    REQUIRE(clp.getVal(L"k7") == L"v7 /v=-'");
 }
 
 // Test: one way to create json.
 //
-void CreateJsonMethod1Test() {
+TEST_CASE("JSONTest1", "[create1]") {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
     jhc::json j;
@@ -303,12 +278,12 @@ void CreateJsonMethod1Test() {
     j["list"] = {1, 0, 2};
     j["object"] = {{"currency", "USD"}, {"value", 42.99}};
 
-    EXPECT_TRUE(j.dump() == expectJSON);
+    REQUIRE(j.dump() == expectJSON);
 }
 
 // Test: one way to create json.
 //
-void CreateJsonMethod2Test() {
+TEST_CASE("JSONTest2", "[create2]") {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
     jhc::json j2 = {
@@ -320,12 +295,12 @@ void CreateJsonMethod2Test() {
         {"list", {1, 0, 2}},
         {"object", {{"currency", "USD"}, {"value", 42.99}}}};
 
-    EXPECT_TRUE(j2.dump() == expectJSON);
+    REQUIRE(j2.dump() == expectJSON);
 }
 
 // Test: one way to create json.
 //
-void CreateJsonMethod3Test() {
+TEST_CASE("JSONTest3", "[create3]") {
     const std::string expectJSON = R"({"answer":{"everything":42},"happy":true,"list":[1,0,2],"name":"Niels","nothing":null,"object":{"currency":"USD","value":42.99},"pi":3.141})";
 
     jhc::json j3;
@@ -352,12 +327,12 @@ void CreateJsonMethod3Test() {
 
     j3["object"] = j3_object;
 
-    EXPECT_TRUE(j3.dump() == expectJSON);
+    REQUIRE(j3.dump() == expectJSON);
 }
 
 // Test: one way to parse json.
 //
-void ParseJsonMethod1Test() {
+TEST_CASE("JSONTest4", "[parse]") {
     // create json object
     jhc::json j;
     j["pi"] = 3.141;
@@ -372,82 +347,82 @@ void ParseJsonMethod1Test() {
 
     // parse json string
     auto jsonObj = jhc::json::parse(strJson);
-    EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["pi"].get<float>(), 3.141f));
-    EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["pi"].get<double>(), 3.141));
-    EXPECT_TRUE(jsonObj["happy"].get<bool>() == true);
-    EXPECT_TRUE(jsonObj["name"].get<std::string>() == "Niels");
-    EXPECT_TRUE(jsonObj["nothing"] == nullptr);
-    EXPECT_TRUE(jsonObj["answer"]["everything"].get<int>() == 42);
-    EXPECT_TRUE(jsonObj["list"].size() == 3);
-    EXPECT_TRUE(jsonObj["list"][0].get<int>() == 1);
-    EXPECT_TRUE(jsonObj["list"][1].get<int>() == 0);
-    EXPECT_TRUE(jsonObj["list"][2].get<int>() == 2);
-    EXPECT_TRUE(jsonObj["object"]["currency"].get<std::string>() == "USD");
-    EXPECT_TRUE(IS_NEARLY_EQUAL(jsonObj["object"]["value"].get<float>(), 42.99f));
+    REQUIRE(IS_NEARLY_EQUAL(jsonObj["pi"].get<float>(), 3.141f));
+    REQUIRE(IS_NEARLY_EQUAL(jsonObj["pi"].get<double>(), 3.141));
+    REQUIRE(jsonObj["happy"].get<bool>() == true);
+    REQUIRE(jsonObj["name"].get<std::string>() == "Niels");
+    REQUIRE(jsonObj["nothing"] == nullptr);
+    REQUIRE(jsonObj["answer"]["everything"].get<int>() == 42);
+    REQUIRE(jsonObj["list"].size() == 3);
+    REQUIRE(jsonObj["list"][0].get<int>() == 1);
+    REQUIRE(jsonObj["list"][1].get<int>() == 0);
+    REQUIRE(jsonObj["list"][2].get<int>() == 2);
+    REQUIRE(jsonObj["object"]["currency"].get<std::string>() == "USD");
+    REQUIRE(IS_NEARLY_EQUAL(jsonObj["object"]["value"].get<float>(), 42.99f));
 }
 
 // Test: path attribute getter/convert
 //
-void FileSystemTest1() {
+TEST_CASE("FileSystemTest1", "[path attribute]") {
 #ifdef JHC_WIN
     jhc::fs::path path1(u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.wstring() == L"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_wstring() == L"C:/testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.wstring() == L"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
+    REQUIRE(path1.generic_wstring() == L"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.string() == u8"C:\\testoi89hk8\\abc\\__filesystem_test1__.dat");
+    REQUIRE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.has_extension());
-    EXPECT_TRUE(path1.has_filename());
-    EXPECT_TRUE(path1.has_parent_path());
-    EXPECT_TRUE(path1.has_relative_path());
-    EXPECT_TRUE(path1.has_root_directory());
-    EXPECT_TRUE(path1.has_root_name());
-    EXPECT_TRUE(path1.has_root_path());
-    EXPECT_TRUE(path1.has_stem());
+    REQUIRE(path1.has_extension());
+    REQUIRE(path1.has_filename());
+    REQUIRE(path1.has_parent_path());
+    REQUIRE(path1.has_relative_path());
+    REQUIRE(path1.has_root_directory());
+    REQUIRE(path1.has_root_name());
+    REQUIRE(path1.has_root_path());
+    REQUIRE(path1.has_stem());
 
-    EXPECT_TRUE(path1.extension().u8string() == u8".dat");
-    EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
+    REQUIRE(path1.extension().u8string() == u8".dat");
+    REQUIRE(path1.filename() == u8"__filesystem_test1__.dat");
+    REQUIRE(path1.stem() == u8"__filesystem_test1__");
 
-    EXPECT_TRUE(path1.parent_path().wstring() == L"C:\\testoi89hk8\\abc");
-    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"C:/testoi89hk8/abc");
+    REQUIRE(path1.parent_path().wstring() == L"C:\\testoi89hk8\\abc");
+    REQUIRE(path1.parent_path().generic_wstring() == L"C:/testoi89hk8/abc");
 
-    EXPECT_TRUE(path1.relative_path().wstring() == L"testoi89hk8\\abc\\__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.root_name() == "C:");
-    EXPECT_TRUE(path1.root_directory() == "\\");
-    EXPECT_TRUE(path1.root_path() == "C:\\");
+    REQUIRE(path1.relative_path().wstring() == L"testoi89hk8\\abc\\__filesystem_test1__.dat");
+    REQUIRE(path1.root_name() == "C:");
+    REQUIRE(path1.root_directory() == "\\");
+    REQUIRE(path1.root_path() == "C:\\");
 
     path1.replace_filename(L"abctest.txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
+    REQUIRE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
 
     path1.replace_extension(".txt");
-    EXPECT_TRUE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
+    REQUIRE(path1.string() == u8"C:\\testoi89hk8\\abc\\abctest.txt");
 
     path1.replace_filename(u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.generic_string() == u8"C:/testoi89hk8/abc/__filesystem_test1__.dat");
 
     path1 = L"C:\\testoi89hk8\\..\\123\\.\\__filesystem_test1__.dat";
     jhc::fs::path path2 = jhc::fs::absolute(path1);
-    EXPECT_TRUE(path2.wstring() == L"C:\\123\\__filesystem_test1__.dat");
+    REQUIRE(path2.wstring() == L"C:\\123\\__filesystem_test1__.dat");
 #else
     jhc::fs::path path1(u8"./testoi89hk8/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.generic_wstring() == L"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
 
-    EXPECT_TRUE(path1.has_extension());
-    EXPECT_TRUE(path1.has_filename());
-    EXPECT_TRUE(path1.has_stem());
+    REQUIRE(path1.has_extension());
+    REQUIRE(path1.has_filename());
+    REQUIRE(path1.has_stem());
 
-    EXPECT_TRUE(path1.extension().u8string() == u8".dat");
-    EXPECT_TRUE(path1.filename() == u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.stem() == u8"__filesystem_test1__");
+    REQUIRE(path1.extension().u8string() == u8".dat");
+    REQUIRE(path1.filename() == u8"__filesystem_test1__.dat");
+    REQUIRE(path1.stem() == u8"__filesystem_test1__");
 
-    EXPECT_TRUE(path1.parent_path().wstring() == L"./testoi89hk8/abc");
-    EXPECT_TRUE(path1.parent_path().generic_wstring() == L"./testoi89hk8/abc");
+    REQUIRE(path1.parent_path().wstring() == L"./testoi89hk8/abc");
+    REQUIRE(path1.parent_path().generic_wstring() == L"./testoi89hk8/abc");
 
     std::cout << std::endl;
     std::cout << "relative_path:" << path1.relative_path().string() << std::endl;
@@ -455,55 +430,55 @@ void FileSystemTest1() {
     std::cout << "root_directory:" << path1.root_directory().string() << std::endl;
     std::cout << "root_path:" << path1.root_path().string() << std::endl;
 
-    EXPECT_TRUE(path1.relative_path().string() == "./testoi89hk8/abc/__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.root_name() == "");
-    EXPECT_TRUE(path1.root_directory() == "");
-    EXPECT_TRUE(path1.root_path() == "");
+    REQUIRE(path1.relative_path().string() == "./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.root_name() == "");
+    REQUIRE(path1.root_directory() == "");
+    REQUIRE(path1.root_path() == "");
 
     path1.replace_filename(L"abctest.txt");
-    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
+    REQUIRE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
 
     path1.replace_extension(".txt");
-    EXPECT_TRUE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
+    REQUIRE(path1.string() == u8"./testoi89hk8/abc/abctest.txt");
 
     path1.replace_filename(u8"__filesystem_test1__.dat");
-    EXPECT_TRUE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
+    REQUIRE(path1.generic_string() == u8"./testoi89hk8/abc/__filesystem_test1__.dat");
 
     jhc::fs::path path2 = jhc::fs::absolute(path1);
     std::wcout << "absolute:" << path2.wstring() << std::endl;
-    EXPECT_TRUE(path2.wstring().length() > 4);
+    REQUIRE(path2.wstring().length() > 4);
 #endif
 }
 
 // Test: remove empty directory.
 //
-void FileSystemTest2() {
+TEST_CASE("FileSystemTest2", "[remove empty dir]") {
 #ifdef JHC_WIN
     std::error_code ec;
     jhc::fs::path path2(L"C:\\testuy763e\\abc\\__filesystem_test2_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(path2, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(path2, ec));
-    EXPECT_TRUE(jhc::fs::exists(path2, ec) == true);
-    EXPECT_TRUE(jhc::fs::remove(path2, ec) == true);
+    REQUIRE(jhc::fs::exists(path2, ec) == false);
+    REQUIRE(jhc::fs::create_directories(path2, ec));
+    REQUIRE(jhc::fs::exists(path2, ec) == true);
+    REQUIRE(jhc::fs::remove(path2, ec) == true);
 #else
     std::error_code ec;
     jhc::fs::path path2("./testuy763e/abc/__filesystem_test2_" + std::to_string(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(path2, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(path2, ec));
-    EXPECT_TRUE(jhc::fs::exists(path2, ec) == true);
-    EXPECT_TRUE(jhc::fs::remove(path2, ec) == true);
+    REQUIRE(jhc::fs::exists(path2, ec) == false);
+    REQUIRE(jhc::fs::create_directories(path2, ec));
+    REQUIRE(jhc::fs::exists(path2, ec) == true);
+    REQUIRE(jhc::fs::remove(path2, ec) == true);
 #endif
 }
 
 // Test: remove non-empty directory.
 //
-void FileSystemTest3() {
+TEST_CASE("FileSystemTest3", "[remove non-empty dir]") {
 #ifdef JHC_WIN
     std::error_code ec;
     jhc::fs::path path3(L"C:\\testuy763e\\abc\\__filesystem_test3_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(path3, ec));
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == true);
+    REQUIRE(jhc::fs::exists(path3, ec) == false);
+    REQUIRE(jhc::fs::create_directories(path3, ec));
+    REQUIRE(jhc::fs::exists(path3, ec) == true);
 
     const std::string strWritten = "hello world";
 
@@ -511,20 +486,20 @@ void FileSystemTest3() {
     path4.append("path4.txt");
 
     jhc::File file4(path4);
-    EXPECT_TRUE(file4.open("wb") == true);
-    EXPECT_TRUE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(file4.close());
+    REQUIRE(file4.open("wb") == true);
+    REQUIRE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(file4.close());
 
-    EXPECT_TRUE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::fs::exists(path3.parent_path(), ec) == true);
+    REQUIRE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
+    REQUIRE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
+    REQUIRE(jhc::fs::exists(path3, ec) == false);
+    REQUIRE(jhc::fs::exists(path3.parent_path(), ec) == true);
 #else
     std::error_code ec;
     jhc::fs::path path3(L"./testuy763e/abc/__filesystem_test3_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(path3, ec));
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == true);
+    REQUIRE(jhc::fs::exists(path3, ec) == false);
+    REQUIRE(jhc::fs::create_directories(path3, ec));
+    REQUIRE(jhc::fs::exists(path3, ec) == true);
 
     const std::string strWritten = "hello world";
 
@@ -532,27 +507,27 @@ void FileSystemTest3() {
     path4.append("path4.txt");
 
     jhc::File file4(path4);
-    EXPECT_TRUE(file4.open("wb") == true);
-    EXPECT_TRUE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(file4.close());
+    REQUIRE(file4.open("wb") == true);
+    REQUIRE(file4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(file4.close());
 
-    EXPECT_TRUE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
-    EXPECT_TRUE(jhc::fs::exists(path3, ec) == false);
+    REQUIRE(jhc::fs::remove(path3, ec) == false);  // remove can only delete empty directory
+    REQUIRE(jhc::fs::remove_all(path3, ec) == 2);  // return remove item count
+    REQUIRE(jhc::fs::exists(path3, ec) == false);
 
-    EXPECT_TRUE(jhc::fs::exists(path3.parent_path(), ec) == true);
+    REQUIRE(jhc::fs::exists(path3.parent_path(), ec) == true);
 #endif
 }
 
 // Test: Recursive remove non-empty directory.
 //
-void FileSystemTest4() {
+TEST_CASE("FileSystemTest4", "[recursive remove non-empty attribute]") {
 #ifdef JHC_WIN
     std::error_code ec;
     jhc::fs::path p1(L"C:\\test87w232\\abc\\__filesystem_test4_" + std::to_wstring(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(p1, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(p1, ec));
-    EXPECT_TRUE(jhc::fs::exists(p1, ec) == true);
+    REQUIRE(jhc::fs::exists(p1, ec) == false);
+    REQUIRE(jhc::fs::create_directories(p1, ec));
+    REQUIRE(jhc::fs::exists(p1, ec) == true);
 
     const std::string strWritten = "hello world";
 
@@ -561,37 +536,37 @@ void FileSystemTest4() {
     p2.append("p2.txt");
 
     jhc::File f2(p2);
-    EXPECT_TRUE(f2.open("wb") == true);
-    EXPECT_TRUE(f2.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f2.close());
+    REQUIRE(f2.open("wb") == true);
+    REQUIRE(f2.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f2.close());
 
     // create C:\test\abc\p3.txt
     jhc::fs::path p3 = p1;
     p3.append("..\\p2.txt");
 
     jhc::File f3(p3);
-    EXPECT_TRUE(f3.open("wb") == true);
-    EXPECT_TRUE(f3.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f3.close());
+    REQUIRE(f3.open("wb") == true);
+    REQUIRE(f3.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f3.close());
 
     // create C:\test\p4.txt
     jhc::fs::path p4 = p1;
     p4.append("..\\..\\p4.txt");
 
     jhc::File f4(p4);
-    EXPECT_TRUE(f4.open("wb") == true);
-    EXPECT_TRUE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f4.close());
+    REQUIRE(f4.open("wb") == true);
+    REQUIRE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f4.close());
 
-    EXPECT_TRUE(jhc::fs::remove(L"C:\\test87w232", ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::fs::remove_all(L"C:\\test87w232", ec) == 6);  // return remove item count
-    EXPECT_TRUE(jhc::fs::exists(L"C:\\test87w232", ec) == false);
+    REQUIRE(jhc::fs::remove(L"C:\\test87w232", ec) == false);  // remove can only delete empty directory
+    REQUIRE(jhc::fs::remove_all(L"C:\\test87w232", ec) == 6);  // return remove item count
+    REQUIRE(jhc::fs::exists(L"C:\\test87w232", ec) == false);
 #else
     std::error_code ec;
     jhc::fs::path p1("~/test87w232/abc/__filesystem_test4_" + std::to_string(time(nullptr)));
-    EXPECT_TRUE(jhc::fs::exists(p1, ec) == false);
-    EXPECT_TRUE(jhc::fs::create_directories(p1, ec));
-    EXPECT_TRUE(jhc::fs::exists(p1, ec) == true);
+    REQUIRE(jhc::fs::exists(p1, ec) == false);
+    REQUIRE(jhc::fs::create_directories(p1, ec));
+    REQUIRE(jhc::fs::exists(p1, ec) == true);
 
     const std::string strWritten = "hello world";
 
@@ -600,38 +575,38 @@ void FileSystemTest4() {
     p2.append("p2.txt");
 
     jhc::File f2(p2);
-    EXPECT_TRUE(f2.open("wb") == true);
-    EXPECT_TRUE(f2.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f2.close());
+    REQUIRE(f2.open("wb") == true);
+    REQUIRE(f2.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f2.close());
 
     // create ~/test87w232/abc/p3.txt
     jhc::fs::path p3 = p1;
     p3.append("../p2.txt");
 
     jhc::File f3(p3);
-    EXPECT_TRUE(f3.open("wb") == true);
-    EXPECT_TRUE(f3.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f3.close());
+    REQUIRE(f3.open("wb") == true);
+    REQUIRE(f3.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f3.close());
 
     // create ~/test87w232/p4.txt
     jhc::fs::path p4 = p1;
     p4.append("../../p4.txt");
 
     jhc::File f4(p4);
-    EXPECT_TRUE(f4.open("wb") == true);
-    EXPECT_TRUE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
-    EXPECT_TRUE(f4.close());
+    REQUIRE(f4.open("wb") == true);
+    REQUIRE(f4.writeFrom((void*)strWritten.c_str(), strWritten.size(), 0) == strWritten.size());
+    REQUIRE(f4.close());
 
-    EXPECT_TRUE(jhc::fs::remove("~/test87w232", ec) == false);  // remove can only delete empty directory
-    EXPECT_TRUE(jhc::fs::remove_all("~/test87w232", ec) == 6);  // return remove item count
-    EXPECT_TRUE(jhc::fs::exists("~/test87w232", ec) == false);
+    REQUIRE(jhc::fs::remove("~/test87w232", ec) == false);  // remove can only delete empty directory
+    REQUIRE(jhc::fs::remove_all("~/test87w232", ec) == 6);  // return remove item count
+    REQUIRE(jhc::fs::exists("~/test87w232", ec) == false);
 #endif
 }
 
 #ifdef JHC_WIN
 // Test: create process, send data to process's input and get process's output.
 //
-void ProcessTest() {
+TEST_CASE("ProcessTest") {
 #ifdef JHC_WIN
     jhc::Process proc(
         L"cmd.exe",
@@ -646,18 +621,18 @@ void ProcessTest() {
         },
         true);
 
-    EXPECT_TRUE(proc.successed());
+    REQUIRE(proc.successed());
 
     int exitStatus = 0;
-    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    REQUIRE(proc.tryGetExitStatus(exitStatus) == false);
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    REQUIRE(proc.tryGetExitStatus(exitStatus) == false);
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    EXPECT_TRUE(proc.write(std::string("ping 127.0.0.1\n")));
-    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    REQUIRE(proc.write(std::string("ping 127.0.0.1\n")));
+    REQUIRE(proc.tryGetExitStatus(exitStatus) == false);
     std::this_thread::sleep_for(std::chrono::seconds(3));
     proc.killProcessTree();
-    EXPECT_TRUE(proc.getExitStatus() > 0);
+    REQUIRE(proc.getExitStatus() > 0);
 #else
     jhc::Process proc(
         "bash",
@@ -672,161 +647,117 @@ void ProcessTest() {
         },
         true);
 
-    EXPECT_TRUE(proc.successed());
+    REQUIRE(proc.successed());
 
     int exitStatus = 0;
-    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    REQUIRE(proc.tryGetExitStatus(exitStatus) == false);
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    EXPECT_TRUE(proc.tryGetExitStatus(exitStatus) == false);
+    REQUIRE(proc.tryGetExitStatus(exitStatus) == false);
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    EXPECT_TRUE(proc.write(std::string("ping -c 6 127.0.0.1\n")));
+    REQUIRE(proc.write(std::string("ping -c 6 127.0.0.1\n")));
     std::this_thread::sleep_for(std::chrono::seconds(3));
     proc.killProcessTree(true);
-    EXPECT_TRUE(proc.getExitStatus() > 0);
+    REQUIRE(proc.getExitStatus() > 0);
 #endif
 }
 
 // Test: Windows http get request
 //
-void WinHttpGetRequestTest() {
+TEST_CASE("WinHttpTest1", "[get]") {
     jhc::WinHttp winHttp;
-    EXPECT_TRUE(winHttp.openSession());
-    EXPECT_TRUE(winHttp.openConnect(L"https://www.baidu.com"));
-    EXPECT_TRUE(winHttp.openRequest(false));
-    EXPECT_TRUE(winHttp.sendRequest());
-    EXPECT_TRUE(winHttp.receiveResponse());
+    REQUIRE(winHttp.openSession());
+    REQUIRE(winHttp.openConnect(L"https://www.baidu.com"));
+    REQUIRE(winHttp.openRequest(false));
+    REQUIRE(winHttp.sendRequest());
+    REQUIRE(winHttp.receiveResponse());
 
     const std::vector<BYTE> body = winHttp.getResponseBody();
-    EXPECT_TRUE(body.size() > 0);
+    REQUIRE(body.size() > 0);
 
     const DWORD dwStatusCode = winHttp.getResponseStatusCode();
-    EXPECT_TRUE(dwStatusCode == 200);
+    REQUIRE(dwStatusCode == 200);
 
     const std::wstring strStatusTxt = winHttp.getResponseStatusText();
-    EXPECT_TRUE(strStatusTxt == L"OK");
+    REQUIRE(strStatusTxt == L"OK");
 
     const std::wstring strRawHeaders = winHttp.getResponseRawHeaders();
-    EXPECT_TRUE(strRawHeaders.size() > 0);
+    REQUIRE(strRawHeaders.size() > 0);
 
     const std::unordered_map<std::wstring, std::wstring> headerMap = winHttp.getResponseHeaders();
-    EXPECT_TRUE(headerMap.size() > 0);
+    REQUIRE(headerMap.size() > 0);
 }
 
 // Test: Windows http post request
 //
-void WinHttpPostRequestTest() {
+TEST_CASE("WinHttpTest2", "[post]") {
     std::string data = "test";
 
     jhc::WinHttp winHttp;
-    EXPECT_TRUE(winHttp.openSession());
-    EXPECT_TRUE(winHttp.openConnect(L"https://www.baidu.com"));
-    EXPECT_TRUE(winHttp.openRequest(true));
-    EXPECT_TRUE(winHttp.sendRequest((LPVOID)data.c_str(), data.size()));
-    EXPECT_TRUE(winHttp.receiveResponse());
+    REQUIRE(winHttp.openSession());
+    REQUIRE(winHttp.openConnect(L"https://www.baidu.com"));
+    REQUIRE(winHttp.openRequest(true));
+    REQUIRE(winHttp.sendRequest((LPVOID)data.c_str(), data.size()));
+    REQUIRE(winHttp.receiveResponse());
 
     const std::vector<BYTE> body = winHttp.getResponseBody();
-    EXPECT_TRUE(body.size() > 0);
+    REQUIRE(body.size() > 0);
 
     const DWORD dwStatusCode = winHttp.getResponseStatusCode();
-    EXPECT_TRUE(dwStatusCode == 200);
+    REQUIRE(dwStatusCode == 200);
 
     const std::wstring strStatusTxt = winHttp.getResponseStatusText();
-    EXPECT_TRUE(strStatusTxt == L"OK");
+    REQUIRE(strStatusTxt == L"OK");
 
     const std::wstring strRawHeaders = winHttp.getResponseRawHeaders();
-    EXPECT_TRUE(strRawHeaders.size() > 0);
+    REQUIRE(strRawHeaders.size() > 0);
 
     const std::unordered_map<std::wstring, std::wstring> headerMap = winHttp.getResponseHeaders();
-    EXPECT_TRUE(headerMap.size() > 0);
+    REQUIRE(headerMap.size() > 0);
 }
 #endif
 
 // Test: Version compare
 //
-void VersionTest() {
+TEST_CASE("VersionCompareTest") {
     jhc::Version v1("1.2.3.4");
     jhc::Version v2("4.3.2");
     jhc::Version v3(L"4.3.2.1");
     jhc::Version v4 = v3;
 
-    EXPECT_TRUE(v1.isValid());
-    EXPECT_TRUE(v2.isValid());
-    EXPECT_TRUE(v1.isSameFormat(v2) == false);
-    EXPECT_TRUE(v2.isSameFormat(v1) == false);
+    REQUIRE(v1.isValid());
+    REQUIRE(v2.isValid());
+    REQUIRE(v1.isSameFormat(v2) == false);
+    REQUIRE(v2.isSameFormat(v1) == false);
 
-    EXPECT_TRUE(v1 != v3);
-    EXPECT_TRUE(v3 == v4);
-    EXPECT_TRUE(v3 >= v4);
-    EXPECT_TRUE(v3 <= v4);
-    EXPECT_TRUE(v1 <= v4);
-    EXPECT_TRUE(v1 < v4);
-    EXPECT_TRUE(v4 >= v1);
-    EXPECT_TRUE(v4 > v1);
+    REQUIRE((v1 != v3));
+    REQUIRE((v3 == v4));
+    REQUIRE((v3 >= v4));
+    REQUIRE((v3 <= v4));
+    REQUIRE((v1 <= v4));
+    REQUIRE((v1 < v4));
+    REQUIRE((v4 >= v1));
+    REQUIRE((v4 > v1));
 }
 
 // Test: Process singleton
 //
-void ProcessSingletonTest() {
+TEST_CASE("SingletonProcessTest") {
     jhc::SingletonProcess::Instance()->markAndCheckStartup("test");
-    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
-    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+    REQUIRE(jhc::SingletonProcess::Instance()->isPrimary());
+    REQUIRE(jhc::SingletonProcess::Instance()->isPrimary());
 
     jhc::SingletonProcess::Release();
     jhc::SingletonProcess::Instance()->markAndCheckStartup("test");
-    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
-    EXPECT_TRUE(jhc::SingletonProcess::Instance()->isPrimary());
+    REQUIRE(jhc::SingletonProcess::Instance()->isPrimary());
+    REQUIRE(jhc::SingletonProcess::Instance()->isPrimary());
 }
 
 // Test: Windows virtual key convert.
-void WinVirtualKeyTest() {
-    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_SHIFT") == 0x10);
-    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_EXECUTE") == 0x2B);
-    EXPECT_TRUE(jhc::WinVirtualKey::ToInteger("VK_RETURN") == 0x0D);
+TEST_CASE("WinVirtualKeyProcessTest") {
+    REQUIRE(jhc::WinVirtualKey::ToInteger("VK_SHIFT") == 0x10);
+    REQUIRE(jhc::WinVirtualKey::ToInteger("VK_EXECUTE") == 0x2B);
+    REQUIRE(jhc::WinVirtualKey::ToInteger("VK_RETURN") == 0x0D);
 
-    EXPECT_TRUE(jhc::WinVirtualKey::ToString(0x0D) == "VK_RETURN");
-    EXPECT_TRUE(jhc::WinVirtualKey::ToString(0x2B) == "VK_EXECUTE");
-}
-
-int main() {
-    printf("Current timestamp(by microseconds): %" PRId64 "\n", jhc::TimeUtil::GetCurrentTimestampByMicroSec());
-
-    const std::string strOSVer = jhc::OSVersion::GetOSVersion();
-    printf("Current OS Version: %s\n", strOSVer.c_str());
-
-    const std::string strCurExePath = jhc::ProcessUtil::GetCurrentExePath();
-    printf("Current Path: %s\n", strCurExePath.c_str());
-
-    const std::string strCurExeDir = jhc::ProcessUtil::GetCurrentExeDirectory();
-    printf("Current Directory: %s\n", strCurExeDir.c_str());
-
-    UUIDTest();
-    FileTest1();
-    FileTest2();
-    HashTest1();
-    HashTest2();
-    Base64Test();
-    IpAddressTest();
-    StringHelperTest();
-    StringEncodeTest();
-    PathTest();
-    TraceTest();
-    CmdLineParserTest();
-    CreateJsonMethod1Test();
-    CreateJsonMethod2Test();
-    CreateJsonMethod3Test();
-    ParseJsonMethod1Test();
-    FileSystemTest1();
-    FileSystemTest2();
-    FileSystemTest3();
-    FileSystemTest4();
-    ProcessTest();
-#ifdef JHC_WIN
-    WinHttpGetRequestTest();
-    WinHttpPostRequestTest();
-    WinVirtualKeyTest();
-#endif
-    VersionTest();
-    ProcessSingletonTest();
-
-    return 0;
+    REQUIRE(jhc::WinVirtualKey::ToString(0x0D) == "VK_RETURN");
+    REQUIRE(jhc::WinVirtualKey::ToString(0x2B) == "VK_EXECUTE");
 }
