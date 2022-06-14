@@ -19,6 +19,7 @@
 
 #ifndef JHC_WIN_REGISTRY_HPP_
 #define JHC_WIN_REGISTRY_HPP_
+#pragma once
 
 #include "jhc/config.hpp"
 #include "jhc/arch.hpp"

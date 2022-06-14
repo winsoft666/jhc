@@ -71,5 +71,29 @@ class ScopedHandle {
 };
 #else
 #endif
+
+class ScopedFile {
+   public:
+    JHC_DISALLOW_COPY_MOVE(ScopedFile);
+    ScopedFile(FILE* f) noexcept :
+        f_(f) {
+    }
+
+    ~ScopedFile() noexcept {
+        close();
+    }
+
+    operator FILE*() const noexcept { return f_; }
+    FILE** operator&() noexcept { return &f_; }
+
+    void close() {
+        if (f_) {
+            fclose(f_);
+            f_ = nullptr;
+        }
+    }
+
+    FILE* f_ = nullptr;
+};
 }  // namespace jhc
 #endif  // !SCOPED_OBJECT_HPP__
