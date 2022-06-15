@@ -35,6 +35,37 @@
 #endif
 
 namespace jhc {
+namespace stringhelper_detail {
+struct EqualA {
+    EqualA() = delete;
+    EqualA(bool caseInsensitive) :
+        caseInsensitive_(caseInsensitive) {}
+
+    bool operator()(char ch1, char ch2) {
+        if (caseInsensitive_)
+            return StringHelper::ToUpper(ch1) == StringHelper::ToUpper(ch2);
+        return ch1 == ch2;
+    }
+
+   private:
+    bool caseInsensitive_ = false;
+};
+
+struct EqualW {
+    EqualW() = delete;
+    EqualW(bool caseInsensitive) :
+        caseInsensitive_(caseInsensitive) {}
+
+    bool operator()(wchar_t ch1, wchar_t ch2) {
+        if (caseInsensitive_)
+            return StringHelper::ToUpper(ch1) == StringHelper::ToUpper(ch2);
+        return ch1 == ch2;
+    }
+
+   private:
+    bool caseInsensitive_ = false;
+};
+}  // namespace stringhelper_detail
 JHC_INLINE char StringHelper::ToLower(const char& in) {
     if (in <= 'Z' && in >= 'A')
         return in - ('Z' - 'z');
@@ -241,6 +272,38 @@ JHC_INLINE size_t StringHelper::ContainTimes(const std::wstring& str, const std:
     return times;
 }
 
+JHC_INLINE std::string::size_type StringHelper::Find(const std::string& str, const std::string& substring, std::string::size_type offset, bool caseInsensitive) {
+    if (offset >= str.length())
+        return std::wstring::npos;
+
+    std::string::const_iterator src_it = str.begin() + offset;
+    std::string::const_iterator it = std::search(src_it,
+                                                 str.end(),
+                                                 substring.begin(),
+                                                 substring.end(),
+                                                 stringhelper_detail::EqualA(caseInsensitive));
+    if (it != str.end())
+        return it - str.begin();
+
+    return std::string::npos;  // Not found
+}
+
+std::wstring::size_type StringHelper::Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
+    if (offset >= str.length())
+        return std::wstring::npos;
+
+    std::wstring::const_iterator src_it = str.begin() + offset;
+    std::wstring::const_iterator it = std::search(src_it,
+                                                  str.end(),
+                                                  substring.begin(),
+                                                  substring.end(),
+                                                  stringhelper_detail::EqualW(caseInsensitive));
+    if (it != str.end())
+        return it - str.begin();
+
+    return std::wstring::npos;  // Not found
+}
+
 JHC_INLINE std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::string::npos) {
@@ -285,19 +348,19 @@ JHC_INLINE std::wstring StringHelper::ReplaceLast(const std::wstring& s, const s
     return ret;
 }
 
-JHC_INLINE std::string StringHelper::Replace(const std::string& s, const std::string& from, const std::string& to) {
+JHC_INLINE std::string StringHelper::Replace(const std::string& s, const std::string& from, const std::string& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    size_t start_pos = 0;
-    const bool found_substring = s.find(from, start_pos) != std::string::npos;
+    const bool found_substring = StringHelper::Find(s, from, offset, caseInsensitive) != std::string::npos;
     if (!found_substring) {
         return s;
     }
 
+    size_t start_pos = 0;
     std::string ret = s;
-    while ((start_pos = ret.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = StringHelper::Find(ret, from, start_pos, caseInsensitive)) != std::string::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -305,19 +368,19 @@ JHC_INLINE std::string StringHelper::Replace(const std::string& s, const std::st
     return ret;
 }
 
-JHC_INLINE std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+JHC_INLINE std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    size_t start_pos = 0;
-    const bool found_substring = s.find(from, start_pos) != std::string::npos;
+    const bool found_substring = StringHelper::Find(s, from, offset, caseInsensitive) != std::wstring::npos;
     if (!found_substring) {
         return s;
     }
 
+    size_t start_pos = 0;
     std::wstring ret = s;
-    while ((start_pos = ret.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = StringHelper::Find(ret, from, start_pos, caseInsensitive)) != std::wstring::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }

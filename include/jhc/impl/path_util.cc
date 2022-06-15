@@ -11,6 +11,7 @@
 #include <shlobj_core.h>
 #endif
 #include "jhc/os_ver.hpp"
+#include "jhc/string_helper.hpp"
 
 namespace jhc {
 #ifdef JHC_WIN
@@ -109,6 +110,88 @@ JHC_INLINE std::wstring PathUtil::GetWinExplorerDisplayName(const std::wstring& 
         return std::wstring(sfi.szDisplayName);
     }
     return std::wstring();
+}
+
+JHC_INLINE std::string PathUtil::ReplaceKnownEnvToWow6432(const std::string& src) {
+    if (!StringHelper::IsContains(src, "%"))
+        return src;
+
+    BOOL isWow64 = FALSE;
+#ifdef JHC_WIN32
+    HANDLE hProcess = GetCurrentProcess();
+    IsWow64Process(hProcess, &isWow64);
+#endif
+
+    if (!isWow64)
+        return src;
+
+    std::string sl = src;
+    sl = StringHelper::Replace(sl, "%ProgramFiles%", "%ProgramW6432%", 0, true);
+    sl = StringHelper::Replace(sl, "%CommonProgramFiles%", "%CommonProgramW6432%", 0, true);
+
+    return sl;
+}
+
+JHC_INLINE std::wstring PathUtil::ReplaceKnownEnvToWow6432(const std::wstring& src) {
+    if (!StringHelper::IsContains(src, L"%"))
+        return src;
+
+    BOOL isWow64 = FALSE;
+#ifdef JHC_WIN32
+    HANDLE hProcess = GetCurrentProcess();
+    IsWow64Process(hProcess, &isWow64);
+#endif
+
+    if (!isWow64)
+        return src;
+
+    std::wstring sl = src;
+    sl = StringHelper::Replace(sl, L"%ProgramFiles%", L"%ProgramW6432%", 0, true);
+    sl = StringHelper::Replace(sl, L"%CommonProgramFiles%", L"%CommonProgramW6432%", 0, true);
+
+    return sl;
+}
+
+JHC_INLINE std::string PathUtil::ExpandEnvString(const std::string& src, bool disableWow64FsRedirection) {
+    std::string srcCopy;
+    PVOID OldValue = NULL;
+    if (disableWow64FsRedirection) {
+        Wow64DisableWow64FsRedirection(&OldValue);
+        srcCopy = ReplaceKnownEnvToWow6432(src);
+    }
+    else {
+        srcCopy = src;
+    }
+
+    DWORD dwCount = ExpandEnvironmentStringsA(srcCopy.c_str(), NULL, 0);
+    std::vector<char> buf(dwCount + 1);
+    ExpandEnvironmentStringsA(srcCopy.c_str(), &buf[0], dwCount);
+
+    if (disableWow64FsRedirection)
+        Wow64RevertWow64FsRedirection(OldValue);
+
+    return std::string(&buf[0]);
+}
+
+JHC_INLINE std::wstring PathUtil::ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection) {
+    std::wstring srcCopy;
+    PVOID OldValue = NULL;
+    if (disableWow64FsRedirection) {
+        Wow64DisableWow64FsRedirection(&OldValue);
+        srcCopy = ReplaceKnownEnvToWow6432(src);
+    }
+    else {
+        srcCopy = src;
+    }
+
+    DWORD dwCount = ExpandEnvironmentStringsW(srcCopy.c_str(), NULL, 0);
+    std::vector<wchar_t> buf(dwCount + 1);
+    ExpandEnvironmentStringsW(srcCopy.c_str(), &buf[0], dwCount);
+
+    if (disableWow64FsRedirection)
+        Wow64RevertWow64FsRedirection(OldValue);
+
+    return std::wstring(&buf[0]);
 }
 #endif
 }  // namespace jhc

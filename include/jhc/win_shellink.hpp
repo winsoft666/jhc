@@ -28,7 +28,6 @@
 #include <vector>
 #include <string>
 #include "jhc/flags.hpp"
-#include "jhc/filesystem.hpp"
 
 // This class provides an interface for the MS Shell Link Binary File Format.
 // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/16cb4ca1-9339-4d0c-a68d-bf1d6cc0f943
@@ -246,7 +245,7 @@ class WinShellink {
     };
     ALLOW_FLAGS_FOR_ENUM_IN_CLASS(ShllinkLinkFlag);
 
-    enum class ShllinkFileAttribute : uint32_t {
+    enum class FileAttribute : uint32_t {
         /*
         The file or directory is read-only. For a file, if this bit is set,
         applications can read the file but cannot write to it or delete
@@ -318,7 +317,7 @@ class WinShellink {
         FA_ENCRYPTED = 1 << 14,
         // 16 bit 0
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(ShllinkFileAttribute);
+    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(FileAttribute);
 
     enum ShllinkHotKey : uint8_t {
         HOTK_NONE = 0x00,
@@ -394,29 +393,29 @@ class WinShellink {
         const uint32_t HeaderSize = 0x0000004C;
 
         // A class identifier (CLSID). This value MUST be 00021401-0000-0000-C000-000000000046
-        uint64_t LinkCLSID_L;
-        uint64_t LinkCLSID_H;
+        uint64_t LinkCLSID_L = 0;
+        uint64_t LinkCLSID_H = 0;
 
         // A LinkFlags structure (section 2.1.1) that specifies information about the shell link and the presence of optional portions of the structure
         ShllinkLinkFlags LinkFlags;
 
         // A FileAttributesFlags structure (section 2.1.2) that specifies information about the link target
-        ShllinkFileAttributes FileAttributes;
+        FileAttributes TargetFileAttributes;
 
         // A FILETIME structure ([MS-DTYP] section 2.3.3) that specifies the creation time of the link target in UTC (Coordinated Universal Time). If the value is zero, there is no creation time set on the link target
-        uint64_t CreationTime;
+        uint64_t CreationTime = 0;
 
         // A FILETIME structure ([MS-DTYP] section 2.3.3) that specifies the access time of the link target in UTC (Coordinated Universal Time). If the value is zero, there is no access time set on the link target
-        uint64_t AccessTime;
+        uint64_t AccessTime = 0;
 
         // A FILETIME structure ([MS-DTYP] section 2.3.3) that specifies the write time of the link target in UTC (Coordinated Universal Time). If the value is zero, there is no write time set on the link target
-        uint64_t WriteTime;
+        uint64_t WriteTime = 0;
 
         // A 32-bit unsigned integer that specifies the size, in bytes, of the link target. If the link target file is larger than 0xFFFFFFFF, this value specifies the least significant 32 bits of the link target file size
-        uint32_t FileSize;
+        uint32_t FileSize = 0;
 
         // A 32-bit signed integer that specifies the index of an icon within a given icon location
-        uint32_t IconIndex;
+        int32_t IconIndex = 0;
 
         /* A 32-bit unsigned integer that specifies the expected window state of an application launched by the link. This value SHOULD be one of the following
 
@@ -426,10 +425,10 @@ class WinShellink {
 
             All other values MUST be treated as SW_SHOWNORMAL
         */
-        uint32_t ShowCommand;
+        uint32_t ShowCommand = 0;
 
         // A HotKeyFlags structure (section 2.1.3) that specifies the keystrokes used to launch the application referenced by the shortcut key. This value is assigned to the application after it is launched, so that pressing the key activates that application
-        uint16_t HotKey;
+        uint16_t HotKey = 0;
 
         /*
             + 10 bytes NULL
@@ -447,10 +446,10 @@ class WinShellink {
             List of IDList elements
         */
         // size in bytes = SUM(_cshllink_lnktidl_idl_item.item_size)
-        uint16_t idListSize;
+        uint16_t idListSize = 0;
 
         // A stored IDList structure (section 2.2.1), which contains the item ID list
-        std::vector<std::vector<uint8_t>> itemIDList;
+        std::vector<uint8_t> IDListData;
     };
 #pragma endregion LinkTargetIDList
 
@@ -510,21 +509,27 @@ class WinShellink {
         std::vector<char> Data;
     };
 
+    enum class CommonNetworkRelativeLinkFlag : uint32_t {
+        CNETRLNK_ValidDevice = 1 << 0,
+        CNETRLNK_ValidNetType = 1 << 1
+    };
+    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(CommonNetworkRelativeLinkFlag);
+
     struct CommonNetworkRelativeLink {
         // A 32-bit, unsigned integer that specifies the size, in bytes, of the CommonNetworkRelativeLink structure. This value MUST be greater than or equal to 0x00000014. All offsets specified in this structure MUST be less than this value, and all strings contained in this structure MUST fit within the extent defined by this size
-        uint32_t CommonNetworkRelativeSize;
+        uint32_t CommonNetworkRelativeSize = 0;
         // Flags that specify the contents of the DeviceNameOffset and NetProviderType fields
-        uint32_t CommonNetworkRelativeLinkFlags;
+        CommonNetworkRelativeLinkFlags ComNetRelLnkFlags;
         // A 32-bit, unsigned integer that specifies the location of the NetName field. This value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure
-        uint32_t NetNameOffset;
+        uint32_t NetNameOffset = 0;
         // A 32-bit, unsigned integer that specifies the location of the DeviceName field. If the ValidDevice flag is set, this value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure; otherwise, this value MUST be zero
-        uint32_t DeviceNameOffset;
+        uint32_t DeviceNameOffset = 0;
         // A 32-bit, unsigned integer that specifies the type of network provider. If the ValidNetType flag is set, this value MUST be one of the defined; otherwise, this value MUST be ignored
-        uint32_t NetworkProviderType;
+        uint32_t NetworkProviderType = 0;
         // An optional, 32-bit, unsigned integer that specifies the location of the NetNameUnicode field. This value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure. This field MUST be present if the value of the NetNameOffset field is greater than 0x00000014; otherwise, this field MUST NOT be present
-        uint32_t NetNameOffsetUnicode;
+        uint32_t NetNameOffsetUnicode = 0;
         // An optional, 32-bit, unsigned integer that specifies the location of the DeviceNameUnicode field. This value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure. This field MUST be present if the value of the NetNameOffset field is greater than 0x00000014; otherwise, this field MUST NOT be present
-        uint32_t DeviceNameOffsetUnicode;
+        uint32_t DeviceNameOffsetUnicode = 0;
         // A NULL¨Cterminated string, as defined by the system default code page, which specifies a server share path; for example, "\\server\share"
         std::string NetName;
         // A NULL¨Cterminated string, as defined by the system default code page, which specifies a device; for example, the drive letter "D:"
@@ -537,7 +542,7 @@ class WinShellink {
 
     struct LinkInfo {
         // A 32-bit, unsigned integer that specifies the size, in bytes, of the LinkInfo structure. All offsets specified in this structure MUST be less than this value, and all strings contained in this structure MUST fit within the extent defined by this size
-        uint32_t LinkInfoSize;
+        uint32_t LinkInfoSize = 0;
 
         // A 32-bit, unsigned integer that specifies the size, in bytes, of the LinkInfo header section, which is composed of the LinkInfoSize, LinkInfoHeaderSize, LinkInfoFlags VolumeIDOffset, LocalBasePathOffset, CommonNetworkRelativeLinkOffset, CommonPathSuffixOffset fields, and, if included, the LocalBasePathOffsetUnicode and CommonPathSuffixOffsetUnicode fields
         /*
@@ -546,28 +551,28 @@ class WinShellink {
 
         In Windows, Unicode characters are stored in this structure if the data cannot be represented as ANSI characters due to truncation of the values. In this case, the value of the LinkInfoHeaderSize field is greater than or equal to 36
         */
-        uint32_t LinkInfoHeaderSize;
+        uint32_t LinkInfoHeaderSize = 0;
 
         // Flags that specify whether the VolumeID, LocalBasePath, LocalBasePathUnicode, and CommonNetworkRelativeLink fields are present in this structure
         LinkInfoFlags LnkInfFlags;
 
         // A 32-bit, unsigned integer that specifies the location of the VolumeID field. If the VolumeIDAndLocalBasePath flag is set, this value is an offset, in bytes, from the start of the LinkInfo structure; otherwise, this value MUST be zero
-        uint32_t VolumeIDOffset;
+        uint32_t VolumeIDOffset = 0;
 
         // A 32-bit, unsigned integer that specifies the location of the LocalBasePath field. If the VolumeIDAndLocalBasePath flag is set, this value is an offset, in bytes, from the start of the LinkInfo structure; otherwise, this value MUST be zero
-        uint32_t LocalBasePathOffset;
+        uint32_t LocalBasePathOffset = 0;
 
         // A 32-bit, unsigned integer that specifies the location of the CommonNetworkRelativeLink field. If the CommonNetworkRelativeLinkAndPathSuffix flag is set, this value is an offset, in bytes, from the start of the LinkInfo structure; otherwise, this value MUST be zero
-        uint32_t CommonNetworkRelativeLinkOffset;
+        uint32_t CommonNetworkRelativeLinkOffset = 0;
 
         // A 32-bit, unsigned integer that specifies the location of the CommonPathSuffix field. This value is an offset, in bytes, from the start of the LinkInfo structure
-        uint32_t CommonPathSuffixOffset;
+        uint32_t CommonPathSuffixOffset = 0;
 
         // An optional, 32-bit, unsigned integer that specifies the location of the LocalBasePathUnicode field. If the VolumeIDAndLocalBasePath flag is set, this value is an offset, in bytes, from the start of the LinkInfo structure; otherwise, this value MUST be zero. This field can be present only if the value of the LinkInfoHeaderSize field is greater than or equal to 0x00000024
-        uint32_t LocalBasePathOffsetUnicode;
+        uint32_t LocalBasePathOffsetUnicode = 0;
 
         // An optional, 32-bit, unsigned integer that specifies the location of the CommonPathSuffixUnicode field. This value is an offset, in bytes, from the start of the LinkInfo structure. This field can be present only if the value of the LinkInfoHeaderSize field is greater than or equal to 0x00000024
-        uint32_t CommonPathSuffixOffsetUnicode;
+        uint32_t CommonPathSuffixOffsetUnicode = 0;
 
         // An optional VolumeID structure (section 2.3.1) that specifies information about the volume that the link target was on when the link was created. This field is present if the VolumeIDAndLocalBasePath flag is set
         VolumeID VolID;
@@ -592,15 +597,24 @@ class WinShellink {
 #pragma region StringData
     struct StringData {
         // REFERED TO AS "Comment". An optional structure that specifies a description of the shortcut that is displayed to end users to identify the purpose of the shell link. This structure MUST be present if the HasName flag is set
-        std::wstring NameString;
+        std::wstring NameStringW;
+        std::string NameStringA;
+
         // An optional structure that specifies the location of the link target relative to the file that contains the shell link. When specified, this string SHOULD be used when resolving the link. This structure MUST be present if the HasRelativePath flag is set
-        std::wstring RelativePath;
+        std::wstring RelativePathW;
+        std::string RelativePathA;
+
         // An optional structure that specifies the file system path of the working directory to be used when activating the link target. This structure MUST be present if the HasWorkingDir flag is set
-        std::wstring WorkingDir;
+        std::wstring WorkingDirW;
+        std::string WorkingDirA;
+
         // An optional structure that stores the command-line arguments that are specified when activating the link target. This structure MUST be present if the HasArguments flag is set
-        std::wstring CommandLineArguments;
+        std::wstring CommandLineArgumentsW;
+        std::string CommandLineArgumentsA;
+
         // An optional structure that specifies the location of the icon to be used when displaying a shell link item in an icon view. This structure MUST be present if the HasIconLocation flag is set
-        std::wstring IconLocation;
+        std::wstring IconLocationW;
+        std::string IconLocationA;
     };
 #pragma endregion StringData
 
@@ -655,20 +669,20 @@ class WinShellink {
         // A 16-bit, unsigned integer that specifies the fill attributes that control the foreground and background text color in the console window popup. The values are the same as for the FillAttributes field
         ConsoleDataBlockFileAttributes PopupFillAttributes;
         // A 16-bit, signed integer that specifies the horizontal size (X axis), in characters, of the console window buffer
-        uint16_t ScreenBufferSizeX;
+        uint16_t ScreenBufferSizeX = 0;
         // A 16-bit, signed integer that specifies the vertical size (Y axis), in characters, of the console window buffer
-        uint16_t ScreenBufferSizeY;
+        uint16_t ScreenBufferSizeY = 0;
         // A 16-bit, signed integer that specifies the horizontal size (X axis), in characters, of the console window
-        uint16_t WindowSizeX;
+        uint16_t WindowSizeX = 0;
         // A 16-bit, signed integer that specifies the vertical size (Y axis), in characters, of the console window
-        uint16_t WindowSizeY;
+        uint16_t WindowSizeY = 0;
         // A 16-bit, signed integer that specifies the horizontal coordinate (X axis), in pixels, of the console window origin
-        uint16_t WindowOriginX;
+        uint16_t WindowOriginX = 0;
         // A 16-bit, signed integer that specifies the vertical coordinate (Y axis), in pixels, of the console window origin
-        uint16_t WindowOriginY;
+        uint16_t WindowOriginY = 0;
         /*8 bytes unused data*/
         // A 32-bit, unsigned integer that specifies the size, in pixels, of the font used in the console window. The two most significant bytes contain the font height and the two least significant bytes contain the font width. For vector fonts, the width is set to zero
-        uint32_t FontSize;
+        uint32_t FontSize = 0;
         /*
                 A 32-bit, unsigned integer that specifies the family of the font used in the
                 console window. This value MUST be comprised of a font family and a font pitch. The values for
@@ -695,7 +709,7 @@ class WinShellink {
                 700 ¡Ü value     A bold font.
                 value < 700     A regular-weight font.
             */
-        uint32_t FontWeight;
+        uint32_t FontWeight = 0;
         // A 32-character Unicode string that specifies the face name of the font used in the console window
         std::wstring FaceName;
         // A 32-bit, unsigned integer that specifies the size of the cursor, in pixels, used in the console window
@@ -704,50 +718,50 @@ class WinShellink {
                 26 ¡ª 50         A medium cursor.
                 51 ¡ª 100        A large cursor.
             */
-        uint32_t CursorSize;
+        uint32_t CursorSize = 0;
         // A 32-bit, unsigned integer that specifies whether to open the console window in full-screen mode
         /*
                 0x00000000              Full-screen mode is off.
                 0x00000000 < value      Full-screen mode is on.
             */
-        uint32_t FullScreen;
+        uint32_t FullScreen = 0;
         // A 32-bit, unsigned integer that specifies whether to open the console window in QuikEdit mode. In QuickEdit mode, the mouse can be used to cut, copy, and paste text in the console window
         /*
                 0x00000000              QuikEdit mode is off.
                 0x00000000 < value      QuikEdit mode is on.
             */
-        uint32_t QuickEdit;
+        uint32_t QuickEdit = 0;
         // A 32-bit, unsigned integer that specifies insert mode in the console window
         /*
                 0x00000000              Insert mode is disabled.
                 0x00000000 < value      Insert mode is enabled.
             */
-        uint32_t InsertMode;
+        uint32_t InsertMode = 0;
         // A 32-bit, unsigned integer that specifies auto-position mode of the console window
         /*
                 0x00000000              The values of the WindowOriginX and WindowOriginY fields are used to position the console window.
                 0x00000000 < value      The console window is positioned automatically
             */
-        uint32_t AutoPosition;
+        uint32_t AutoPosition = 0;
         // A 32-bit, unsigned integer that specifies the size, in characters, of the buffer that is used to store a history of user input into the console window
-        uint32_t HistoryBufferSize;
+        uint32_t HistoryBufferSize = 0;
         // A 32-bit, unsigned integer that specifies the number of history buffers to use
-        uint32_t NumberOfHistoryBuffers;
+        uint32_t NumberOfHistoryBuffers = 0;
         // A 32-bit, unsigned integer that specifies whether to remove duplicates in the history buffer
         /*
                 0x00000000              Duplicates are not allowed.
                 0x00000000 < value      Duplicates are allowed.
             */
-        uint32_t HistoryNoDup;
+        uint32_t HistoryNoDup = 0;
         // A table of 16 32-bit, unsigned integers specifying the RGB colors that are used for text in the console window. The values of the fill attribute fields FillAttributes and PopupFillAttributes are used as indexes into this table to specify the final foreground and background color for a character
-        uint32_t ColorTable[16];
+        uint32_t ColorTable[16] = {0};
     };
 
     struct ConsoleFEDataBlock {
         const uint32_t BlockSize = 0x0000000C;
         static const uint32_t BlockSignature = 0xA0000004;
         // A 32-bit, unsigned integer that specifies a code page language code identifier. For details concerning the structure and meaning of language code identifiers, see [MS-LCID]. For additional background information, see [MSCHARSET], [MSDN-CS], and [MSDOCS-CodePage]
-        uint32_t CodePage;
+        uint32_t CodePage = 0;
     };
 
     struct DarwinDataBlock {
@@ -785,7 +799,7 @@ class WinShellink {
         // A value in GUID packet representation ([MS-DTYP] section 2.3.4.2) that specifies the folder GUID ID
         std::string KnownFolderID;
         // A 32-bit, unsigned integer that specifies the location of the ItemID of the first child segment of the IDList specified by KnownFolderID. This value is the offset, in bytes, into the link target IDList
-        uint32_t Offset;
+        uint32_t Offset = 0;
     };
 
     struct PropertyStoreDataBlock {
@@ -793,12 +807,12 @@ class WinShellink {
         uint32_t BlockSize;
         static const uint32_t BlockSignature = 0xA0000009;
         // A serialized property storage structure ([MS-PROPSTORE] section 2.2)
-        uint8_t* PropertyStore;
+        std::string PropertyStore;
     };
 
     struct ShimDataBlock {
         // BlockSize MUST be >= 0x00000088
-        uint32_t BlockSize;
+        uint32_t BlockSize = 0;
         static const uint32_t BlockSignature = 0xA0000008;
         // A Unicode string that specifies the name of a shim layer to apply to a link target when it is being activated
         std::wstring LayerName;
@@ -808,18 +822,18 @@ class WinShellink {
         const uint32_t BlockSize = 0x00000010;
         static const uint32_t BlockSignature = 0xA0000005;
         // A 32-bit, unsigned integer that specifies the folder integer ID
-        uint32_t SpecialFolderID;
+        uint32_t SpecialFolderID = 0;
         // A 32-bit, unsigned integer that specifies the location of the ItemID of the first child segment of the IDList specified by SpecialFolderID. This value is the offset, in bytes, into the link target IDList
-        uint32_t Offset;
+        uint32_t Offset = 0;
     };
 
     struct TrackerDataBlock {
         const uint32_t BlockSize = 0x00000060;
         static const uint32_t BlockSignature = 0xA0000003;
         // A 32-bit, unsigned integer that specifies the size of the rest of the TrackerDataBlock structure, including this Length field. This value MUST be 0x00000058
-        uint32_t Length;
+        uint32_t Length = 0;
         // A 32-bit, unsigned integer. This value MUST be 0x00000000
-        uint32_t Version;
+        uint32_t Version = 0;
         // A NULL¨Cterminated character string, as defined by the system default code page, which specifies the NetBIOS name of the machine where the link target was last known to reside
         std::string MachineID;
         // Two values in GUID packet representation ([MS-DTYP] section 2.3.4.2) that are used to find the link target with the Link Tracking service, as described in [MS-DLTW]
@@ -830,7 +844,7 @@ class WinShellink {
 
     struct VistaAndAboveIDListDataBlock {
         // BlockSize MUST be >= 0x0000000A
-        uint32_t BlockSize;
+        uint32_t BlockSize = 0;
         static const uint32_t BlockSignature = 0xA000000C;
         // An IDList structure (section 2.2.1)
         LinkTargetIDList targetIdList;
@@ -854,8 +868,26 @@ class WinShellink {
     WinShellink();
     virtual ~WinShellink();
 
-    ShellinkErr load(const fs::path& lnkPath);
-    bool saveAs(const fs::path& lnkPath);
+    ShellinkErr load(const std::wstring& lnkPath);
+    bool saveAs(const std::wstring& lnkPath);
+
+    LinkHeader linkHeader() const { return header_; }
+    LinkTargetIDList linkTargetIdList() const { return targetIdList_; }
+    LinkInfo linkInfo() const { return linkInfo_; }
+    StringData stringData() const { return stringData_; }
+    ExtraData extraData() const { return extraData_; }
+
+    std::wstring getDisplayName() const;
+    std::wstring getTargetPath() const;
+    std::wstring getArguments() const;
+    std::wstring getIconPath() const;
+    int32_t getIconIndex() const;
+
+    // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
+    static bool IsResourceString(const std::wstring& s);
+
+    // Notice: 32bit program can not load 64bit dll
+    static bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
 
    private:
     WinShellink::ShellinkErr WinShellink::readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
@@ -875,6 +907,8 @@ class WinShellink {
     ShellinkErr readNULLWStr(wchar_t** dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp);
     ShellinkErr readNULLStr(std::vector<char>& dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp);
     ShellinkErr readNULLWStr(std::vector<wchar_t>& dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp);
+
+    // read special size string
     ShellinkErr readStr(std::string& dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp, size_t size);
     ShellinkErr readWStr(std::wstring& dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp, size_t size);
 
@@ -889,8 +923,6 @@ class WinShellink {
     ExtraData extraData_;
 
     const int kExtraDataBlockNum = 11;
-    class Private;
-    Private* p_ = nullptr;
 };
 }  // namespace jhc
 

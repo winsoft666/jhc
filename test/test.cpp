@@ -154,7 +154,7 @@ TEST_CASE("IpAddressTest") {
 
 // Test: string operate.
 //
-TEST_CASE("StringHelperTest") {
+TEST_CASE("StringHelperTest1") {
     REQUIRE(jhc::StringHelper::ToLower('c') == 'c');
     REQUIRE(jhc::StringHelper::ToLower('C') == 'c');
     REQUIRE(jhc::StringHelper::ToUpper('A') == 'A');
@@ -229,6 +229,39 @@ TEST_CASE("StringHelperTest") {
     std::wstring bigStrW2(1024, L'c');
     const std::wstring sw3 = jhc::StringHelper::StringPrintf(L"%ls", bigStrW2.c_str());
     REQUIRE(sw3 == bigStrW2);
+}
+
+TEST_CASE("StringHelperTest2", "Find") {
+    std::wstring s = L"@%SystemRoot%\\system32\\shell32.dll,-10113";
+    std::wstring::size_type pos = jhc::StringHelper::Find(s, L"%systemroot%", 0, true);
+    REQUIRE(pos == 1);
+
+    std::wstring::size_type pos2 = jhc::StringHelper::Find(s, L"%systemroot%", 0, false);
+    REQUIRE(pos2 == std::wstring::npos);
+
+    std::wstring::size_type pos3 = jhc::StringHelper::Find(s, L"%SystemRoot%", 2, true);
+    REQUIRE(pos3 == std::wstring::npos);
+
+    std::wstring::size_type pos4 = jhc::StringHelper::Find(s, L"%SystemRoot%", 1, false);
+    REQUIRE(pos4 == 1);
+
+    std::wstring::size_type pos5 = jhc::StringHelper::Find(s, L"32", 23, false);
+    REQUIRE(pos5 == 28);
+
+    std::wstring::size_type pos6 = jhc::StringHelper::Find(s, L"32", 230, false);
+    REQUIRE(pos6 == std::wstring::npos);
+}
+
+TEST_CASE("StringHelperTest3", "Repace") {
+    std::wstring s = L"@%SystemRoot%\\system32\\%systemroot%.dll,-10113";
+    std::wstring s1 = jhc::StringHelper::Replace(s, L"%systemroot%", L"c:", 0, false);
+    REQUIRE(s1 == L"@%SystemRoot%\\system32\\c:.dll,-10113");
+
+    std::wstring s2 = jhc::StringHelper::Replace(s, L"%systemroot%", L"c:", 0, true);
+    REQUIRE(s2 == L"@c:\\system32\\c:.dll,-10113");
+
+    std::wstring s3 = jhc::StringHelper::Replace(s, L"%systemroot%", L"c:", 200, true);
+    REQUIRE(s3 == L"@%SystemRoot%\\system32\\%systemroot%.dll,-10113");
 }
 
 // Test: string encode, utf8/utf16

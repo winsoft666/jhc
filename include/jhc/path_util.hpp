@@ -45,6 +45,12 @@ class PathUtil {
     static bool OpenWinExplorerAndLocate(const std::wstring& path);
 
     static std::wstring GetWinExplorerDisplayName(const std::wstring& path);
+
+    static std::string ReplaceKnownEnvToWow6432(const std::string& src);
+    static std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src);
+
+    static std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = true);
+    static std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = true);
 #endif
 };
 

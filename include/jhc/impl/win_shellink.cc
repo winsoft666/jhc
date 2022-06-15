@@ -5,6 +5,12 @@
 
 #ifdef JHC_WIN
 #include "jhc/scoped_object.hpp"
+#include "jhc/string_encode.hpp"
+#include "jhc/string_helper.hpp"
+#include "jhc/path_util.hpp"
+#include <shlobj_core.h>
+
+#pragma comment(lib, "Shell32.lib")
 
 namespace jhc {
 
@@ -14,13 +20,9 @@ WinShellink::WinShellink() {
 WinShellink::~WinShellink() {
 }
 
-WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
+WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
     FILE* fp = nullptr;
-#ifdef JHC_WIN
-    _wfopen_s(&fp, lnkPath.wstring().c_str(), L"rb");
-#else
-    fp = fopen(lnkPath.u8string().c_str(), "rb");
-#endif
+    _wfopen_s(&fp, lnkPath.c_str(), L"rb");
 
     if (!fp)
         return ShellinkErr::SHLLINK_ERR_FCL;
@@ -57,7 +59,7 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
         uint32_t fileAttributesValue = 0;
         if (fread(&fileAttributesValue, 4, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        header_.FileAttributes.set_underlying_value(fileAttributesValue);
+        header_.TargetFileAttributes.set_underlying_value(fileAttributesValue);
 
         //CreationTime
         if (fread(&header_.CreationTime, 8, 1, fp) != 1)
@@ -94,7 +96,12 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
         if (fread(&targetIdList_.idListSize, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
 
-        int tmpS = targetIdList_.idListSize - 2;
+        targetIdList_.IDListData.resize(targetIdList_.idListSize);
+        if (fread((void*)(&targetIdList_.IDListData[0]), targetIdList_.idListSize, 1, fp) != 1)
+            return ShellinkErr::SHLLINK_ERR_FIO;
+
+#if 0
+        int tmpS = targetIdList_.idListSize - 2;  // TerminalID (2 bytes)
         while (tmpS > 0) {
             //Element size
             uint16_t itemSize = 0;
@@ -105,9 +112,10 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
             uint16_t itemDataSize = itemSize - 2;
             std::vector<uint8_t> vItemId((size_t)(itemDataSize));
 
-            if (fread((void*)(&vItemId[0]), itemDataSize, 1, fp) != 1)
-                return ShellinkErr::SHLLINK_ERR_FIO;
-
+            if (itemDataSize > 0) {
+                if (fread((void*)(&vItemId[0]), itemDataSize, 1, fp) != 1)
+                    return ShellinkErr::SHLLINK_ERR_FIO;
+            }
             tmpS -= itemSize;
             targetIdList_.itemIDList.push_back(vItemId);
         }
@@ -118,6 +126,7 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
 
         if (tmpS < 0 || nullb != 0)
             return ShellinkErr::SHLLINK_ERR_INVIDL;
+#endif
     }
 
     char* pValue = nullptr;
@@ -202,7 +211,7 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
                 return ShellinkErr::SHLLINK_ERR_NULLPVIDD;
             //Data
             if (linkInfo_.VolID.VolumeLabelOffset == 0x00000014) {
-                if (fread(&linkInfo_.VolID.Data[0], sizeof(char16_t), (linkInfo_.VolID.VolumeIDSize - VtmpSize) / 2, fp) != (linkInfo_.VolID.VolumeIDSize - VtmpSize) / 2)
+                if (fread(&linkInfo_.VolID.Data[0], sizeof(wchar_t), (linkInfo_.VolID.VolumeIDSize - VtmpSize) / 2, fp) != (linkInfo_.VolID.VolumeIDSize - VtmpSize) / 2)
                     return ShellinkErr::SHLLINK_ERR_FIO;
             }
             else {
@@ -225,8 +234,10 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
                 return ShellinkErr::SHLLINK_ERR_FIO;
 
             //CommonNetworkRelativeLinkFlags
-            if (fread(&linkInfo_.CommonNetRelLnk.CommonNetworkRelativeLinkFlags, 4, 1, fp) != 1)
+            uint32_t commonNetworkRelativeLinkFlagsValue = 0;
+            if (fread(&commonNetworkRelativeLinkFlagsValue, 4, 1, fp) != 1)
                 return ShellinkErr::SHLLINK_ERR_FIO;
+            linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags.set_underlying_value(commonNetworkRelativeLinkFlagsValue);
 
             //NetNameOffset
             if (fread(&linkInfo_.CommonNetRelLnk.NetNameOffset, 4, 1, fp) != 1)
@@ -314,40 +325,74 @@ WinShellink::ShellinkErr WinShellink::load(const fs::path& lnkPath) {
         if (fread(&countCharacters, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
 
-        if ((err = readWStr(stringData_.NameString, ShellinkErr::SHLLINK_ERR_NULLPSTRDNAME, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
-            return err;
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode) {
+            if ((err = readWStr(stringData_.NameStringW, ShellinkErr::SHLLINK_ERR_NULLPSTRDNAME, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
+        else {
+            if ((err = readStr(stringData_.NameStringA, ShellinkErr::SHLLINK_ERR_NULLPSTRDNAME, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
     }
     if (header_.LinkFlags & ShllinkLinkFlag::LF_HasRelativePath) {
         //RelativePath
         uint16_t countCharacters = 0;
         if (fread(&countCharacters, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        if ((err = readWStr(stringData_.RelativePath, ShellinkErr::SHLLINK_ERR_NULLPSTRDRPATH, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
-            return err;
+
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode) {
+            if ((err = readWStr(stringData_.RelativePathW, ShellinkErr::SHLLINK_ERR_NULLPSTRDRPATH, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
+        else {
+            if ((err = readStr(stringData_.RelativePathA, ShellinkErr::SHLLINK_ERR_NULLPSTRDRPATH, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
     }
     if (header_.LinkFlags & ShllinkLinkFlag::LF_HasWorkingDir) {
         //WorkingDir
         uint16_t countCharacters = 0;
         if (fread(&countCharacters, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        if ((err = readWStr(stringData_.WorkingDir, ShellinkErr::SHLLINK_ERR_NULLPSTRDWDIR, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
-            return err;
+
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode) {
+            if ((err = readWStr(stringData_.WorkingDirW, ShellinkErr::SHLLINK_ERR_NULLPSTRDWDIR, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
+        else {
+            if ((err = readStr(stringData_.WorkingDirA, ShellinkErr::SHLLINK_ERR_NULLPSTRDWDIR, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
     }
     if (header_.LinkFlags & ShllinkLinkFlag::LF_HasArguments) {
         //CommandLineArguments
         uint16_t countCharacters = 0;
         if (fread(&countCharacters, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        if ((err = readWStr(stringData_.CommandLineArguments, ShellinkErr::SHLLINK_ERR_NULLPSTRDARG, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
-            return err;
+
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode) {
+            if ((err = readWStr(stringData_.CommandLineArgumentsW, ShellinkErr::SHLLINK_ERR_NULLPSTRDARG, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
+        else {
+            if ((err = readStr(stringData_.CommandLineArgumentsA, ShellinkErr::SHLLINK_ERR_NULLPSTRDARG, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
     }
     if (header_.LinkFlags & ShllinkLinkFlag::LF_HasIconLocation) {
         //IconLocation
         uint16_t countCharacters = 0;
         if (fread(&countCharacters, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        if ((err = readWStr(stringData_.IconLocation, ShellinkErr::SHLLINK_ERR_NULLPSTRDICO, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
-            return err;
+
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode) {
+            if ((err = readWStr(stringData_.IconLocationW, ShellinkErr::SHLLINK_ERR_NULLPSTRDICO, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters * 2)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
+        else {
+            if ((err = readStr(stringData_.IconLocationA, ShellinkErr::SHLLINK_ERR_NULLPSTRDICO, ShellinkErr::SHLLINK_ERR_FIO, fp, countCharacters)) != ShellinkErr::SHLLINK_ERR_NONE)
+                return err;
+        }
     }
 
     // ExtraDataBlock
@@ -623,8 +668,7 @@ WinShellink::ShellinkErr WinShellink::readEPropertyStoreDataBlock(uint32_t block
     extraData_.propStoreDB.BlockSize = blockSize;
 
     //PropertyStore
-    // TODO: check
-    if ((err = readStr(extraData_.knownFolderDB.KnownFolderID, ShellinkErr::SHLLINK_ERR_NULLPEXTD, ShellinkErr::SHLLINK_ERR_FIO, fp, extraData_.propStoreDB.BlockSize - 8)) != ShellinkErr::SHLLINK_ERR_NONE)
+    if ((err = readStr(extraData_.propStoreDB.PropertyStore, ShellinkErr::SHLLINK_ERR_NULLPEXTD, ShellinkErr::SHLLINK_ERR_FIO, fp, extraData_.propStoreDB.BlockSize - 8)) != ShellinkErr::SHLLINK_ERR_NONE)
         return err;
 
     return ShellinkErr::SHLLINK_ERR_NONE;
@@ -695,6 +739,14 @@ WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
     extraData_.vistaAboveIDListDB.BlockSize = blockSize;
 
+    if (fread(&extraData_.vistaAboveIDListDB.targetIdList.idListSize, 2, 1, fp) != 1)
+        return (ShellinkErr::SHLLINK_ERR_FIO);
+
+    extraData_.vistaAboveIDListDB.targetIdList.IDListData.resize(extraData_.vistaAboveIDListDB.targetIdList.idListSize);
+    if (fread(&extraData_.vistaAboveIDListDB.targetIdList.IDListData[0], extraData_.vistaAboveIDListDB.targetIdList.idListSize, 1, fp) != 1)
+        return (ShellinkErr::SHLLINK_ERR_FIO);
+
+#if 0
     int tmpS = blockSize - 10;
     while (tmpS > 0) {
         uint16_t itemSize = 0;
@@ -722,11 +774,11 @@ WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t
 
     if (tmpS < 0 || nullb != 0)
         return (ShellinkErr::SHLLINK_ERR_INVIDL);
-
+#endif
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-bool WinShellink::saveAs(const fs::path& lnkPath) {
+bool WinShellink::saveAs(const std::wstring& lnkPath) {
     return true;
 }
 
@@ -817,11 +869,11 @@ WinShellink::ShellinkErr WinShellink::readWStr(std::wstring& dest, WinShellink::
     size /= 2;
     if (size == 0)
         return (errv1);
-    wchar_t* buf = (wchar_t*)malloc(size * sizeof(char16_t) + 1);
+    wchar_t* buf = (wchar_t*)malloc((size + 1) * sizeof(wchar_t));
     if (buf == NULL)
         return (errv1);
-    memset(buf, 0, size * sizeof(char16_t) + 1);
-    if (fread(buf, sizeof(char16_t), size, fp) != size) {
+    memset(buf, 0, (size + 1) * sizeof(wchar_t));
+    if (fread(buf, sizeof(wchar_t), size, fp) != size) {
         free(buf);
         return (errv2);
     }
@@ -839,5 +891,155 @@ void WinShellink::toBigEndian(void* inp, size_t size) {
         ((uint8_t*)inp)[i] = t;
     }
 }
+
+bool WinShellink::IsResourceString(const std::wstring& s) {
+    std::wstring s2 = StringHelper::Trim(s, L" \"");
+    return StringHelper::IsStartsWith(s2, L"@");
+}
+
+bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
+    std::wstring resStrFormat = StringHelper::Trim(resStr, L" \"");
+    resStrFormat = resStrFormat.substr(1);  // @
+
+    if (resStrFormat.empty())
+        return false;
+
+    std::vector<std::wstring> v = StringHelper::Split(resStrFormat, L",", true);
+    if (v.size() < 2)
+        return false;
+
+    if (v[0].empty() || v[1].empty())
+        return false;
+
+    std::wstring envExpanded = PathUtil::ExpandEnvString(v[0]);
+    HMODULE hDll = LoadLibraryW(envExpanded.c_str());
+    if (!hDll) {
+        DWORD dwGLE = GetLastError();
+        return false;
+    }
+
+    if (StringHelper::IsStartsWith(v[1], L"-"))
+        v[1] = v[1].substr(1);
+
+    UINT id = _wtoi(v[1].c_str());
+
+    wchar_t szBuf[MAX_PATH + 1] = {0};
+    int numberOfBytes = LoadStringW(hDll, id, szBuf, MAX_PATH);
+    if (numberOfBytes <= 0) {
+        FreeLibrary(hDll);
+        return false;
+    }
+
+    result = szBuf;
+    FreeLibrary(hDll);
+
+    return true;
+}
+
+std::wstring WinShellink::getDisplayName() const {
+    std::wstring result;
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasName) {
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
+            result = stringData_.NameStringW;
+        else
+            result = StringEncode::AnsiToUnicode(stringData_.NameStringA);
+    }
+
+    return result;
+}
+
+std::wstring WinShellink::getTargetPath() const {
+    std::wstring result;
+    if ((header_.LinkFlags & ShllinkLinkFlag::LF_HasLinkInfo) && !(header_.LinkFlags & ShllinkLinkFlag::LF_ForceNoLinkInfo)) {
+        if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_VolumeIDAndLocalBasePath) {
+            if (linkInfo_.LinkInfoHeaderSize >= 0x00000024)
+                result = linkInfo_.LocalBasePathUnicode + linkInfo_.CommonPathSuffixUnicode;
+            else
+                result = StringEncode::AnsiToUnicode(linkInfo_.LocalBasePath + linkInfo_.CommonPathSuffix);
+        }
+        else if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_CommonNetworkRelativeLinkAndPathSuffix) {
+            if (linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags & CommonNetworkRelativeLinkFlag::CNETRLNK_ValidDevice) {
+                if (linkInfo_.CommonNetRelLnk.NetNameOffset > 0x00000014)
+                    result = linkInfo_.CommonNetRelLnk.DeviceNameUnicode;
+                else
+                    result = StringEncode::AnsiToUnicode(linkInfo_.CommonNetRelLnk.DeviceName);
+            }
+            else if (linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags & CommonNetworkRelativeLinkFlag::CNETRLNK_ValidNetType) {
+                if (linkInfo_.CommonNetRelLnk.NetNameOffset > 0x00000014)
+                    result = linkInfo_.CommonNetRelLnk.NetNameUnicode;
+                else
+                    result = StringEncode::AnsiToUnicode(linkInfo_.CommonNetRelLnk.NetName);
+            }
+        }
+    }
+    if (!result.empty())
+        return result;
+
+    if (extraData_.speFolderDB.SpecialFolderID != 0) {
+        wchar_t szPath[MAX_PATH + 1] = {0};
+        if (S_OK == SHGetFolderPathW(NULL, extraData_.speFolderDB.SpecialFolderID, NULL, SHGFP_TYPE_CURRENT, szPath)) {
+            result = szPath;
+        }
+    }
+    if (!result.empty())
+        return result;
+
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasLinkTargetIDList) {
+        ITEMIDLIST* pIDL = (ITEMIDLIST*)(&targetIdList_.IDListData[0]);
+        wchar_t szPath[MAX_PATH + 1] = {0};
+        if (SHGetPathFromIDListW(pIDL, szPath)) {
+            result = szPath;
+        }
+    }
+    if (!result.empty())
+        return result;
+
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasExpString) {
+        if (!extraData_.envVarDB.TargetUnicode.empty())
+            result = extraData_.envVarDB.TargetUnicode;
+        else if (!extraData_.envVarDB.TargetAnsi.empty())
+            result = StringEncode::AnsiToUnicode(extraData_.envVarDB.TargetAnsi);
+    }
+
+    return result;
+}
+
+std::wstring WinShellink::getArguments() const {
+    std::wstring result;
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasArguments) {
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
+            result = stringData_.CommandLineArgumentsW;
+        else
+            result = StringEncode::AnsiToUnicode(stringData_.CommandLineArgumentsA);
+    }
+    return result;
+}
+
+std::wstring WinShellink::getIconPath() const {
+    std::wstring result;
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasExpIcon) {
+        if (!extraData_.iconEnvDB.TargetUnicode.empty())
+            result = extraData_.iconEnvDB.TargetUnicode;
+        else if (!extraData_.iconEnvDB.TargetAnsi.empty())
+            result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
+    }
+
+    if (!result.empty())
+        return result;
+
+    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasIconLocation) {
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
+            result = stringData_.IconLocationW;
+        else
+            result = StringEncode::AnsiToUnicode(stringData_.IconLocationA);
+    }
+
+    return result;
+}
+
+int32_t WinShellink::getIconIndex() const {
+    return header_.IconIndex;
+}
+
 }  // namespace jhc
 #endif

@@ -84,7 +84,7 @@
 #define JHC_ARCH_32_BITS 1
 #define JHC_ARCH_LITTLE_ENDIAN 1
 #else
-#error Please add support for your architecture in rtc_base/system/arch.h
+#error Please add support for your architecture in jhc/arch.hpp
 #endif
 
 #if !(defined(JHC_ARCH_LITTLE_ENDIAN) ^ defined(JHC_ARCH_BIG_ENDIAN))
