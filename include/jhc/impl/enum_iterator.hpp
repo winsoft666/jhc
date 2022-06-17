@@ -1,16 +1,16 @@
-#ifndef ENUM_CLASS_ITERATOR_HPP
-#define ENUM_CLASS_ITERATOR_HPP
+#ifndef JHC_ENUM_CLASS_ITERATOR_HPP
+#define JHC_ENUM_CLASS_ITERATOR_HPP
 
-#include "flagsfwd.hpp"
+#include "enum_flagsfwd.hpp"
 #include <iterator>
 
 namespace jhc {
-namespace flags {
+namespace enum_flags {
 
 template <class E>
 class FlagsIterator {
    public:
-    using flags_type = flags<E>;
+    using flags_type = EnumFlags<E>;
     using difference_type = std::ptrdiff_t;
     using value_type = E;
     using pointer = value_type*;
@@ -50,7 +50,7 @@ class FlagsIterator {
 
    private:
     template <class E_>
-    friend class flags;
+    friend class EnumFlags;
 
     using impl_type = typename flags_type::impl_type;
 
@@ -75,7 +75,7 @@ class FlagsIterator {
     impl_type mask_;
 };
 
-}  // namespace flags
+}  // namespace enum_flags
 }  // namespace jhc
 
-#endif  // ENUM_CLASS_ITERATOR_HPP
+#endif  // JHC_ENUM_CLASS_ITERATOR_HPP

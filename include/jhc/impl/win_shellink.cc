@@ -8,6 +8,7 @@
 #include "jhc/string_encode.hpp"
 #include "jhc/string_helper.hpp"
 #include "jhc/path_util.hpp"
+#include "jhc/macros.hpp"
 #include <shlobj_core.h>
 
 #pragma comment(lib, "Shell32.lib")
@@ -938,7 +939,7 @@ bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::wstring& re
 
 std::wstring WinShellink::getDisplayName() const {
     std::wstring result;
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasName) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasName)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.NameStringW;
         else
@@ -950,7 +951,7 @@ std::wstring WinShellink::getDisplayName() const {
 
 std::wstring WinShellink::getTargetPath() const {
     std::wstring result;
-    if ((header_.LinkFlags & ShllinkLinkFlag::LF_HasLinkInfo) && !(header_.LinkFlags & ShllinkLinkFlag::LF_ForceNoLinkInfo)) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkInfo) && !IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_ForceNoLinkInfo)) {
         if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_VolumeIDAndLocalBasePath) {
             if (linkInfo_.LinkInfoHeaderSize >= 0x00000024)
                 result = linkInfo_.LocalBasePathUnicode + linkInfo_.CommonPathSuffixUnicode;
@@ -984,7 +985,7 @@ std::wstring WinShellink::getTargetPath() const {
     if (!result.empty())
         return result;
 
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasLinkTargetIDList) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkTargetIDList)) {
         ITEMIDLIST* pIDL = (ITEMIDLIST*)(&targetIdList_.IDListData[0]);
         wchar_t szPath[MAX_PATH + 1] = {0};
         if (SHGetPathFromIDListW(pIDL, szPath)) {
@@ -994,7 +995,7 @@ std::wstring WinShellink::getTargetPath() const {
     if (!result.empty())
         return result;
 
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasExpString) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpString)) {
         if (!extraData_.envVarDB.TargetUnicode.empty())
             result = extraData_.envVarDB.TargetUnicode;
         else if (!extraData_.envVarDB.TargetAnsi.empty())
@@ -1006,7 +1007,7 @@ std::wstring WinShellink::getTargetPath() const {
 
 std::wstring WinShellink::getArguments() const {
     std::wstring result;
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasArguments) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasArguments)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.CommandLineArgumentsW;
         else
@@ -1017,7 +1018,7 @@ std::wstring WinShellink::getArguments() const {
 
 std::wstring WinShellink::getIconPath() const {
     std::wstring result;
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasExpIcon) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
         if (!extraData_.iconEnvDB.TargetUnicode.empty())
             result = extraData_.iconEnvDB.TargetUnicode;
         else if (!extraData_.iconEnvDB.TargetAnsi.empty())
@@ -1027,7 +1028,7 @@ std::wstring WinShellink::getIconPath() const {
     if (!result.empty())
         return result;
 
-    if (header_.LinkFlags & ShllinkLinkFlag::LF_HasIconLocation) {
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasIconLocation)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.IconLocationW;
         else

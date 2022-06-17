@@ -23,7 +23,7 @@
 #include <type_traits>
 
 namespace jhc {
-namespace flags {
+namespace enum_flags {
 
 //template <class E, class Enabler = void>
 //struct is_flags
@@ -35,24 +35,24 @@ struct is_flags : std::false_type {};
 template <typename T>
 struct is_flags<T, decltype(enableEnumFlags(T{}))> : std::true_type {};
 
-}  // namespace flags
+}  // namespace enum_flags
 }  // namespace jhc
 
 //#define ALLOW_FLAGS_FOR_ENUM(name)             \
 //    namespace jhc {                            \
-//    namespace flags {                          \
+//    namespace enum_flags {                          \
 //    template <>                                \
 //    struct is_flags<name> : std::true_type {}; \
 //    }                                          \
 //    }                                          \
-//    using name##s = jhc::flags::flags<name>
+//    using name##s = jhc::enum_flags::EnumFlags<name>
 
 #define ALLOW_FLAGS_FOR_ENUM(name)       \
     inline void enableEnumFlags(name) {} \
-    using name##s = jhc::flags::flags<name>
+    using name##s = jhc::enum_flags::EnumFlags<name>
 
 #define ALLOW_FLAGS_FOR_ENUM_IN_CLASS(name)     \
     friend inline void enableEnumFlags(name) {} \
-    using name##s = jhc::flags::flags<name>
+    using name##s = jhc::enum_flags::EnumFlags<name>
 
 #endif  // JHC_ENUM_CLASS_ALLOW_FLAGS_HPP_

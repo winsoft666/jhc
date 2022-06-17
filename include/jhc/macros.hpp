@@ -91,18 +91,22 @@
 #define JHC_DISALLOW_MOVE(TypeName)      \
     TypeName(const TypeName&&) = delete; \
     TypeName& operator=(const TypeName&&) = delete
-#endif
+#endif  // !JHC_DISALLOW_MOVE
 
 #ifndef JHC_DISALLOW_COPY
 #define JHC_DISALLOW_COPY(TypeName)     \
     TypeName(const TypeName&) = delete; \
     TypeName& operator=(const TypeName&) = delete
-#endif
+#endif  // !JHC_DISALLOW_COPY
 
 #ifndef JHC_DISALLOW_COPY_MOVE
 #define JHC_DISALLOW_COPY_MOVE(TypeName) \
     JHC_DISALLOW_MOVE(TypeName);         \
     JHC_DISALLOW_COPY(TypeName)
-#endif
+#endif  // !JHC_DISALLOW_COPY_MOVE
+
+#ifndef IS_FLAG_SET
+#define IS_FLAG_SET(var, flag) (((var) & (flag)) == (flag))
+#endif  // !IS_FLAG_SET
 
 #endif  // ! JHC_MACROS_HPP__

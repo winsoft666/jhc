@@ -27,7 +27,7 @@
 #ifdef JHC_WIN
 #include <vector>
 #include <string>
-#include "jhc/flags.hpp"
+#include "jhc/enum_flags.hpp"
 
 // This class provides an interface for the MS Shell Link Binary File Format.
 // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/16cb4ca1-9339-4d0c-a68d-bf1d6cc0f943
@@ -487,7 +487,7 @@ class WinShellink {
 
     struct VolumeID {
         // A 32-bit, unsigned integer that specifies the size, in bytes, of this structure. This value MUST be greater than 0x00000010. All offsets specified in this structure MUST be less than this value, and all strings contained in this structure MUST fit within the extent defined by this size
-        uint32_t VolumeIDSize;
+        uint32_t VolumeIDSize = 0;
         // A 32-bit, unsigned integer that specifies the type of drive the link target is stored on
         /*
                 DRIVE_UNKNOWN       0x00000000       The drive type cannot be determined.
@@ -498,13 +498,13 @@ class WinShellink {
                 DRIVE_CDROM         0x00000005       The drive is a CD-ROM drive.
                 DRIVE_RAMDISK       0x00000006       The drive is a RAM disk.
             */
-        uint32_t DriveType;
+        uint32_t DriveType = 0;
         // A 32-bit, unsigned integer that specifies the drive serial number of the volume the link target is stored on
-        uint32_t DriveSerialNumber;
+        uint32_t DriveSerialNumber = 0;
         // A 32-bit, unsigned integer that specifies the location of a string that contains the volume label of the drive that the link target is stored on. This value is an offset, in bytes, from the start of the VolumeID structure to a NULL-terminated string of characters, defined by the system default code page. The volume label string is located in the Data field of this structure. If the value of this field is 0x00000014, it MUST be ignored, and the value of the VolumeLabelOffsetUnicode field MUST be used to locate the volume label string
-        uint32_t VolumeLabelOffset;
+        uint32_t VolumeLabelOffset = 0;
         // An optional, 32-bit, unsigned integer that specifies the location of a string that contains the volume label of the drive that the link target is stored on. This value is an offset, in bytes, from the start of the VolumeID structure to a NULL-terminated string of Unicode characters. The volume label string is located in the Data field of this structure. If the value of the VolumeLabelOffset field is not 0x00000014, this field MUST NOT be present; instead, the value of the VolumeLabelOffset field MUST be used to locate the volume label string
-        uint32_t VolumeLabelOffsetUnicode;
+        uint32_t VolumeLabelOffsetUnicode = 0;
         // A buffer of data that contains the volume label of the drive as a string defined by the system default code page or Unicode characters, as specified by preceding fields
         std::vector<char> Data;
     };

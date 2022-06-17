@@ -30,6 +30,7 @@
 #include "jhc/buffer_queue.hpp"
 #include "jhc/cmd_line_parse.hpp"
 #include "jhc/event.hpp"
+#include "jhc/enum_flags.hpp"
 #include "jhc/file.hpp"
 #include "jhc/filesystem.hpp"
 #include "jhc/hex_encode.hpp"

@@ -17,28 +17,28 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef JHC_ENUM_CLASS_FLAGS_HPP_
-#define JHC_ENUM_CLASS_FLAGS_HPP_
+#ifndef JHC_ENUM_FLAGS_HPP_
+#define JHC_ENUM_FLAGS_HPP_
 
-#include "impl/allow_flags.hpp"
-#include "impl/iterator.hpp"
+#include "impl/allow_enum_flags.hpp"
+#include "impl/enum_iterator.hpp"
 #include <bitset>
 #include <initializer_list>
 #include <numeric>
 #include <utility>
 
 namespace jhc {
-namespace flags {
+namespace enum_flags {
 
 constexpr struct empty_t {
     constexpr empty_t() noexcept = default;
 } empty;
 
 template <class E>
-class flags {
+class EnumFlags {
    public:
     static_assert(is_flags<E>::value,
-                  "jhc::flags::flags is disallowed for this type; "
+                  "jhc::enum_flags::EnumFlags is disallowed for this type; "
                   "use ALLOW_FLAGS_FOR_ENUM macro.");
 
     using enum_type = typename std::decay<E>::type;
@@ -63,43 +63,43 @@ class flags {
                                        Res>;
 
    public:
-    flags() noexcept = default;
-    flags(const flags& fl) noexcept = default;
-    flags& operator=(const flags& fl) noexcept = default;
-    flags(flags&& fl) noexcept = default;
-    flags& operator=(flags&& fl) noexcept = default;
+    EnumFlags() noexcept = default;
+    EnumFlags(const EnumFlags& fl) noexcept = default;
+    EnumFlags& operator=(const EnumFlags& fl) noexcept = default;
+    EnumFlags(EnumFlags&& fl) noexcept = default;
+    EnumFlags& operator=(EnumFlags&& fl) noexcept = default;
 
-    explicit constexpr flags(empty_t) noexcept :
+    explicit constexpr EnumFlags(empty_t) noexcept :
         val_(0) {}
 
 #ifdef ENUM_CLASS_FLAGS_FORBID_IMPLICT_CONVERSION
     explicit
 #endif
-        constexpr flags(enum_type e) noexcept
+        constexpr EnumFlags(enum_type e) noexcept
         :
         val_(static_cast<impl_type>(e)) {
     }
 
-    flags& operator=(enum_type e) noexcept {
+    EnumFlags& operator=(enum_type e) noexcept {
         val_ = static_cast<impl_type>(e);
         return *this;
     }
 
-    flags(std::initializer_list<enum_type> il) noexcept :
+    EnumFlags(std::initializer_list<enum_type> il) noexcept :
         val_(0) { insert(il); }
 
-    flags& operator=(std::initializer_list<enum_type> il) noexcept {
+    EnumFlags& operator=(std::initializer_list<enum_type> il) noexcept {
         clear();
         insert(il);
         return *this;
     }
 
     template <class... Args>
-    flags(enum_type e, Args... args) noexcept :
-        flags{e, args...} {}
+    EnumFlags(enum_type e, Args... args) noexcept :
+        EnumFlags{e, args...} {}
 
     template <class FwIter>
-    flags(FwIter b, FwIter e, typename convertible<decltype(*b)>::type = nullptr) noexcept(noexcept(std::declval<flags>().insert(std::declval<FwIter>(),
+    EnumFlags(FwIter b, FwIter e, typename convertible<decltype(*b)>::type = nullptr) noexcept(noexcept(std::declval<EnumFlags>().insert(std::declval<FwIter>(),
                                                                                                                                  std::declval<FwIter>()))) :
         val_(0) { insert(b, e); }
 
@@ -107,59 +107,59 @@ class flags {
 
     constexpr bool operator!() const noexcept { return !val_; }
 
-    friend constexpr bool operator==(flags fl1, flags fl2) {
+    friend constexpr bool operator==(EnumFlags fl1, EnumFlags fl2) {
         return fl1.val_ == fl2.val_;
     }
 
-    friend constexpr bool operator!=(flags fl1, flags fl2) {
+    friend constexpr bool operator!=(EnumFlags fl1, EnumFlags fl2) {
         return fl1.val_ != fl2.val_;
     }
 
-    constexpr flags operator~() const noexcept { return flags(~val_); }
+    constexpr EnumFlags operator~() const noexcept { return EnumFlags(~val_); }
 
-    flags& operator|=(const flags& fl) noexcept {
+    EnumFlags& operator|=(const EnumFlags& fl) noexcept {
         val_ |= fl.val_;
         return *this;
     }
 
-    flags& operator&=(const flags& fl) noexcept {
+    EnumFlags& operator&=(const EnumFlags& fl) noexcept {
         val_ &= fl.val_;
         return *this;
     }
 
-    flags& operator^=(const flags& fl) noexcept {
+    EnumFlags& operator^=(const EnumFlags& fl) noexcept {
         val_ ^= fl.val_;
         return *this;
     }
 
-    flags& operator|=(enum_type e) noexcept {
+    EnumFlags& operator|=(enum_type e) noexcept {
         val_ |= static_cast<impl_type>(e);
         return *this;
     }
 
-    flags& operator&=(enum_type e) noexcept {
+    EnumFlags& operator&=(enum_type e) noexcept {
         val_ &= static_cast<impl_type>(e);
         return *this;
     }
 
-    flags& operator^=(enum_type e) noexcept {
+    EnumFlags& operator^=(enum_type e) noexcept {
         val_ ^= static_cast<impl_type>(e);
         return *this;
     }
 
-    friend constexpr flags operator|(flags f1, flags f2) noexcept {
-        return flags{static_cast<impl_type>(f1.val_ | f2.val_)};
+    friend constexpr EnumFlags operator|(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ | f2.val_)};
     }
 
-    friend constexpr flags operator&(flags f1, flags f2) noexcept {
-        return flags{static_cast<impl_type>(f1.val_ & f2.val_)};
+    friend constexpr EnumFlags operator&(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ & f2.val_)};
     }
 
-    friend constexpr flags operator^(flags f1, flags f2) noexcept {
-        return flags{static_cast<impl_type>(f1.val_ ^ f2.val_)};
+    friend constexpr EnumFlags operator^(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ ^ f2.val_)};
     }
 
-    void swap(flags& fl) noexcept { std::swap(val_, fl.val_); }
+    void swap(EnumFlags& fl) noexcept { std::swap(val_, fl.val_); }
 
     constexpr underlying_type underlying_value() const noexcept {
         return static_cast<underlying_type>(val_);
@@ -169,11 +169,11 @@ class flags {
         val_ = static_cast<impl_type>(newval);
     }
 
-    constexpr explicit operator std::bitset<flags<E>::bit_size()>() const noexcept {
+    constexpr explicit operator std::bitset<EnumFlags<E>::bit_size()>() const noexcept {
         return to_bitset();
     }
 
-    constexpr std::bitset<flags<E>::bit_size()> to_bitset() const noexcept {
+    constexpr std::bitset<EnumFlags<E>::bit_size()> to_bitset() const noexcept {
         return {val_};
     }
 
@@ -255,7 +255,7 @@ class flags {
     }
 
     iterator erase(iterator i1, iterator i2) noexcept {
-        val_ ^= flags(i1, i2).val_;
+        val_ ^= EnumFlags(i1, i2).val_;
         update_uvalue(i2);
         return i2;
     }
@@ -263,7 +263,7 @@ class flags {
     void clear() noexcept { val_ = 0; }
 
    private:
-    constexpr explicit flags(impl_type val) noexcept :
+    constexpr explicit EnumFlags(impl_type val) noexcept :
         val_(val) {}
 
     void update_uvalue(iterator& it) const noexcept { it.uvalue_ = val_; }
@@ -272,32 +272,32 @@ class flags {
 };
 
 template <class E>
-void swap(flags<E>& fl1, flags<E>& fl2) noexcept {
+void swap(EnumFlags<E>& fl1, EnumFlags<E>& fl2) noexcept {
     fl1.swap(fl2);
 }
 
-}  // namespace flags
+}  // namespace enum_flags
 }  // namespace jhc
 
 template <class E>
 constexpr auto operator|(E e1, E e2) noexcept
-    -> typename std::enable_if<jhc::flags::is_flags<E>::value,
-                               jhc::flags::flags<E>>::type {
-    return jhc::flags::flags<E>(e1) | e2;
+    -> typename std::enable_if<jhc::enum_flags::is_flags<E>::value,
+                               jhc::enum_flags::EnumFlags<E>>::type {
+    return jhc::enum_flags::EnumFlags<E>(e1) | e2;
 }
 
 template <class E>
 constexpr auto operator&(E e1, E e2) noexcept
-    -> typename std::enable_if<jhc::flags::is_flags<E>::value,
-                               jhc::flags::flags<E>>::type {
-    return jhc::flags::flags<E>(e1) & e2;
+    -> typename std::enable_if<jhc::enum_flags::is_flags<E>::value,
+                               jhc::enum_flags::EnumFlags<E>>::type {
+    return jhc::enum_flags::EnumFlags<E>(e1) & e2;
 }
 
 template <class E>
 constexpr auto operator^(E e1, E e2) noexcept
-    -> typename std::enable_if<jhc::flags::is_flags<E>::value,
-                               jhc::flags::flags<E>>::type {
-    return jhc::flags::flags<E>(e1) ^ e2;
+    -> typename std::enable_if<jhc::enum_flags::is_flags<E>::value,
+                               jhc::enum_flags::EnumFlags<E>>::type {
+    return jhc::enum_flags::EnumFlags<E>(e1) ^ e2;
 }
 
-#endif  // JHC_ENUM_CLASS_FLAGS_HPP_
+#endif  // JHC_ENUM_FLAGS_HPP_
