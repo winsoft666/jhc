@@ -21,10 +21,10 @@
 #define JHC_THREAD_HPP__
 #pragma once
 
-#include "jhc/config.hpp"
 #include "jhc/arch.hpp"
 
 #if defined JHC_WIN || defined JHC_LINUX
+#include "jhc/config.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <functional>
@@ -33,22 +33,6 @@
 #include <mutex>
 #include <queue>
 #include <string>
-#ifdef JHC_WIN
-#ifndef _INC_WINDOWS
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
-#include <Windows.h>
-#endif
-#elif (defined JHC_LINUX)
-#include <sys/prctl.h>
-#include <unistd.h>
-#include <sys/syscall.h>
-#endif
-
 #include "jhc/macros.hpp"
 
 namespace jhc {
@@ -56,67 +40,23 @@ class Thread {
    public:
     JHC_DISALLOW_COPY_MOVE(Thread);
 
-    Thread() :
-        thread_id_(0), exit_(false) { running_.store(false); }
+    Thread();
+    Thread(const std::string& name);
 
-    Thread(const std::string& name) :
-        thread_id_(0), exit_(false), thread_name_(name) {
-        running_.store(false);
-    }
+    virtual ~Thread();
 
-    virtual ~Thread() { stop(true); }
+    void setName(const std::string& name);
+    std::string name() const;
 
-    void setName(const std::string& name) { thread_name_ = name; }
-    std::string name() const { return thread_name_; }
+    long id();
 
-    long id() { return thread_id_; }
+    virtual bool start();
 
-    bool start() {
-        if (thread_.valid()) {
-            if (thread_.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
-                return false;
-            }
-        }
-        thread_ = std::async(std::launch::async, &Thread::run, this);
-        return true;
-    }
+    virtual void stop(bool wait_until_stopped);
 
-    virtual void stop(bool wait_until_stopped) {
-        {
-            std::lock_guard<std::mutex> lg(mutex_);
-            exit_ = true;
-        }
-        exit_cond_var_.notify_one();
+    bool isRunning() const;
 
-        if (wait_until_stopped) {
-            if (thread_.valid())
-                thread_.wait();
-        }
-    }
-
-    bool isRunning() const { return running_.load(); }
-
-    virtual void run() {
-        running_.store(true);
-
-        SetCurrentThreadName(thread_name_.c_str());
-        thread_id_ = Thread::GetCurThreadId();
-        while (true) {
-            std::function<void()> task;
-            {
-                std::unique_lock<std::mutex> lg(mutex_);
-                exit_cond_var_.wait(lg, [this]() { return (exit_ || !work_queue_.empty()); });
-                if (exit_) {
-                    running_.store(false);
-                    return;
-                }
-                task = std::move(work_queue_.front());
-                work_queue_.pop();
-            }
-
-            task();
-        }
-    }
+    virtual void run();
 
     template <class F, class... Args>
     auto invoke(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {
@@ -134,33 +74,9 @@ class Thread {
         return res;
     }
 
-    static void SetCurrentThreadName(const char* name) {
-#ifdef JHC_WIN
-        struct {
-            DWORD dwType;
-            LPCSTR szName;
-            DWORD dwThreadID;
-            DWORD dwFlags;
-        } threadname_info = {0x1000, name, static_cast<DWORD>(-1), 0};
+    static void SetCurrentThreadName(const char* name);
 
-        __try {
-            ::RaiseException(0x406D1388, 0, sizeof(threadname_info) / sizeof(DWORD),
-                             reinterpret_cast<ULONG_PTR*>(&threadname_info));
-        } __except (EXCEPTION_EXECUTE_HANDLER) {  // NOLINT
-        }
-#elif defined JHC_LINUX
-        prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name));  // NOLINT
-#endif
-    }
-
-    static long GetCurThreadId() {
-#ifdef JHC_WIN
-        return GetCurrentThreadId();
-#elif defined JHC_LINUX
-        return static_cast<long>(syscall(__NR_gettid));
-#endif
-    }
-
+    static long GetCurThreadId();
    protected:
     std::string thread_name_;
     std::future<void> thread_;
@@ -172,5 +88,10 @@ class Thread {
     std::atomic_bool running_;
 };
 }  // namespace jhc
+
+#ifndef JHC_NOT_HEADER_ONLY
+#include "impl/thread.cc"
+#endif
+
 #endif
 #endif  // !JHC_THREAD_HPP__
