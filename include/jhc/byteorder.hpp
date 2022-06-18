@@ -146,6 +146,7 @@ class ByteOrder {
     static uint32_t HostToNetwork32(uint32_t n);
     static uint16_t NetworkToHost16(uint16_t n);
     static uint32_t NetworkToHost32(uint32_t n);
+    static void ByteSwap(void* inp, size_t size);
 };
 }  // namespace jhc
 

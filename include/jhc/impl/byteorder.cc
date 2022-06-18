@@ -105,3 +105,11 @@ JHC_INLINE uint16_t jhc::ByteOrder::NetworkToHost16(uint16_t n) {
 JHC_INLINE uint32_t jhc::ByteOrder::NetworkToHost32(uint32_t n) {
     return be32toh(n);
 }
+
+JHC_INLINE void jhc::ByteOrder::ByteSwap(void* inp, size_t size) {
+    for (int i = 0; i < size / 2; i++) {
+        uint8_t t = ((uint8_t*)inp)[size - 1 - i];
+        ((uint8_t*)inp)[size - 1 - i] = ((uint8_t*)inp)[i];
+        ((uint8_t*)inp)[i] = t;
+    }
+}
