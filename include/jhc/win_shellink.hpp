@@ -442,14 +442,10 @@ class WinShellink {
         - specifies the target of the link. The presence of this structure is specified by the HasLinkTargetIDList bit (LinkFlags section 2.1.1) in the ShellLinkHeader
     */
     struct LinkTargetIDList {
-        /*
-            List of IDList elements
-        */
-        // size in bytes = SUM(_cshllink_lnktidl_idl_item.item_size)
-        uint16_t idListSize = 0;
-
         // A stored IDList structure (section 2.2.1), which contains the item ID list
-        std::vector<uint8_t> IDListData;
+        std::vector<std::vector<uint8_t>> ItemIDList;
+
+        std::vector<uint8_t> ToWholeIDList() const;
     };
 #pragma endregion LinkTargetIDList
 

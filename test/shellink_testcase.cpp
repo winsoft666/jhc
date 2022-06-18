@@ -3,8 +3,6 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #include <strsafe.h>
-#include "EnumIDList.hpp"
-#include "PIDL.h"
 
 // The number of in-use objects.
 long objectCounter;
@@ -68,16 +66,5 @@ TEST_CASE("Shellink4", "load computer.lnk") {
 
     std::wstring iconPath = wsl.getIconPath();
     CHECK(iconPath == LR"()");
-
-    jhc::WinShellink::LinkTargetIDList idlist = wsl.linkTargetIdList();
-    ITEMIDLIST* pIDL = (ITEMIDLIST*)(&idlist.IDListData[0]);
-
-
-
-    UINT count = PIDL::ItemCount(pIDL);
-    std::vector<IShellFolder*> out;
-    HRESULT hr = PIDL::GetShellFoldersFor(pIDL, &out);
-    wchar_t szPath[MAX_PATH] = {0};
-    PIDL::GetFullPath(pIDL, NULL, szPath, MAX_PATH);
 }
 #endif

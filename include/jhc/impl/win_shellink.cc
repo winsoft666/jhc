@@ -9,19 +9,20 @@
 #include "jhc/string_helper.hpp"
 #include "jhc/path_util.hpp"
 #include "jhc/macros.hpp"
+#include "jhc/byteorder.hpp"
 #include <shlobj_core.h>
 
 #pragma comment(lib, "Shell32.lib")
 
 namespace jhc {
 
-WinShellink::WinShellink() {
+JHC_INLINE WinShellink::WinShellink() {
 }
 
-WinShellink::~WinShellink() {
+JHC_INLINE WinShellink::~WinShellink() {
 }
 
-WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
     FILE* fp = nullptr;
     _wfopen_s(&fp, lnkPath.c_str(), L"rb");
 
@@ -94,15 +95,11 @@ WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
     // LinkTargetIDList
     if (header_.LinkFlags & ShllinkLinkFlag::LF_HasLinkTargetIDList) {
         //IDList size
-        if (fread(&targetIdList_.idListSize, 2, 1, fp) != 1)
+        uint16_t idListSize = 0;
+        if (fread(&idListSize, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
 
-        targetIdList_.IDListData.resize(targetIdList_.idListSize);
-        if (fread((void*)(&targetIdList_.IDListData[0]), targetIdList_.idListSize, 1, fp) != 1)
-            return ShellinkErr::SHLLINK_ERR_FIO;
-
-#if 0
-        int tmpS = targetIdList_.idListSize - 2;  // TerminalID (2 bytes)
+        int tmpS = idListSize - 2;  // TerminalID (2 bytes)
         while (tmpS > 0) {
             //Element size
             uint16_t itemSize = 0;
@@ -118,7 +115,7 @@ WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
                     return ShellinkErr::SHLLINK_ERR_FIO;
             }
             tmpS -= itemSize;
-            targetIdList_.itemIDList.push_back(vItemId);
+            targetIdList_.ItemIDList.push_back(vItemId);
         }
 
         uint16_t nullb;
@@ -127,7 +124,6 @@ WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
 
         if (tmpS < 0 || nullb != 0)
             return ShellinkErr::SHLLINK_ERR_INVIDL;
-#endif
     }
 
     char* pValue = nullptr;
@@ -482,7 +478,7 @@ WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.consoleDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -587,7 +583,7 @@ WinShellink::ShellinkErr WinShellink::readEConsoleDataBlock(uint32_t blockSize, 
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEConsoleFEDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEConsoleFEDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     if (blockSize != extraData_.consoleFEDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
 
@@ -598,7 +594,7 @@ WinShellink::ShellinkErr WinShellink::readEConsoleFEDataBlock(uint32_t blockSize
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEDarwinDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEDarwinDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.darDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -614,7 +610,7 @@ WinShellink::ShellinkErr WinShellink::readEDarwinDataBlock(uint32_t blockSize, u
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEEnvironmentVariableDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEEnvironmentVariableDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.envVarDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -630,7 +626,7 @@ WinShellink::ShellinkErr WinShellink::readEEnvironmentVariableDataBlock(uint32_t
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEIconEnvironmentDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEIconEnvironmentDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.iconEnvDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -646,7 +642,7 @@ WinShellink::ShellinkErr WinShellink::readEIconEnvironmentDataBlock(uint32_t blo
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEKnownFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEKnownFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.knownFolderDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -662,7 +658,7 @@ WinShellink::ShellinkErr WinShellink::readEKnownFolderDataBlock(uint32_t blockSi
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEPropertyStoreDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEPropertyStoreDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize < 0x0000000C)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -675,7 +671,7 @@ WinShellink::ShellinkErr WinShellink::readEPropertyStoreDataBlock(uint32_t block
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEShimDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEShimDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize < 0x00000088)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -688,7 +684,7 @@ WinShellink::ShellinkErr WinShellink::readEShimDataBlock(uint32_t blockSize, uin
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readESpecialFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readESpecialFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     if (blockSize != extraData_.speFolderDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
 
@@ -703,7 +699,7 @@ WinShellink::ShellinkErr WinShellink::readESpecialFolderDataBlock(uint32_t block
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readETrackerDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readETrackerDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     WinShellink::ShellinkErr err;
     if (blockSize != extraData_.trackerDB.BlockSize)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
@@ -735,19 +731,15 @@ WinShellink::ShellinkErr WinShellink::readETrackerDataBlock(uint32_t blockSize, 
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp) {
     if (blockSize < 0x0000000A)
         return (ShellinkErr::SHLLINK_ERRX_WRONGSIZE);
     extraData_.vistaAboveIDListDB.BlockSize = blockSize;
 
-    if (fread(&extraData_.vistaAboveIDListDB.targetIdList.idListSize, 2, 1, fp) != 1)
+    uint16_t idListSize = 0;
+    if (fread(&idListSize, 2, 1, fp) != 1)
         return (ShellinkErr::SHLLINK_ERR_FIO);
 
-    extraData_.vistaAboveIDListDB.targetIdList.IDListData.resize(extraData_.vistaAboveIDListDB.targetIdList.idListSize);
-    if (fread(&extraData_.vistaAboveIDListDB.targetIdList.IDListData[0], extraData_.vistaAboveIDListDB.targetIdList.idListSize, 1, fp) != 1)
-        return (ShellinkErr::SHLLINK_ERR_FIO);
-
-#if 0
     int tmpS = blockSize - 10;
     while (tmpS > 0) {
         uint16_t itemSize = 0;
@@ -766,7 +758,7 @@ WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t
             return (ShellinkErr::SHLLINK_ERR_FIO);
 
         tmpS -= itemSize;
-        extraData_.vistaAboveIDListDB.targetIdList.itemIDList.push_back(itemData);
+        extraData_.vistaAboveIDListDB.targetIdList.ItemIDList.push_back(itemData);
     }
 
     uint16_t nullb;
@@ -775,15 +767,15 @@ WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t
 
     if (tmpS < 0 || nullb != 0)
         return (ShellinkErr::SHLLINK_ERR_INVIDL);
-#endif
+
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-bool WinShellink::saveAs(const std::wstring& lnkPath) {
+JHC_INLINE bool WinShellink::saveAs(const std::wstring& lnkPath) {
     return true;
 }
 
-WinShellink::ShellinkErr WinShellink::readNULLStr(char** dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readNULLStr(char** dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
     char tmpC = 1;
     uint32_t tmpS = 0;
     while (tmpC != 0) {
@@ -798,7 +790,7 @@ WinShellink::ShellinkErr WinShellink::readNULLStr(char** dest, WinShellink::Shel
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readNULLWStr(wchar_t** dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readNULLWStr(wchar_t** dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
     char16_t tmpC = 1;
     uint32_t tmpS = 0;
     while (tmpC != 0) {
@@ -813,7 +805,7 @@ WinShellink::ShellinkErr WinShellink::readNULLWStr(wchar_t** dest, WinShellink::
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readNULLStr(std::vector<char>& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readNULLStr(std::vector<char>& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
     char tmpC = 1;
     uint32_t tmpS = 0;
     while (tmpC != 0) {
@@ -830,7 +822,7 @@ WinShellink::ShellinkErr WinShellink::readNULLStr(std::vector<char>& dest, WinSh
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readNULLWStr(std::vector<wchar_t>& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readNULLWStr(std::vector<wchar_t>& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp) {
     char16_t tmpC = 1;
     uint32_t tmpS = 0;
     while (tmpC != 0) {
@@ -848,7 +840,7 @@ WinShellink::ShellinkErr WinShellink::readNULLWStr(std::vector<wchar_t>& dest, W
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readStr(std::string& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp, size_t size) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readStr(std::string& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp, size_t size) {
     if (size == 0)
         return (errv1);
     char* buf = (char*)malloc(size + 1);
@@ -866,7 +858,7 @@ WinShellink::ShellinkErr WinShellink::readStr(std::string& dest, WinShellink::Sh
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-WinShellink::ShellinkErr WinShellink::readWStr(std::wstring& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp, size_t size) {
+JHC_INLINE WinShellink::ShellinkErr WinShellink::readWStr(std::wstring& dest, WinShellink::ShellinkErr errv1, WinShellink::ShellinkErr errv2, FILE* fp, size_t size) {
     size /= 2;
     if (size == 0)
         return (errv1);
@@ -885,7 +877,7 @@ WinShellink::ShellinkErr WinShellink::readWStr(std::wstring& dest, WinShellink::
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
 
-void WinShellink::toBigEndian(void* inp, size_t size) {
+JHC_INLINE void WinShellink::toBigEndian(void* inp, size_t size) {
     for (int i = 0; i < size / 2; i++) {
         uint8_t t = ((uint8_t*)inp)[size - 1 - i];
         ((uint8_t*)inp)[size - 1 - i] = ((uint8_t*)inp)[i];
@@ -893,12 +885,12 @@ void WinShellink::toBigEndian(void* inp, size_t size) {
     }
 }
 
-bool WinShellink::IsResourceString(const std::wstring& s) {
+JHC_INLINE bool WinShellink::IsResourceString(const std::wstring& s) {
     std::wstring s2 = StringHelper::Trim(s, L" \"");
     return StringHelper::IsStartsWith(s2, L"@");
 }
 
-bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
+JHC_INLINE bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     std::wstring resStrFormat = StringHelper::Trim(resStr, L" \"");
     resStrFormat = resStrFormat.substr(1);  // @
 
@@ -937,7 +929,7 @@ bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::wstring& re
     return true;
 }
 
-std::wstring WinShellink::getDisplayName() const {
+JHC_INLINE std::wstring WinShellink::getDisplayName() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasName)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
@@ -949,7 +941,7 @@ std::wstring WinShellink::getDisplayName() const {
     return result;
 }
 
-std::wstring WinShellink::getTargetPath() const {
+JHC_INLINE std::wstring WinShellink::getTargetPath() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkInfo) && !IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_ForceNoLinkInfo)) {
         if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_VolumeIDAndLocalBasePath) {
@@ -986,7 +978,8 @@ std::wstring WinShellink::getTargetPath() const {
         return result;
 
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkTargetIDList)) {
-        ITEMIDLIST* pIDL = (ITEMIDLIST*)(&targetIdList_.IDListData[0]);
+        std::vector<uint8_t> itemIdList = targetIdList_.ToWholeIDList();
+        ITEMIDLIST* pIDL = (ITEMIDLIST*)(&itemIdList[0]);
         wchar_t szPath[MAX_PATH + 1] = {0};
         if (SHGetPathFromIDListW(pIDL, szPath)) {
             result = szPath;
@@ -1005,7 +998,7 @@ std::wstring WinShellink::getTargetPath() const {
     return result;
 }
 
-std::wstring WinShellink::getArguments() const {
+JHC_INLINE std::wstring WinShellink::getArguments() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasArguments)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
@@ -1016,7 +1009,7 @@ std::wstring WinShellink::getArguments() const {
     return result;
 }
 
-std::wstring WinShellink::getIconPath() const {
+JHC_INLINE std::wstring WinShellink::getIconPath() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
         if (!extraData_.iconEnvDB.TargetUnicode.empty())
@@ -1038,8 +1031,25 @@ std::wstring WinShellink::getIconPath() const {
     return result;
 }
 
-int32_t WinShellink::getIconIndex() const {
+JHC_INLINE int32_t WinShellink::getIconIndex() const {
     return header_.IconIndex;
+}
+
+JHC_INLINE std::vector<uint8_t> WinShellink::LinkTargetIDList::ToWholeIDList() const {
+    std::vector<uint8_t> result;
+    for (const auto& itemId : ItemIDList) {
+        uint8_t itemIdDataSize[2] = {0};
+        ByteOrder::SetLE16(&itemIdDataSize[0], (uint16_t)itemId.size());
+        result.push_back(itemIdDataSize[0]);
+        result.push_back(itemIdDataSize[1]);
+
+        result.insert(result.end(), itemId.begin(), itemId.end());
+    }
+
+    result.push_back(0);
+    result.push_back(0);
+
+    return result;
 }
 
 }  // namespace jhc

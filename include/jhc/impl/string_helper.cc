@@ -288,7 +288,7 @@ JHC_INLINE std::string::size_type StringHelper::Find(const std::string& str, con
     return std::string::npos;  // Not found
 }
 
-std::wstring::size_type StringHelper::Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
+JHC_INLINE std::wstring::size_type StringHelper::Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
     if (offset >= str.length())
         return std::wstring::npos;
 
