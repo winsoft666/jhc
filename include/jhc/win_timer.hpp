@@ -108,5 +108,9 @@ class WinTimer : public WinTimerBase {
     FN_CB m_cb;
 };
 }  // namespace jhc
+
+#ifndef JHC_NOT_HEADER_ONLY
+#include "impl/win_timer.cc"
+#endif
 #endif
 #endif  // !JHC_WIN_TIMER_HPP_

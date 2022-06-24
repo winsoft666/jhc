@@ -25,7 +25,7 @@ project(jhc CXX)
 configure_file("${PROJECT_SOURCE_DIR}/include/jhc/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/jhc/config.hpp")
 
 option(JHC_NOT_HEADER_ONLY "Whether definition and implementation are decoupled or not" ON)
-option(BUILD_TESTS "Build tests project" OFF)
+option(BUILD_TESTS "Build tests project" ON)
 option(USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
 
 

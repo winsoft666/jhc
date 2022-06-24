@@ -9,6 +9,7 @@
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
 #include <shlobj_core.h>
+#include <shellapi.h>
 #endif
 #include "jhc/os_ver.hpp"
 #include "jhc/string_helper.hpp"
