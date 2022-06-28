@@ -4,29 +4,40 @@
 #include "../event.hpp"
 #endif
 
-JHC_INLINE jhc::Event::Event(bool setted) :
-    setted_(setted) {}
+JHC_INLINE jhc::Event::Event(bool isSet) :
+    is_set_(isSet) {}
 
 JHC_INLINE void jhc::Event::set() noexcept {
-    std::unique_lock<std::mutex> ul(setted_mutex_);
-    setted_ = true;
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    is_set_ = true;
+    setted_cond_var_.notify_all();
+}
+
+JHC_INLINE void jhc::Event::cancel() noexcept {
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    is_cancelld_ = true;
     setted_cond_var_.notify_all();
 }
 
 JHC_INLINE void jhc::Event::unset() noexcept {
-    std::unique_lock<std::mutex> ul(setted_mutex_);
-    setted_ = false;
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    is_set_ = false;
     setted_cond_var_.notify_all();
 }
 
-JHC_INLINE bool jhc::Event::isSetted() noexcept {
-    std::unique_lock<std::mutex> ul(setted_mutex_);
-    return setted_;
+JHC_INLINE bool jhc::Event::isSet() noexcept {
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    return is_set_;
 }
 
-JHC_INLINE bool jhc::Event::wait(int32_t millseconds) noexcept {
-    std::unique_lock<std::mutex> ul(setted_mutex_);
-    setted_cond_var_.wait_for(ul, std::chrono::milliseconds(millseconds),
-                              [this] { return setted_; });
-    return setted_;
+JHC_INLINE bool jhc::Event::isCancelled() noexcept {
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    return is_cancelld_;
+}
+
+JHC_INLINE bool jhc::Event::wait(int64_t millseconds) noexcept {
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    int64_t m = (millseconds >= 0 ? millseconds : std::chrono::duration_values<int64_t>::max());
+    setted_cond_var_.wait_for(ul, std::chrono::milliseconds(m), [this] { return (is_set_ || is_cancelld_); });
+    return is_set_;
 }

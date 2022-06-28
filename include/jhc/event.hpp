@@ -30,7 +30,7 @@ namespace jhc {
 class Event {
    public:
     JHC_DISALLOW_COPY_MOVE(Event);
-    Event(bool setted = false);
+    Event(bool isSet = false);
 
     ~Event() = default;
 
@@ -38,13 +38,19 @@ class Event {
 
     void unset() noexcept;
 
-    bool isSetted() noexcept;
+    void cancel() noexcept;
 
-    bool wait(int32_t millseconds) noexcept;
+    bool isSet() noexcept;
+
+    bool isCancelled() noexcept;
+
+    // is infinite when millseconds < 0.
+    bool wait(int64_t millseconds = -1) noexcept;
 
    protected:
-    bool setted_;
-    std::mutex setted_mutex_;
+    bool is_set_ = false;
+    bool is_cancelld_ = false;
+    std::mutex set_mutex_;
     std::condition_variable setted_cond_var_;
 };
 }  // namespace jhc
