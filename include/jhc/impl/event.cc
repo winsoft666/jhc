@@ -4,6 +4,10 @@
 #include "../event.hpp"
 #endif
 
+#ifdef max
+#undef max
+#endif
+
 JHC_INLINE jhc::Event::Event(bool isSet) :
     is_set_(isSet) {}
 
