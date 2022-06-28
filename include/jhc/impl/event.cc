@@ -23,6 +23,12 @@ JHC_INLINE void jhc::Event::cancel() noexcept {
     setted_cond_var_.notify_all();
 }
 
+JHC_INLINE void jhc::Event::unCancel() noexcept {
+    std::unique_lock<std::mutex> ul(set_mutex_);
+    is_cancelld_ = false;
+    setted_cond_var_.notify_all();
+}
+
 JHC_INLINE void jhc::Event::unset() noexcept {
     std::unique_lock<std::mutex> ul(set_mutex_);
     is_set_ = false;

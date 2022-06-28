@@ -40,6 +40,8 @@ class Event {
 
     void cancel() noexcept;
 
+    void unCancel() noexcept;
+
     bool isSet() noexcept;
 
     bool isCancelled() noexcept;
