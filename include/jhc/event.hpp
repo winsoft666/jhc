@@ -42,6 +42,9 @@ class Event {
 
     void unCancel() noexcept;
 
+    // is equal unset() and unCancel().
+    void reset() noexcept;
+
     bool isSet() noexcept;
 
     bool isCancelled() noexcept;
