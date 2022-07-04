@@ -82,6 +82,10 @@ class WinProcessFinder {
 
     static bool IsExist(const std::string& processName);
 
+    static bool IsExist(const std::wstring& processName, DWORD* dwPID);
+
+    static bool IsExist(const std::string& processName, DWORD* dwPID);
+
    private:
     HANDLE m_hSnapShot;
 };

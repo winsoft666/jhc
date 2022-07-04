@@ -12,6 +12,7 @@
 #elif defined(_GNU_SOURCE)
 #include <errno.h>
 #endif
+#include "jhc/macros.hpp"
 #include "jhc/string_encode.hpp"
 #include "jhc/filesystem.hpp"
 
@@ -89,7 +90,7 @@ JHC_INLINE bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID
     return !!res;
 }
 
-JHC_INLINE bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param) {
+JHC_INLINE bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess) {
     WCHAR szDir[MAX_PATH] = {0};
     StringCchPrintfW(szDir, MAX_PATH, L"%s", path.c_str());
     PathRemoveFileSpecW(szDir);
@@ -108,8 +109,16 @@ JHC_INLINE bool ProcessUtil::CreateNewProcess(const std::wstring& path, const st
     if (pi.hThread)
         CloseHandle(pi.hThread);
 
-    if (pi.hProcess)
-        CloseHandle(pi.hProcess);
+    if (pProcess) {
+        *pProcess = pi.hProcess;
+    }
+    else {
+        SAFE_CLOSE(pi.hProcess);
+    }
+
+    if (dwPID) {
+        *dwPID = pi.dwProcessId;
+    }
 
     return true;
 }

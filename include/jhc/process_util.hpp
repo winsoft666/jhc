@@ -46,7 +46,7 @@ class ProcessUtil {
 
     static bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow);
 
-    static bool CreateNewProcess(const std::wstring& path, const std::wstring& param);
+    static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD *dwPID, HANDLE* pProcess);
 
 #endif
 

@@ -132,4 +132,29 @@ JHC_INLINE bool WinProcessFinder::IsExist(const std::string& processName) {
     const BOOL b = wpf.processFind(AnsiToTCHAR(processName).c_str(), &pe32);
     return !!b;
 }
+
+JHC_INLINE bool WinProcessFinder::IsExist(const std::wstring& processName, DWORD* dwPID) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+
+    PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
+    const BOOL b = wpf.processFind(UnicodeToTCHAR(processName).c_str(), &pe32);
+    if (b) {
+        if (dwPID)
+            *dwPID = pe32.th32ProcessID;
+    }
+    return !!b;
+}
+
+JHC_INLINE bool WinProcessFinder::IsExist(const std::string& processName, DWORD* dwPID) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+
+    PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
+    const BOOL b = wpf.processFind(AnsiToTCHAR(processName).c_str(), &pe32);
+    if (b) {
+        if (dwPID)
+            *dwPID = pe32.th32ProcessID;
+    }
+    return !!b;
+}
+
 }  // namespace jhc
