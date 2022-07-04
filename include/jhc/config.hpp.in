@@ -10,4 +10,8 @@
 #define JHC_INLINE inline
 #endif
 
+#define JHC_VERSION_MAJOR 1
+#define JHC_VERSION_MINOR 0
+#define JHC_VERSION_PATCH 1
+
 #endif //!JHC_CONFIG_HPP__
