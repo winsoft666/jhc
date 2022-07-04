@@ -99,7 +99,7 @@ JHC_INLINE bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
         return false;
     }
 
-    delete (pszTaskName);
+    deleteTask(pszTaskName);
 
     ITaskDefinition* pTaskDefinition = NULL;
     HRESULT hr = p_->m_lpITS->NewTask(0, &pTaskDefinition);
