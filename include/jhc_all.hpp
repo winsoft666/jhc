@@ -44,6 +44,7 @@
 #include "jhc/sha512.hpp"
 #include "jhc/memory_pool.hpp"
 #include "jhc/os_ver.hpp"
+#include "jhc/optional.hpp"
 #include "jhc/path_util.hpp"
 #include "jhc/process.hpp"
 #include "jhc/process_util.hpp"
