@@ -16,6 +16,7 @@
 #include <winhttp.h>
 #pragma comment(lib, "winhttp")
 #include "jhc/string_helper.hpp"
+#include "jhc/file.hpp"
 
 namespace jhc {
 JHC_INLINE WinHttp::~WinHttp() {
@@ -137,7 +138,7 @@ JHC_INLINE std::vector<unsigned char> WinHttp::getResponseBody() {
         }
 
         // No more available data.
-        if (!dwSize)
+        if (dwSize == 0)
             break;
 
         // Allocate space for the buffer.
@@ -164,6 +165,59 @@ JHC_INLINE std::vector<unsigned char> WinHttp::getResponseBody() {
     } while (dwSize > 0);
 
     return list;
+}
+
+JHC_INLINE bool WinHttp::saveResponseBodyToFile(const std::wstring& filePath) {
+    if (!m_hRequest)
+        return false;
+
+    File f(filePath);
+    if (!f.open(L"wb"))
+        return false;
+
+    bool result = true;
+    DWORD dwSize = 0;
+    do {
+        // Check for available data.
+        dwSize = 0;
+        if (!WinHttpQueryDataAvailable(m_hRequest, &dwSize)) {
+            break;
+        }
+
+        // No more available data.
+        if (dwSize == 0)
+            break;
+
+        // Allocate space for the buffer.
+        BYTE* lpReceivedData = new BYTE[dwSize];
+        if (!lpReceivedData) {
+            result = false;
+            break;
+        }
+
+        // Read the Data.
+        ZeroMemory(lpReceivedData, dwSize);
+
+        DWORD dwRead = 0;
+        if (!WinHttpReadData(m_hRequest, lpReceivedData, dwSize, &dwRead)) {
+            delete[] lpReceivedData;
+            result = false;
+            break;
+        }
+
+        if (f.writeFrom(lpReceivedData, dwSize) != dwSize) {
+            delete[] lpReceivedData;
+            result = false;
+            break;
+        }
+
+        // Free the memory allocated to the buffer.
+        delete[] lpReceivedData;
+    } while (dwSize > 0);
+
+    f.close();
+
+    return result;
 }
 
 JHC_INLINE unsigned int WinHttp::getResponseStatusCode() {

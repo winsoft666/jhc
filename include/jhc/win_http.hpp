@@ -60,6 +60,8 @@ class WinHttp {
 
     std::vector<unsigned char> getResponseBody();
 
+    bool saveResponseBodyToFile(const std::wstring& filePath);
+
     unsigned int getResponseStatusCode();
 
     std::wstring getResponseStatusText();
