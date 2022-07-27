@@ -11,6 +11,7 @@
 #include "jhc/macros.hpp"
 #include "jhc/byteorder.hpp"
 #include "jhc/filesystem.hpp"
+#include "jhc/win_registry.hpp"
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
@@ -26,6 +27,7 @@ JHC_INLINE WinShellink::~WinShellink() {
 }
 
 JHC_INLINE WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
+    targetPath_.clear();
     linkPath_ = lnkPath;
     FILE* fp = nullptr;
     _wfopen_s(&fp, lnkPath.c_str(), L"rb");
@@ -930,7 +932,8 @@ JHC_INLINE std::wstring WinShellink::getDescription() const {
     return result;
 }
 
-JHC_INLINE std::wstring WinShellink::getTargetPath() const {
+JHC_INLINE std::wstring WinShellink::getTargetPath() {
+    targetPath_.clear();
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkInfo) && !IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_ForceNoLinkInfo)) {
         if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_VolumeIDAndLocalBasePath) {
@@ -954,8 +957,10 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
             }
         }
     }
-    if (!result.empty())
+    if (!result.empty()) {
+        targetPath_ = result;
         return result;
+    }
 
     if (extraData_.speFolderDB.SpecialFolderID != 0) {
         wchar_t szPath[MAX_PATH + 1] = {0};
@@ -963,8 +968,10 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
             result = szPath;
         }
     }
-    if (!result.empty())
+    if (!result.empty()) {
+        targetPath_ = result;
         return result;
+    }
 
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkTargetIDList)) {
         DWORD dwGLE = 0;
@@ -995,14 +1002,29 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
         }
     }
 
-    if (!result.empty())
+    if (!result.empty()) {
+        targetPath_ = result;
         return result;
+    }
 
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpString)) {
         if (!extraData_.envVarDB.TargetUnicode.empty())
             result = extraData_.envVarDB.TargetUnicode;
         else if (!extraData_.envVarDB.TargetAnsi.empty())
             result = StringEncode::AnsiToUnicode(extraData_.envVarDB.TargetAnsi);
+    }
+
+    targetPath_ = result;
+    return result;
+}
+
+JHC_INLINE std::wstring WinShellink::getWorkingDir() const {
+    std::wstring result;
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasWorkingDir)) {
+        if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
+            result = stringData_.WorkingDirW;
+        else
+            result = StringEncode::AnsiToUnicode(stringData_.WorkingDirA);
     }
 
     return result;
@@ -1043,6 +1065,31 @@ JHC_INLINE std::wstring WinShellink::getIconPath() const {
 
 JHC_INLINE int32_t WinShellink::getIconIndex() const {
     return header_.IconIndex;
+}
+
+JHC_INLINE bool WinShellink::isRunAsAdmin() {
+    std::wstring target;
+
+    if (targetPath_.empty())
+        target = getTargetPath();
+    else
+        target = targetPath_;
+
+    if (target.empty())
+        return false;
+
+    bool runAsAdmin = false;
+    jhc::RegKey regKey(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers");
+    if (regKey.open(KEY_ALL_ACCESS | KEY_WOW64_64KEY, false) == S_OK) {
+        std::wstring strValue;
+        if (regKey.getSZValue(target.c_str(), strValue) == S_OK) {
+            if (strValue == L"~ RUNASADMIN")
+                runAsAdmin = true;
+        }
+        regKey.close();
+    }
+
+    return runAsAdmin;
 }
 
 }  // namespace jhc

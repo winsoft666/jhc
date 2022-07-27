@@ -873,10 +873,12 @@ class WinShellink {
 
     std::wstring getDisplayName() const;
     std::wstring getDescription() const;
-    std::wstring getTargetPath() const;
+    std::wstring getTargetPath();
+    std::wstring getWorkingDir() const;
     std::wstring getArguments() const;
     std::wstring getIconPath() const;
     int32_t getIconIndex() const;
+    bool isRunAsAdmin();
 
     // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
     static bool IsResourceString(const std::wstring& s);
@@ -917,6 +919,8 @@ class WinShellink {
     LinkInfo linkInfo_;
     StringData stringData_;
     ExtraData extraData_;
+
+    std::wstring targetPath_; // cache this value
 
     const int kExtraDataBlockNum = 11;
 };
