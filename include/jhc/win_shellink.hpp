@@ -443,9 +443,7 @@ class WinShellink {
     */
     struct LinkTargetIDList {
         // A stored IDList structure (section 2.2.1), which contains the item ID list
-        std::vector<std::vector<uint8_t>> ItemIDList;
-
-        std::vector<uint8_t> ToWholeIDList() const;
+        std::vector<uint8_t> WholeIDList;
     };
 #pragma endregion LinkTargetIDList
 
@@ -873,7 +871,7 @@ class WinShellink {
     StringData stringData() const { return stringData_; }
     ExtraData extraData() const { return extraData_; }
 
-    std::wstring getDisplayName() const;
+    std::wstring getDescription() const;
     std::wstring getTargetPath() const;
     std::wstring getArguments() const;
     std::wstring getIconPath() const;

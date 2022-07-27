@@ -10,7 +10,9 @@
 #include "jhc/path_util.hpp"
 #include "jhc/macros.hpp"
 #include "jhc/byteorder.hpp"
-#include <shlobj_core.h>
+
+#define STRICT_TYPED_ITEMIDS
+#include <shlobj.h>
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -99,31 +101,8 @@ JHC_INLINE WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPat
         if (fread(&idListSize, 2, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
 
-        int tmpS = idListSize - 2;  // TerminalID (2 bytes)
-        while (tmpS > 0) {
-            //Element size
-            uint16_t itemSize = 0;
-            if (fread(&itemSize, 2, 1, fp) != 1)
-                return ShellinkErr::SHLLINK_ERR_FIO;
-
-            //Element (size -2 as struct contains one 2byte var)
-            uint16_t itemDataSize = itemSize - 2;
-            std::vector<uint8_t> vItemId((size_t)(itemDataSize));
-
-            if (itemDataSize > 0) {
-                if (fread((void*)(&vItemId[0]), itemDataSize, 1, fp) != 1)
-                    return ShellinkErr::SHLLINK_ERR_FIO;
-            }
-            tmpS -= itemSize;
-            targetIdList_.ItemIDList.push_back(vItemId);
-        }
-
-        uint16_t nullb;
-        if (fread(&nullb, 2, 1, fp) != 1)
-            return ShellinkErr::SHLLINK_ERR_FIO;
-
-        if (tmpS < 0 || nullb != 0)
-            return ShellinkErr::SHLLINK_ERR_INVIDL;
+        targetIdList_.WholeIDList.resize(idListSize, 0);
+        fread(&targetIdList_.WholeIDList[0], 1, idListSize, fp);
     }
 
     char* pValue = nullptr;
@@ -740,33 +719,8 @@ JHC_INLINE WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlo
     if (fread(&idListSize, 2, 1, fp) != 1)
         return (ShellinkErr::SHLLINK_ERR_FIO);
 
-    int tmpS = blockSize - 10;
-    while (tmpS > 0) {
-        uint16_t itemSize = 0;
-        //Element size
-        if (fread(&itemSize, 2, 1, fp) != 1)
-            return (ShellinkErr::SHLLINK_ERR_FIO);
-
-        //Element (size -2 as struct contains one 2byte var)
-        uint16_t itemDataSize = itemSize - 2;
-        std::vector<uint8_t> itemData((size_t)(itemDataSize));
-
-        if (itemData.size() != itemDataSize)
-            return (ShellinkErr::SHLLINK_ERR_NULLPIDLM);
-
-        if (fread(&itemData[0], itemDataSize, 1, fp) != 1)
-            return (ShellinkErr::SHLLINK_ERR_FIO);
-
-        tmpS -= itemSize;
-        extraData_.vistaAboveIDListDB.targetIdList.ItemIDList.push_back(itemData);
-    }
-
-    uint16_t nullb;
-    if (fread(&nullb, 2, 1, fp) != 1)
-        return (ShellinkErr::SHLLINK_ERR_FIO);
-
-    if (tmpS < 0 || nullb != 0)
-        return (ShellinkErr::SHLLINK_ERR_INVIDL);
+    extraData_.vistaAboveIDListDB.targetIdList.WholeIDList.resize(idListSize, 0);
+    fread(&extraData_.vistaAboveIDListDB.targetIdList.WholeIDList[0], 1, idListSize, fp);
 
     return ShellinkErr::SHLLINK_ERR_NONE;
 }
@@ -905,6 +859,15 @@ JHC_INLINE bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::
         return false;
 
     std::wstring envExpanded = PathUtil::ExpandEnvString(v[0]);
+    DWORD dwBinType = 0;
+    if (GetBinaryTypeW(envExpanded.c_str(), &dwBinType)) {
+#ifdef JHC_WIN32
+        if (dwBinType == SCS_64BIT_BINARY) {
+            return false;
+        }
+#endif
+    }
+
     HMODULE hDll = LoadLibraryW(envExpanded.c_str());
     if (!hDll) {
         DWORD dwGLE = GetLastError();
@@ -929,7 +892,7 @@ JHC_INLINE bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::
     return true;
 }
 
-JHC_INLINE std::wstring WinShellink::getDisplayName() const {
+JHC_INLINE std::wstring WinShellink::getDescription() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasName)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
@@ -977,14 +940,36 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
     if (!result.empty())
         return result;
 
+
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkTargetIDList)) {
-        std::vector<uint8_t> itemIdList = targetIdList_.ToWholeIDList();
-        ITEMIDLIST* pIDL = (ITEMIDLIST*)(&itemIdList[0]);
+        DWORD dwGLE = 0;
+        PIDLIST_ABSOLUTE pIDL = (PIDLIST_ABSOLUTE)(&targetIdList_.WholeIDList[0]);
         wchar_t szPath[MAX_PATH + 1] = {0};
-        if (SHGetPathFromIDListW(pIDL, szPath)) {
+        if (SHGetPathFromIDListEx(pIDL, szPath, MAX_PATH, GPFIDL_DEFAULT)) {
             result = szPath;
         }
+
+        if (result.empty()) { // Not file path
+            IShellFolder* deskFolder;
+            HRESULT hr = SHGetDesktopFolder(&deskFolder);
+            if (hr == S_OK) {
+                STRRET strret = {0};
+                hr = deskFolder->GetDisplayNameOf(pIDL, SHGDN_FORPARSING, &strret);
+                if (hr == S_OK) {
+                    if (strret.uType == STRRET_CSTR) {
+                        std::string strAnsi = strret.cStr;
+                        result = jhc::StringEncode::AnsiToUnicode(strAnsi);
+                    }
+                    else if (strret.uType == STRRET_WSTR) {
+                        result = strret.pOleStr;
+                    }
+                }
+
+                deskFolder->Release();
+            }
+        }
     }
+
     if (!result.empty())
         return result;
 
@@ -1033,23 +1018,6 @@ JHC_INLINE std::wstring WinShellink::getIconPath() const {
 
 JHC_INLINE int32_t WinShellink::getIconIndex() const {
     return header_.IconIndex;
-}
-
-JHC_INLINE std::vector<uint8_t> WinShellink::LinkTargetIDList::ToWholeIDList() const {
-    std::vector<uint8_t> result;
-    for (const auto& itemId : ItemIDList) {
-        uint8_t itemIdDataSize[2] = {0};
-        ByteOrder::SetLE16(&itemIdDataSize[0], (uint16_t)itemId.size());
-        result.push_back(itemIdDataSize[0]);
-        result.push_back(itemIdDataSize[1]);
-
-        result.insert(result.end(), itemId.begin(), itemId.end());
-    }
-
-    result.push_back(0);
-    result.push_back(0);
-
-    return result;
 }
 
 }  // namespace jhc
