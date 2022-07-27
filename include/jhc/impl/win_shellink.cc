@@ -1043,21 +1043,21 @@ JHC_INLINE std::wstring WinShellink::getArguments() const {
 
 JHC_INLINE std::wstring WinShellink::getIconPath() const {
     std::wstring result;
-    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
-        if (!extraData_.iconEnvDB.TargetUnicode.empty())
-            result = extraData_.iconEnvDB.TargetUnicode;
-        else if (!extraData_.iconEnvDB.TargetAnsi.empty())
-            result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
-    }
-
-    if (!result.empty())
-        return result;
-
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasIconLocation)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.IconLocationW;
         else
             result = StringEncode::AnsiToUnicode(stringData_.IconLocationA);
+    }
+
+    if (!result.empty())
+        return result;
+
+    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
+        if (!extraData_.iconEnvDB.TargetUnicode.empty())
+            result = extraData_.iconEnvDB.TargetUnicode;
+        else if (!extraData_.iconEnvDB.TargetAnsi.empty())
+            result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
     }
 
     return result;
