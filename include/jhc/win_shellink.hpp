@@ -887,17 +887,17 @@ class WinShellink {
     static bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
 
    private:
-    WinShellink::ShellinkErr WinShellink::readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEConsoleFEDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEDarwinDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEEnvironmentVariableDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEIconEnvironmentDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEKnownFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEPropertyStoreDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEShimDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readESpecialFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readETrackerDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
-    WinShellink::ShellinkErr WinShellink::readEVistaAndAboveIDListDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEConsoleFEDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEDarwinDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEEnvironmentVariableDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEIconEnvironmentDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEKnownFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEPropertyStoreDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEShimDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readESpecialFolderDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readETrackerDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
+    WinShellink::ShellinkErr readEVistaAndAboveIDListDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
 
     // read NULL terminated String
     ShellinkErr readNULLStr(char** dest, ShellinkErr errv1, ShellinkErr errv2, FILE* fp);

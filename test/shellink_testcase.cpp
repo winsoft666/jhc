@@ -21,6 +21,9 @@ TEST_CASE("Shellink1", "load Postman.lnk") {
 
     std::wstring iconPath = wsl.getIconPath();
     CHECK(iconPath == LR"(%USERPROFILE%\AppData\Local\Postman\Postman.exe)");
+
+    bool isRunAsAdmin = wsl.isRunAsAdmin();
+    CHECK(isRunAsAdmin == false);
 }
 
 TEST_CASE("Shellink2", "load 'Shows Desktop.lnk'") {
