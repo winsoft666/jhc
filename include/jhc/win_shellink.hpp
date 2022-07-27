@@ -871,6 +871,7 @@ class WinShellink {
     StringData stringData() const { return stringData_; }
     ExtraData extraData() const { return extraData_; }
 
+    std::wstring getDisplayName() const;
     std::wstring getDescription() const;
     std::wstring getTargetPath() const;
     std::wstring getArguments() const;
@@ -910,6 +911,7 @@ class WinShellink {
     void toBigEndian(void* inp, size_t size);
 
    private:
+    std::wstring linkPath_;
     LinkHeader header_;
     LinkTargetIDList targetIdList_;
     LinkInfo linkInfo_;

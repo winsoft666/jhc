@@ -10,6 +10,7 @@
 #include "jhc/path_util.hpp"
 #include "jhc/macros.hpp"
 #include "jhc/byteorder.hpp"
+#include "jhc/filesystem.hpp"
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
@@ -25,6 +26,7 @@ JHC_INLINE WinShellink::~WinShellink() {
 }
 
 JHC_INLINE WinShellink::ShellinkErr WinShellink::load(const std::wstring& lnkPath) {
+    linkPath_ = lnkPath;
     FILE* fp = nullptr;
     _wfopen_s(&fp, lnkPath.c_str(), L"rb");
 
@@ -892,6 +894,30 @@ JHC_INLINE bool WinShellink::LoadStringFromRes(const std::wstring& resStr, std::
     return true;
 }
 
+std::wstring WinShellink::getDisplayName() const {
+    std::wstring result;
+    if (linkPath_.empty())
+        return result;
+    SHFILEINFOW sfi;
+    ZeroMemory(&sfi, sizeof(SHFILEINFOW));
+    DWORD_PTR dwRet = ::SHGetFileInfoW(linkPath_.c_str(),
+                                       FILE_ATTRIBUTE_NORMAL,
+                                       &sfi,
+                                       sizeof(SHFILEINFOW),
+                                       SHGFI_DISPLAYNAME);
+    if (dwRet != 0)
+        result = sfi.szDisplayName;
+
+    if (!result.empty())
+        return result;
+
+    jhc::fs::path p(linkPath_);
+    if (p.has_stem())
+        result = p.stem().wstring();
+
+    return result;
+}
+
 JHC_INLINE std::wstring WinShellink::getDescription() const {
     std::wstring result;
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasName)) {
@@ -940,7 +966,6 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
     if (!result.empty())
         return result;
 
-
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasLinkTargetIDList)) {
         DWORD dwGLE = 0;
         PIDLIST_ABSOLUTE pIDL = (PIDLIST_ABSOLUTE)(&targetIdList_.WholeIDList[0]);
@@ -949,7 +974,7 @@ JHC_INLINE std::wstring WinShellink::getTargetPath() const {
             result = szPath;
         }
 
-        if (result.empty()) { // Not file path
+        if (result.empty()) {  // Not file path
             IShellFolder* deskFolder;
             HRESULT hr = SHGetDesktopFolder(&deskFolder);
             if (hr == S_OK) {
