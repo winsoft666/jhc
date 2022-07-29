@@ -81,4 +81,14 @@ JHC_INLINE SingletonProcess::~SingletonProcess() {
     }
 #endif
 }
+
+#ifdef JHC_WIN
+JHC_INLINE void* SingletonProcess::mutex() const {
+    return mutex_;
+}
+#else
+JHC_INLINE int SingletonProcess::pidFile() const {
+    return pidFile_;
+}
+#endif
 }  // namespace jhc

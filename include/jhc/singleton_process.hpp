@@ -31,7 +31,11 @@ class SingletonProcess : public SingletonClass<SingletonProcess> {
     const std::string& uniqueName() const;
 
     bool isPrimary() const;
-
+#ifdef JHC_WIN
+    void* mutex() const;
+#else
+    int pidFile() const;
+#endif
    protected:
     void check();
 
